@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 
@@ -26,6 +27,7 @@ const selfieGuide = [
 ];
 
 export default function UploadPage() {
+  const router = useRouter();
   const [selfies, setSelfies] = useState<SelectedSelfie[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -151,6 +153,7 @@ export default function UploadPage() {
       }
 
       setUploadResult(`Job создан: ${job.id}. Загружено фото: ${uploadedRows.length}.`);
+      router.push(`/quality/${job.id}`);
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : "Неизвестная ошибка.");
     } finally {
@@ -213,7 +216,7 @@ export default function UploadPage() {
         <div className="section-header">
           <div>
             <h2>Выбранные фото</h2>
-            <p>Пока это локальное превью. Следующий шаг - отправка в Supabase Storage.</p>
+            <p>После загрузки откроется экран проверки качества фото.</p>
           </div>
           {selfies.length > 0 ? (
             <button className="button button-secondary" onClick={clearFiles} type="button">

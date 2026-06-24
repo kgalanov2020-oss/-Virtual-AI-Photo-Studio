@@ -23,6 +23,18 @@ export type StudioShot = {
   created_at: string;
 };
 
+export type UploadedSelfie = {
+  id: string;
+  job_id: string;
+  user_id: string;
+  file_url: string;
+  quality_score: number | null;
+  face_angle: string | null;
+  is_approved: boolean;
+  rejection_reason: string | null;
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -41,6 +53,14 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<StudioShot>;
+      };
+      uploaded_selfies: {
+        Row: UploadedSelfie;
+        Insert: Omit<UploadedSelfie, "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<UploadedSelfie>;
       };
     };
     Views: Record<string, never>;
