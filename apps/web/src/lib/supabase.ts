@@ -1,4 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
+import type { Database } from "./types";
+
+let browserClient: ReturnType<typeof createClient<Database>> | null = null;
 
 export function hasSupabaseEnv() {
   return Boolean(
@@ -15,5 +18,9 @@ export function createSupabaseBrowserClient() {
     throw new Error("Missing Supabase frontend environment variables.");
   }
 
-  return createClient(supabaseUrl, supabaseKey);
+  if (!browserClient) {
+    browserClient = createClient<Database>(supabaseUrl, supabaseKey);
+  }
+
+  return browserClient;
 }

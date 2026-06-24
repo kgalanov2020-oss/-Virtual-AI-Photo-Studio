@@ -90,23 +90,30 @@ export default function QualityPage({ params }: QualityPageProps) {
           is_approved: true,
           rejection_reason: null,
         })
-        .eq("job_id", jobId);
+        .eq("job_id", jobId)
+        .select("id");
 
       if (updateError) {
         throw new Error(updateError.message);
       }
 
-      const { error: jobError } = await supabase
+      const { data: updatedJob, error: jobError } = await supabase
         .from("jobs")
         .update({
           status: "queued",
           progress: 5,
           queued_at: new Date().toISOString(),
         })
-        .eq("id", jobId);
+        .eq("id", jobId)
+        .select("id, status")
+        .single();
 
       if (jobError) {
         throw new Error(jobError.message);
+      }
+
+      if (updatedJob.status !== "queued") {
+        throw new Error("Supabase не перевёл job в очередь. Проверьте RLS-политики обновления.");
       }
 
       setPhotos((current) =>
