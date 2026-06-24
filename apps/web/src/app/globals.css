@@ -111,7 +111,13 @@ h1 {
   color: white;
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .button-secondary {
+  background: transparent;
   border: 1px solid var(--line);
   color: var(--text);
 }
@@ -274,8 +280,163 @@ h1 {
   white-space: pre;
 }
 
+.upload-layout {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
+  padding: 54px clamp(20px, 4vw, 56px) 28px;
+}
+
+.upload-copy {
+  max-width: 760px;
+}
+
+.upload-status {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  margin-top: 28px;
+  max-width: 420px;
+  padding: 18px;
+}
+
+.upload-status strong {
+  font-size: 24px;
+}
+
+.upload-status span {
+  color: var(--muted);
+}
+
+.upload-dropzone {
+  align-items: center;
+  background:
+    linear-gradient(135deg, rgba(31, 111, 91, 0.12), transparent 48%),
+    var(--panel);
+  border: 1px dashed var(--accent);
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  justify-items: center;
+  min-height: 320px;
+  padding: 32px;
+  text-align: center;
+}
+
+.upload-dropzone input {
+  height: 1px;
+  opacity: 0;
+  position: absolute;
+  width: 1px;
+}
+
+.upload-dropzone span {
+  background: var(--accent);
+  border-radius: 8px;
+  color: white;
+  font-weight: 700;
+  margin-bottom: 14px;
+  padding: 13px 18px;
+}
+
+.upload-dropzone strong {
+  font-size: 20px;
+}
+
+.upload-dropzone em {
+  color: var(--muted);
+  font-style: normal;
+}
+
+.guide-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.guide-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  min-height: 118px;
+  padding: 16px;
+}
+
+.guide-card span {
+  color: var(--accent);
+  display: block;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.guide-card strong {
+  line-height: 1.35;
+}
+
+.selfie-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.selfie-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.selfie-card img {
+  aspect-ratio: 4 / 5;
+  display: block;
+  object-fit: cover;
+  width: 100%;
+}
+
+.selfie-card div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+}
+
+.selfie-card strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selfie-card span,
+.empty-state span {
+  color: var(--muted);
+}
+
+.empty-state {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  padding: 28px;
+}
+
+.upload-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
 @media (max-width: 1100px) {
   .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .upload-layout {
     grid-template-columns: 1fr;
   }
 
@@ -283,7 +444,9 @@ h1 {
     min-height: 360px;
   }
 
-  .shot-grid {
+  .shot-grid,
+  .guide-grid,
+  .selfie-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -299,7 +462,17 @@ h1 {
     font-size: 42px;
   }
 
-  .shot-grid {
+  .shot-grid,
+  .guide-grid,
+  .selfie-grid {
     grid-template-columns: 1fr;
+  }
+
+  .upload-footer {
+    justify-content: stretch;
+  }
+
+  .upload-footer .button {
+    width: 100%;
   }
 }

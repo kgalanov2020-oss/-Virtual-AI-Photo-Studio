@@ -29,8 +29,8 @@ export default async function Home() {
           <h1>{studio.name}</h1>
           <p className="lead">{studio.description}</p>
           <div className="actions">
-            <a className="button button-primary" href="#shots">
-              Смотреть план съёмки
+            <a className="button button-primary" href="/upload">
+              Загрузить селфи
             </a>
             <a className="button button-secondary" href="#upload-guide">
               Гайд по селфи
