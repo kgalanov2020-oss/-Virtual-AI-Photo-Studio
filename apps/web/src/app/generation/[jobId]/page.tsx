@@ -76,6 +76,8 @@ export default function GenerationPage({ params }: GenerationPageProps) {
       }
 
       const currentJob = jobData as Job;
+      const activeError =
+        currentJob.status === "failed" ? currentJob.error_message : null;
 
       const [{ data: shotData, error: shotError }, { data: imageData, error: imageError }] =
         await Promise.all([
@@ -111,6 +113,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
 
       setJob(currentJob);
       setShots(nextShots);
+      setError(activeError);
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "Неизвестная ошибка.");
     } finally {
