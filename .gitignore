@@ -17,4 +17,4 @@ build/
 
 tmp/
 *.log
-
+*.zip
