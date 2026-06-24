@@ -41,9 +41,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Нет доступа к этому job." }, { status: 403 });
     }
 
-    if (!["queued", "running"].includes(job.status)) {
+    if (!["queued", "running", "failed"].includes(job.status)) {
       return NextResponse.json(
-        { error: "Job должен быть в статусе queued." },
+        { error: "Job должен быть в статусе queued, running или failed." },
         { status: 409 },
       );
     }
