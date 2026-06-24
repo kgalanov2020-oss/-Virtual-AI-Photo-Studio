@@ -44,6 +44,11 @@ pnpm install
 pnpm dev:web
 ```
 
+## Supabase Storage
+
+Run `supabase/storage.sql` in the Supabase SQL Editor before testing real selfie uploads.
+The upload flow uses anonymous Supabase Auth, so enable anonymous sign-ins in Auth settings for the MVP.
+
 ## Next Implementation Steps
 
 1. Initialize GitHub repository.

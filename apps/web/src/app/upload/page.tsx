@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { ChangeEvent, useMemo, useState } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase";
 
 type SelectedSelfie = {
   id: string;
+  file: File;
   name: string;
   size: number;
   url: string;
@@ -25,6 +27,9 @@ const selfieGuide = [
 
 export default function UploadPage() {
   const [selfies, setSelfies] = useState<SelectedSelfie[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadResult, setUploadResult] = useState<string | null>(null);
 
   const readyCount = selfies.length;
   const isReady = readyCount >= 8;
@@ -45,16 +50,110 @@ export default function UploadPage() {
     setSelfies(
       files.map((file) => ({
         id: `${file.name}-${file.size}-${file.lastModified}`,
+        file,
         name: file.name,
         size: file.size,
         url: URL.createObjectURL(file),
       })),
     );
+    setUploadError(null);
+    setUploadResult(null);
   }
 
   function clearFiles() {
     selfies.forEach((selfie) => URL.revokeObjectURL(selfie.url));
     setSelfies([]);
+    setUploadError(null);
+    setUploadResult(null);
+  }
+
+  async function handleUpload() {
+    if (!isReady || isUploading) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+    setUploadResult(null);
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      let userId = sessionData.session?.user.id;
+
+      if (!userId) {
+        const { data: anonymousData, error: authError } =
+          await supabase.auth.signInAnonymously();
+
+        if (authError || !anonymousData.user) {
+          throw new Error(
+            "Не удалось создать анонимную сессию. Включите Anonymous sign-ins в Supabase Auth.",
+          );
+        }
+
+        userId = anonymousData.user.id;
+      }
+
+      const { data: studio, error: studioError } = await supabase
+        .from("studios")
+        .select("id")
+        .eq("slug", "modern-business-studio")
+        .single();
+
+      if (studioError || !studio) {
+        throw new Error(studioError?.message ?? "Студия не найдена.");
+      }
+
+      const { data: job, error: jobError } = await supabase
+        .from("jobs")
+        .insert({
+          user_id: userId,
+          studio_id: studio.id,
+          status: "draft",
+          progress: 0,
+        })
+        .select("id")
+        .single();
+
+      if (jobError || !job) {
+        throw new Error(jobError?.message ?? "Не удалось создать job.");
+      }
+
+      const uploadedRows = [];
+
+      for (const [index, selfie] of selfies.entries()) {
+        const filePath = `${userId}/${job.id}/${String(index + 1).padStart(2, "0")}-${sanitizeFileName(selfie.name)}`;
+        const { error: uploadError } = await supabase.storage
+          .from("selfies")
+          .upload(filePath, selfie.file, {
+            contentType: selfie.file.type || "image/jpeg",
+            upsert: false,
+          });
+
+        if (uploadError) {
+          throw new Error(uploadError.message);
+        }
+
+        uploadedRows.push({
+          job_id: job.id,
+          user_id: userId,
+          file_url: filePath,
+          is_approved: false,
+        });
+      }
+
+      const { error: selfiesError } = await supabase
+        .from("uploaded_selfies")
+        .insert(uploadedRows);
+
+      if (selfiesError) {
+        throw new Error(selfiesError.message);
+      }
+
+      setUploadResult(`Job создан: ${job.id}. Загружено фото: ${uploadedRows.length}.`);
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Неизвестная ошибка.");
+    } finally {
+      setIsUploading(false);
+    }
   }
 
   return (
@@ -144,10 +243,18 @@ export default function UploadPage() {
           <Link className="button button-secondary" href="/">
             Назад к студии
           </Link>
-          <button className="button button-primary" disabled={!isReady} type="button">
-            Продолжить к проверке качества
+          <button
+            className="button button-primary"
+            disabled={!isReady || isUploading}
+            onClick={handleUpload}
+            type="button"
+          >
+            {isUploading ? "Загружаем..." : "Продолжить к проверке качества"}
           </button>
         </div>
+
+        {uploadError ? <div className="upload-message error">{uploadError}</div> : null}
+        {uploadResult ? <div className="upload-message success">{uploadResult}</div> : null}
       </section>
     </main>
   );
@@ -156,4 +263,12 @@ export default function UploadPage() {
 function formatFileSize(size: number) {
   if (size < 1024 * 1024) return `${Math.round(size / 1024)} КБ`;
   return `${(size / 1024 / 1024).toFixed(1)} МБ`;
+}
+
+function sanitizeFileName(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9а-яё._-]+/gi, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }

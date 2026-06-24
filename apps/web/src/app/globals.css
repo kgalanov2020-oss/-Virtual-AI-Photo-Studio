@@ -431,6 +431,25 @@ h1 {
   margin-top: 20px;
 }
 
+.upload-message {
+  border-radius: 8px;
+  font-weight: 700;
+  margin-top: 14px;
+  padding: 14px 16px;
+}
+
+.upload-message.error {
+  background: #fff1f1;
+  border: 1px solid #efb5b5;
+  color: #8a1f1f;
+}
+
+.upload-message.success {
+  background: #edf8f2;
+  border: 1px solid #b7dfc9;
+  color: var(--accent-dark);
+}
+
 @media (max-width: 1100px) {
   .hero {
     grid-template-columns: 1fr;
