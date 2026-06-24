@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { UploadedSelfie } from "@/lib/types";
@@ -16,6 +17,7 @@ type QualityPageProps = {
 };
 
 export default function QualityPage({ params }: QualityPageProps) {
+  const router = useRouter();
   const [jobId, setJobId] = useState<string>("");
   const [photos, setPhotos] = useState<QualityPhoto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -124,6 +126,7 @@ export default function QualityPage({ params }: QualityPageProps) {
         })),
       );
       setMessage("Фото приняты. Job переведён в очередь генерации.");
+      router.push(`/generation/${jobId}`);
     } catch (approveError) {
       setError(approveError instanceof Error ? approveError.message : "Неизвестная ошибка.");
     } finally {
