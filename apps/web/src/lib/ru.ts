@@ -2,7 +2,7 @@ import type { Studio, StudioShot } from "./types";
 
 const studioTranslations: Record<string, Pick<Studio, "name" | "description">> = {
   "modern-business-studio": {
-    name: "Современная бизнес-студия",
+    name: "Modern Business Studio",
     description:
       "Премиальная бизнес-фотосессия в современной офисной студии: чистый интерьер, мягкий дневной свет, аккуратный деловой образ и кадры, готовые для LinkedIn, резюме и личного бренда.",
   },
