@@ -16,6 +16,14 @@ type GenerationShot = StudioShot & {
   generated: GeneratedImage[];
 };
 
+type RunPodResponse = {
+  ok?: boolean;
+  done?: boolean;
+  completed?: number;
+  total?: number;
+  error?: string;
+};
+
 const statusLabels: Record<Job["status"], string> = {
   draft: "Черновик",
   queued: "В очереди",
@@ -30,7 +38,9 @@ export default function GenerationPage({ params }: GenerationPageProps) {
   const [job, setJob] = useState<Job | null>(null);
   const [shots, setShots] = useState<GenerationShot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isStartingRunPod, setIsStartingRunPod] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     params.then(({ jobId: resolvedJobId }) => {
@@ -108,6 +118,55 @@ export default function GenerationPage({ params }: GenerationPageProps) {
     }
   }
 
+  async function startRunPodGeneration() {
+    if (!jobId || isStartingRunPod) return;
+
+    setIsStartingRunPod(true);
+    setError(null);
+    setMessage("Отправляем задачу в RunPod/ComfyUI. Первый запуск может занять 1-3 минуты.");
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      if (!token) {
+        throw new Error("Нет активной сессии Supabase. Обновите страницу и попробуйте снова.");
+      }
+
+      let isDone = false;
+
+      while (!isDone) {
+        const response = await fetch(`/api/jobs/${jobId}/runpod`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = (await response.json()) as RunPodResponse;
+
+        if (!response.ok || data.error) {
+          throw new Error(data.error ?? "RunPod вернул ошибку.");
+        }
+
+        isDone = Boolean(data.done);
+        setMessage(
+          data.total
+            ? `RunPod сгенерировал ${data.completed ?? 0}/${data.total} изображений.`
+            : "RunPod сгенерировал изображение.",
+        );
+        await loadGeneration(jobId);
+      }
+
+      setMessage("Фотосессия готова: все изображения сохранены в Supabase.");
+    } catch (runPodError) {
+      setError(runPodError instanceof Error ? runPodError.message : "Неизвестная ошибка.");
+    } finally {
+      setIsStartingRunPod(false);
+    }
+  }
+
   return (
     <main className="page">
       <header className="topbar">
@@ -155,6 +214,14 @@ export default function GenerationPage({ params }: GenerationPageProps) {
           >
             Обновить статус
           </button>
+          <button
+            className="button button-primary"
+            disabled={isLoading || isStartingRunPod || !job || !["queued", "running"].includes(job.status)}
+            onClick={startRunPodGeneration}
+            type="button"
+          >
+            {isStartingRunPod ? "RunPod генерирует..." : "Запустить RunPod"}
+          </button>
         </div>
 
         {isLoading ? (
@@ -165,6 +232,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
         ) : null}
 
         {error ? <div className="upload-message error">{error}</div> : null}
+        {message ? <div className="upload-message success">{message}</div> : null}
 
         {!isLoading && !error ? (
           <>

@@ -35,6 +35,8 @@ Create `apps/web/.env.local`:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://vplhgizzyonpwqjdzvwg.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+COMFY_URL=https://your-new-pod-8188.proxy.runpod.net
 ```
 
 Then run:
@@ -48,6 +50,21 @@ pnpm dev:web
 
 Run `supabase/storage.sql` in the Supabase SQL Editor before testing real selfie uploads.
 The upload flow uses anonymous Supabase Auth, so enable anonymous sign-ins in Auth settings for the MVP.
+
+Run `supabase/migrations/0003_generated_storage.sql` before testing RunPod results.
+
+## RunPod / ComfyUI
+
+Create a separate RunPod pod for this project and expose ComfyUI on port `8188`.
+Put the proxied ComfyUI URL into `apps/web/.env.local` as `COMFY_URL`.
+
+The first real integration uses the checked-in workflow:
+
+```text
+apps/web/src/lib/comfy/workflows/instantid_business_workflow_api.json
+```
+
+The generation page calls `/api/jobs/[jobId]/runpod`, which uploads the first approved selfie to ComfyUI, runs one InstantID business portrait, saves the result to Supabase Storage, and records it in `generated_images`.
 
 ## Next Implementation Steps
 
