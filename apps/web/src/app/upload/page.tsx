@@ -85,7 +85,9 @@ export default function UploadPage() {
 
         if (authError || !anonymousData.user) {
           throw new Error(
-            "Не удалось создать анонимную сессию. Включите Anonymous sign-ins в Supabase Auth.",
+            authError?.message
+              ? `Не удалось создать анонимную сессию: ${authError.message}`
+              : "Не удалось создать анонимную сессию. Включите Anonymous sign-ins в Supabase Auth.",
           );
         }
 
