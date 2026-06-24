@@ -1,0 +1,10 @@
+{
+  "name": "virtual-ai-photo-studio",
+  "private": true,
+  "scripts": {
+    "dev:web": "pnpm --filter @ai-photo-studio/web dev",
+    "build:web": "pnpm --filter @ai-photo-studio/web build",
+    "lint:web": "pnpm --filter @ai-photo-studio/web lint"
+  },
+  "packageManager": "pnpm@11.7.0"
+}

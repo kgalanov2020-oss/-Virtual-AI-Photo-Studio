@@ -21,11 +21,28 @@ The MVP starts with one studio, `Modern Business Studio`, instead of a broad gen
 
 ## Current Contents
 
+- `apps/web` - Next.js frontend that reads the first studio from Supabase
 - `apps/api/app/studio_config.py` - first studio and shot templates
 - `apps/api/app/main.py` - minimal FastAPI contract for studios and job creation
 - `docs/product-brief.md` - current product brief from the source material
 - `docs/api-contract.md` - MVP API endpoints
 - `supabase/schema.sql` - initial Supabase table design with RLS
+
+## Run The Web App
+
+Create `apps/web/.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://vplhgizzyonpwqjdzvwg.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+```
+
+Then run:
+
+```bash
+pnpm install
+pnpm dev:web
+```
 
 ## Next Implementation Steps
 
