@@ -1,5 +1,6 @@
 import { createSupabaseBrowserClient, hasSupabaseEnv } from "./supabase";
 import type { Studio, StudioShot } from "./types";
+import { translateShot, translateStudio } from "./ru";
 
 type StudioSessionResult =
   | { status: "ok"; studio: Studio; shots: StudioShot[] }
@@ -47,5 +48,9 @@ export async function getStudioSession(
     return { status: "error", message: shotsError.message };
   }
 
-  return { status: "ok", studio, shots: (shotsData ?? []) as StudioShot[] };
+  return {
+    status: "ok",
+    studio: translateStudio(studio),
+    shots: ((shotsData ?? []) as StudioShot[]).map(translateShot),
+  };
 }
