@@ -229,10 +229,10 @@ export default function UploadPage() {
       <section className="upload-layout">
         <div className="upload-copy">
           <p className="eyebrow">Шаг 1 из 3</p>
-          <h1>Загрузите 8-10 селфи</h1>
+          <h1>Загрузите фото для сохранения похожести</h1>
           <p className="lead">
-            Нужны разные ракурсы лица, чтобы AI лучше сохранил похожесть в готовой
-            бизнес-фотосессии.
+            Нужны 8-10 обычных фото с телефона: анфас, полуобороты, профиль и
+            несколько вариантов освещения. Так итоговая серия лучше сохранит лицо.
           </p>
 
           <div className="upload-status">
@@ -263,8 +263,8 @@ export default function UploadPage() {
         <label className="upload-dropzone">
           <input accept={acceptedImageTypes} multiple onChange={handleFiles} type="file" />
           <span>Выбрать фото</span>
-          <strong>JPG, PNG, WEBP, HEIC или AVIF</strong>
-          <em>Можно выбрать сразу несколько файлов</em>
+          <strong>Загрузите 8-10 селфи одним разом</strong>
+          <em>JPG, PNG, WEBP, HEIC, HEIF или AVIF</em>
         </label>
       </section>
 
