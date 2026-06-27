@@ -51,6 +51,81 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
     description:
       "Современная переговорная и boardroom для строгих деловых портретов, презентаций и командного leadership-образа.",
   },
+  "yacht-marina": {
+    name: "Яхта / марина",
+    description:
+      "Съёмка на яхте и в марине: белая палуба, море, солнечные блики, канаты, лаунж-зона и спокойный premium resort-образ.",
+  },
+  "beach-club": {
+    name: "Пляж / beach club",
+    description:
+      "Beach club у моря: светлый песок, шезлонги, зонты, мягкий дневной свет и расслабленная курортная эстетика.",
+  },
+  "metropolis-streets": {
+    name: "Улицы мегаполиса",
+    description:
+      "Большой город: стеклянные фасады, переходы, отражения, движение улицы и современный editorial street-style.",
+  },
+  "desert-dunes": {
+    name: "Дюны и барханы",
+    description:
+      "Пустынные дюны: песчаные линии, мягкий закатный свет, ветер, минимализм и кинематографичная fashion-серия.",
+  },
+  "luxury-garage": {
+    name: "Автогараж / luxury garage",
+    description:
+      "Luxury garage с дорогими авто: бетон, тёплый свет, глянец кузова, leather-акценты и уверенный city luxury.",
+  },
+  "pit-lane-racing": {
+    name: "Мотогонки / pit lane",
+    description:
+      "Pit lane и мотоспорт: боксы, разметка, техника, динамичный свет и собранный racing editorial-образ.",
+  },
+  "private-jet": {
+    name: "Частный самолёт / бизнес-джет",
+    description:
+      "Интерьер бизнес-джета: светлая кожа, овальные окна, лакированные панели и приватная premium travel-атмосфера.",
+  },
+  "vip-airport-terminal": {
+    name: "Аэропорт / VIP terminal",
+    description:
+      "VIP terminal аэропорта: lounge, панорамные окна, чемоданы, мягкая подсветка и образ премиального путешествия.",
+  },
+  "city-rooftop": {
+    name: "Rooftop с видом на город",
+    description:
+      "Городской rooftop: огни skyline, терраса, glass railings, вечерний воздух и статусная lifestyle-серия.",
+  },
+  "fine-dining-restaurant": {
+    name: "Ресторан fine dining",
+    description:
+      "Fine dining restaurant: белые скатерти, тёплый свет, сервировка, бар и элегантная вечерняя атмосфера.",
+  },
+  "golf-club": {
+    name: "Гольф-клуб",
+    description:
+      "Гольф-клуб: зелёные поля, clubhouse, тележка, мягкий свет и аккуратный sport-luxury образ.",
+  },
+  "italian-villa-garden": {
+    name: "Сад виллы / итальянская вилла",
+    description:
+      "Итальянская вилла: каменные арки, кипарисы, сад, терраса, солнечные стены и мягкий vacation editorial.",
+  },
+  "paris-street": {
+    name: "Парижская улица / европейский квартал",
+    description:
+      "Европейская улица: кафе, каменные фасады, балконы, мягкий свет и спокойный Paris editorial-style.",
+  },
+  "tokyo-neon-night": {
+    name: "Токио ночью / неоновые улицы",
+    description:
+      "Ночной Токио: неон, мокрый асфальт, витрины, отражения и яркий cinematic street-fashion.",
+  },
+  "new-york-editorial-street": {
+    name: "Нью-Йорк editorial street",
+    description:
+      "New York street editorial: лестницы, кирпич, такси-цвет, плотная городская перспектива и fashion-ритм.",
+  },
 };
 
 const shotTranslations: Record<

@@ -14,6 +14,21 @@ const studioLabels: Record<string, string> = {
   "art-gallery": "Арт-портрет",
   "wellness-spa": "Relaxed-серия",
   "executive-boardroom": "Executive portrait",
+  "yacht-marina": "Resort lifestyle",
+  "beach-club": "Summer editorial",
+  "metropolis-streets": "City editorial",
+  "desert-dunes": "Desert fashion",
+  "luxury-garage": "Auto luxury",
+  "pit-lane-racing": "Racing editorial",
+  "private-jet": "Private travel",
+  "vip-airport-terminal": "VIP travel",
+  "city-rooftop": "Skyline portrait",
+  "fine-dining-restaurant": "Evening dining",
+  "golf-club": "Country club",
+  "italian-villa-garden": "Villa lifestyle",
+  "paris-street": "Paris editorial",
+  "tokyo-neon-night": "Neon night",
+  "new-york-editorial-street": "NY street",
 };
 
 export default async function Home() {
@@ -78,14 +93,14 @@ export default async function Home() {
         <div>
           <h2>Каталог виртуальных студий</h2>
         </div>
-        <p>Готовые пространства с продуманным светом, одеждой и позами.</p>
+        <p>Готовые пространства с продуманным светом, одеждой и позами</p>
       </section>
 
       <section className="atelier-section" id="studios">
         <div className="atelier-section-head atelier-section-head-reverse">
           <p>
             Внутри каждого интерьера можно посмотреть 9 ракурсов самой локации и
-            начать загрузку селфи.
+            начать загрузку селфи
           </p>
           <div>
             <h2>Выберите пространство для фотосессии</h2>
@@ -108,6 +123,14 @@ export default async function Home() {
         </div>
       </section>
 
+      <footer className="atelier-footer">
+        <span>Virtual AI Photo Studio</span>
+        <nav aria-label="Юридическая информация">
+          <a href="/oferta">Пользовательское соглашение</a>
+          <a href="/privacy">Политика конфиденциальности</a>
+          <a href="/personal-data-consent">Согласие на обработку персональных данных</a>
+        </nav>
+      </footer>
     </main>
   );
 }

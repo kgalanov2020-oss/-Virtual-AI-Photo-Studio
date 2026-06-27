@@ -42,7 +42,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
         <div>
           <p className="eyebrow">Интерьер</p>
           <h1>{studio.name}</h1>
-          <div className="actions">
+          <div className="actions studio-actions">
             <Link className="button button-primary" href={`/upload?studio=${studio.slug}`}>
               Выбрать этот интерьер
             </Link>
@@ -76,13 +76,17 @@ export default async function StudioPage({ params }: StudioPageProps) {
               src={url}
             />
           ))}
+          <div className="interior-gallery-cta">
+            <div className="actions studio-actions actions-bottom">
+              <Link className="button button-primary" href={`/upload?studio=${studio.slug}`}>
+                Выбрать этот интерьер
+              </Link>
+              <Link className="button button-secondary" href="/">
+                Все интерьеры
+              </Link>
+            </div>
+          </div>
         </div>
-      </section>
-
-      <section className="section studio-upload-cta">
-        <Link className="button button-primary" href={`/upload?studio=${studio.slug}`}>
-          Перейти к загрузке селфи
-        </Link>
       </section>
     </main>
   );

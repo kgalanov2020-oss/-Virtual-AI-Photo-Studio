@@ -776,6 +776,201 @@ const boardroomPoseTemplates = [
   },
 ];
 
+const yachtMarinaPoseTemplates = [
+  { slug: "deck-rail", name: "У борта яхты", camera: "объектив 70 мм, мягкий дневной свет", pose: "стоит у борта яхты, одна рука на перилах", prompt: "standing by the yacht rail with one hand on polished chrome rail, marina and sea behind, elegant resort posture" },
+  { slug: "stern-lounge", name: "В lounge-зоне палубы", camera: "объектив 85 мм, уровень глаз", pose: "сидит расслабленно на палубной lounge-зоне, руки видны", prompt: "relaxed seated portrait on yacht deck lounge seating, hands visible, calm premium resort mood" },
+  { slug: "marina-walk", name: "Прогулка по марине", camera: "репортажный объектив 50 мм", pose: "идёт по причалу марины, естественный шаг", prompt: "walking along marina dock beside yachts, natural stride, elegant nautical lifestyle styling" },
+  { slug: "helm-moment", name: "У штурвала", camera: "объектив 50 мм, ракурс три четверти", pose: "стоит у штурвала или навигационной зоны, спокойная уверенность", prompt: "standing at yacht helm or navigation area, confident calm posture, polished nautical details" },
+  { slug: "bow-wind", name: "На носу яхты", camera: "объектив 70 мм, боковой ракурс", pose: "стоит на носу яхты, лёгкое движение одежды от ветра", prompt: "standing on yacht bow with subtle wind in clothing, sea horizon, premium travel editorial" },
+  { slug: "steps-seated", name: "На ступенях палубы", camera: "объектив 85 мм, мягкий портрет", pose: "сидит на ступенях палубы, корпус и руки видны", prompt: "seated on yacht deck steps, hands relaxed, elegant resort wardrobe, white deck details" },
+  { slug: "rope-detail", name: "С деталями канатов", camera: "объектив 85 мм, размытый передний план", pose: "стоит рядом с канатами и палубными деталями", prompt: "portrait framed with blurred nautical ropes and deck hardware, marina lifestyle atmosphere" },
+  { slug: "marina-cafe-side", name: "У marina lounge", camera: "объектив 70 мм, тёплый свет", pose: "сидит или стоит у lounge-зоны марины", prompt: "standing or seated near marina lounge area, yachts in background, refined coastal styling" },
+  { slug: "sunset-profile", name: "Профиль на море", camera: "объектив 85 мм, закатный боковой свет", pose: "полуоборот или профиль на фоне воды", prompt: "side profile or half-turn with sea and sunset light behind, elegant calm expression" },
+  { slug: "yacht-hero", name: "Главный яхтенный кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "уверенная финальная поза на яхте или причале", prompt: "signature polished yacht lifestyle editorial pose, luxury marina and yacht architecture clearly visible" },
+];
+
+const beachClubPoseTemplates = [
+  { slug: "cabana-entry", name: "У кабаны", camera: "объектив 70 мм, мягкое солнце", pose: "стоит у beach cabana, расслабленная курортная поза", prompt: "standing at elegant beach cabana entrance, relaxed fully clothed resort outfit, pale sand and ocean behind" },
+  { slug: "sunbed-seated", name: "На шезлонге", camera: "объектив 85 мм, уровень глаз", pose: "сидит на шезлонге, руки видны, без пляжной откровенности", prompt: "seated on designer beach club sunbed, hands visible, fully clothed linen resort styling, upscale beach atmosphere" },
+  { slug: "shore-walk", name: "Прогулка у воды", camera: "репортажный объектив 50 мм", pose: "идёт вдоль линии воды, естественный шаг", prompt: "walking along shoreline near beach club, natural movement, elegant summer clothing, ocean horizon" },
+  { slug: "umbrella-shadow", name: "Под зонтом", camera: "объектив 70 мм, мягкая тень", pose: "стоит под большим кремовым зонтом, спокойный взгляд", prompt: "standing under cream beach umbrella in soft shade, refined resort look, no swimwear" },
+  { slug: "beach-table", name: "У beach table", camera: "объектив 50 мм, ракурс три четверти", pose: "сидит у низкого столика beach club, руки видны", prompt: "seated near low beach club table, hands visible, elegant resort cafe moment" },
+  { slug: "deck-path", name: "На деревянном настиле", camera: "широкий объектив 35 мм", pose: "идёт по деревянному настилу между шезлонгами", prompt: "walking on wooden deck path between sunbeds and cabanas, beach club architecture visible" },
+  { slug: "ocean-profile", name: "Профиль на океан", camera: "объектив 85 мм, боковой свет", pose: "полуоборот к океану, волосы и одежда слегка двигаются", prompt: "side profile looking toward ocean, subtle wind in hair or fabric, premium summer editorial" },
+  { slug: "bar-counter", name: "У beach bar", camera: "объектив 70 мм, тёплый свет", pose: "стоит у стойки beach bar, естественный жест рукой", prompt: "standing at elegant beach bar counter, natural hand gesture, fully clothed stylish vacation outfit" },
+  { slug: "palm-background", name: "На фоне пальм", camera: "объектив 85 мм, мягкая глубина", pose: "стоит на фоне пальм и светлого песка", prompt: "standing with palms and pale sand behind, clean resort portrait, soft depth of field" },
+  { slug: "beach-hero", name: "Главный beach club кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная relaxed premium поза в beach club", prompt: "signature elegant beach club editorial pose, relaxed confident resort lifestyle atmosphere" },
+];
+
+const metropolisStreetPoseTemplates = [
+  { slug: "crosswalk-step", name: "На переходе", camera: "репортажный объектив 50 мм", pose: "идёт по городскому переходу, естественный шаг", prompt: "walking across modern city crosswalk, glass buildings behind, confident street editorial movement" },
+  { slug: "glass-facade", name: "У стеклянного фасада", camera: "объектив 70 мм, отражения", pose: "стоит у стеклянного фасада, отражения города рядом", prompt: "standing beside reflective glass facade, city reflections, stylish urban outfit" },
+  { slug: "curb-portrait", name: "У края улицы", camera: "объектив 85 мм, уровень глаз", pose: "стоит у края тротуара, спокойный городской портрет", prompt: "standing at curbside with urban depth behind, calm editorial expression, no traffic logos" },
+  { slug: "street-corner", name: "На углу здания", camera: "объектив 70 мм, ракурс три четверти", pose: "опирается плечом или рукой на архитектурный угол", prompt: "lightly leaning on modern building corner, relaxed city fashion pose" },
+  { slug: "coffee-to-go", name: "Городской момент", camera: "объектив 50 мм, документальный стиль", pose: "идёт с кофе или телефоном в руке, естественно", prompt: "natural city moment walking with coffee cup or phone, polished street style, no readable brands" },
+  { slug: "metro-entrance", name: "У входа метро", camera: "широкий объектив 35 мм", pose: "стоит рядом с городским входом или лестницей, видна среда", prompt: "standing near modern transit entrance or stairs, urban architecture visible, editorial city look" },
+  { slug: "taxi-light", name: "С городским светом", camera: "объектив 85 мм, боковой свет", pose: "полуоборот на фоне огней и машин", prompt: "half-turn portrait with blurred city lights and traffic color accents, fashionable street mood" },
+  { slug: "building-steps", name: "На ступенях", camera: "объектив 70 мм, уровень глаз", pose: "сидит на широких городских ступенях, руки видны", prompt: "seated on clean city building steps, hands visible, editorial street style" },
+  { slug: "avenue-wide", name: "Широкая авеню", camera: "широкий объектив 35 мм", pose: "стоит в городской перспективе, полный контекст улицы", prompt: "standing in wide avenue perspective, full city scale visible, person integrated into metropolis" },
+  { slug: "metropolis-hero", name: "Главный city кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "уверенная fashion-поза на улице мегаполиса", prompt: "signature confident metropolis street editorial pose, strong city depth and stylish wardrobe" },
+];
+
+const desertDunesPoseTemplates = [
+  { slug: "ridge-stand", name: "На гребне дюны", camera: "объектив 70 мм, закатный свет", pose: "стоит на гребне дюны, силуэт и ткань читаются", prompt: "standing on dune ridge at golden hour, fabric movement, cinematic desert editorial" },
+  { slug: "sand-walk", name: "Шаг по песку", camera: "репортажный объектив 50 мм", pose: "идёт по песку, естественный след и движение", prompt: "walking across soft sand with natural footprints, elegant desert outfit, wind shaped dunes" },
+  { slug: "seated-dune", name: "Сидя на дюне", camera: "объектив 85 мм, мягкий свет", pose: "сидит на склоне дюны, руки видны", prompt: "seated on dune slope, hands visible, flowing linen or safari styling, calm expression" },
+  { slug: "wind-scarf", name: "Ветер и ткань", camera: "объектив 70 мм, боковой ракурс", pose: "держит шарф или край одежды, лёгкое движение ветра", prompt: "holding scarf or coat edge in desert wind, graceful editorial movement" },
+  { slug: "desert-profile", name: "Профиль на горизонт", camera: "объектив 85 мм, боковой свет", pose: "профиль или полуоборот на открытый горизонт", prompt: "side profile looking toward open desert horizon, golden light, minimal landscape" },
+  { slug: "low-dune-angle", name: "Низкий ракурс дюн", camera: "широкий объектив 35 мм, низкая точка", pose: "стоит выше камеры на линии дюны", prompt: "low-angle wide photo from dune line, person above camera, dramatic sand curves" },
+  { slug: "sand-texture", name: "С текстурой песка", camera: "объектив 85 мм, размытый передний план", pose: "стоит за мягким передним планом песка", prompt: "portrait framed through blurred sand texture foreground, warm desert tones" },
+  { slug: "sun-backlight", name: "Контровой свет", camera: "объектив 70 мм, контровой свет", pose: "стоит в мягком контровом свете, расслабленная поза", prompt: "standing in soft backlight, desert glow around silhouette, elegant fully clothed styling" },
+  { slug: "wide-solitude", name: "Общий кадр пустыни", camera: "широкий объектив 35 мм", pose: "стоит далеко среди барханов, локация доминирует", prompt: "wide environmental desert shot, person small in frame, dunes dominate, cinematic scale" },
+  { slug: "desert-hero", name: "Главный desert кадр", camera: "лучший fashion-ракурс, объектив 70 мм", pose: "финальная кинематографичная поза среди дюн", prompt: "signature desert fashion editorial pose, flowing fabric, golden dunes, premium atmosphere" },
+];
+
+const luxuryGaragePoseTemplates = [
+  { slug: "car-front", name: "У передней части авто", camera: "объектив 70 мм, низкий мягкий ракурс", pose: "стоит рядом с передней частью автомобиля, руки расслаблены", prompt: "standing beside front quarter of luxury car, relaxed confident posture, no logos" },
+  { slug: "driver-door", name: "У двери авто", camera: "объектив 50 мм, ракурс три четверти", pose: "стоит у открытой двери автомобиля, естественный жест", prompt: "standing by open car door, one hand near door frame, polished automotive editorial" },
+  { slug: "garage-walk", name: "Проход через гараж", camera: "репортажный объектив 50 мм", pose: "идёт между авто, естественный шаг", prompt: "walking through luxury garage between premium cars, cinematic warm lighting" },
+  { slug: "hood-lean", name: "Лёгкая опора на авто", camera: "объектив 70 мм, уровень глаз", pose: "слегка опирается на край капота, без сидения на машине", prompt: "lightly leaning on edge of car hood, respectful luxury car pose, hands visible" },
+  { slug: "tool-wall", name: "У стены с деталями", camera: "объектив 85 мм, мягкая глубина", pose: "стоит на фоне аккуратной automotive wall", prompt: "standing near clean automotive tool wall or display, premium garage details" },
+  { slug: "leather-seat", name: "У салона", camera: "объектив 85 мм, детальный ракурс", pose: "находится рядом с открытым салоном, руки видны", prompt: "portrait near open car interior with leather seat details, stylish city luxury outfit" },
+  { slug: "car-reflection", name: "В отражениях кузова", camera: "объектив 70 мм, боковой свет", pose: "полуоборот рядом с глянцевым кузовом", prompt: "half-turn portrait beside reflective car paint, garage lights creating elegant reflections" },
+  { slug: "ramp-wide", name: "Широкий гаражный кадр", camera: "широкий объектив 35 мм", pose: "стоит в пространстве гаража, видны авто и архитектура", prompt: "standing in luxury garage wide frame, multiple cars and architecture visible" },
+  { slug: "seated-bench", name: "На leather bench", camera: "объектив 70 мм, уровень глаз", pose: "сидит на lounge-скамье гаража, руки видны", prompt: "seated on leather lounge bench inside luxury garage, hands visible, relaxed automotive lifestyle" },
+  { slug: "garage-hero", name: "Главный auto кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная уверенная поза в luxury garage", prompt: "signature luxury automotive editorial pose, premium cars and garage lighting clearly visible" },
+];
+
+const pitLanePoseTemplates = [
+  { slug: "bike-side", name: "Рядом с мотоциклом", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит рядом с гоночным мотоциклом, руки расслаблены", prompt: "standing beside matte racing motorcycle in pit lane, no logos, confident motorsport posture" },
+  { slug: "garage-bay", name: "У бокса", camera: "объектив 50 мм, документальный ракурс", pose: "стоит у открытого бокса pit lane, техника на фоне", prompt: "standing at open pit garage bay, tools and bike silhouettes behind, racing editorial atmosphere" },
+  { slug: "pit-walk", name: "Проход по pit lane", camera: "репортажный объектив 50 мм", pose: "идёт вдоль pit lane, естественный шаг", prompt: "walking along pit lane markings, natural movement, motorsport jacket, cinematic track mood" },
+  { slug: "helmet-hold", name: "С шлемом в руках", camera: "объектив 70 мм, уровень глаз", pose: "держит шлем в руках у корпуса, лицо открыто", prompt: "holding a racing helmet at waist level, face visible, fully clothed motorsport styling" },
+  { slug: "pit-wall", name: "У pit wall", camera: "объектив 85 мм, боковой свет", pose: "стоит у pit wall, взгляд в сторону трассы", prompt: "standing near pit wall looking toward track, focused calm expression, racing environment" },
+  { slug: "mechanic-table", name: "У рабочей стойки", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит у аккуратной рабочей стойки с деталями, без стола как офис", prompt: "standing at clean racing workbench with tools and parts, natural hand placement, motorsport context" },
+  { slug: "track-entry", name: "На выезде к треку", camera: "широкий объектив 35 мм", pose: "стоит у выезда на трассу, видна линия pit lane", prompt: "standing at pit lane exit with track line visible, wide motorsport architecture context" },
+  { slug: "bike-detail-frame", name: "Через детали байка", camera: "объектив 85 мм, передний план", pose: "портрет через размытые детали мотоцикла", prompt: "portrait framed through blurred motorcycle handlebar or wheel foreground, racing garage depth" },
+  { slug: "seated-pit-box", name: "На pit stool", camera: "объектив 70 мм, уровень глаз", pose: "сидит на pit stool или технической тумбе, руки видны", prompt: "seated on pit stool or equipment case, hands visible, stylish motorsport outfit, safe editorial pose" },
+  { slug: "racing-hero", name: "Главный racing кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная собранная поза в pit lane", prompt: "signature motorsport pit lane editorial pose, dynamic racing atmosphere, no logos" },
+];
+
+const privateJetPoseTemplates = [
+  { slug: "cabin-seat", name: "В кресле бизнес-джета", camera: "объектив 70 мм, уровень глаз", pose: "сидит в кожаном кресле, руки видны", prompt: "seated in cream leather private jet chair, hands visible, elegant travel wardrobe" },
+  { slug: "aisle-stand", name: "В проходе салона", camera: "объектив 50 мм, ракурс три четверти", pose: "стоит в узком проходе салона, спокойная осанка", prompt: "standing in private jet cabin aisle, oval windows and polished panels visible" },
+  { slug: "window-side", name: "У овального окна", camera: "объектив 85 мм, мягкий свет", pose: "сидит или стоит у овального окна, взгляд в сторону", prompt: "seated or standing by oval airplane window, soft daylight on face, quiet luxury travel mood" },
+  { slug: "boarding-steps", name: "На трапе", camera: "объектив 70 мм, открытый ракурс", pose: "стоит на трапе у бизнес-джета, естественный шаг", prompt: "standing or stepping on private jet stairs, aircraft exterior detail, premium travel editorial" },
+  { slug: "table-moment", name: "У складного столика", camera: "объектив 50 мм, документальный стиль", pose: "сидит у компактного столика, руки видны", prompt: "seated at private jet fold-out table, hands visible, refined travel business moment" },
+  { slug: "cabin-walk", name: "Движение по салону", camera: "репортажный объектив 50 мм", pose: "идёт по проходу салона, естественное движение", prompt: "walking through compact jet cabin, natural movement, premium cabin details" },
+  { slug: "seat-profile", name: "Профиль в кресле", camera: "объектив 85 мм, боковой свет", pose: "сидит в профиль или полуобороте у окна", prompt: "side profile seated in jet chair near oval window, calm confident expression" },
+  { slug: "luggage-detail", name: "С travel-деталями", camera: "объектив 70 мм, мягкая глубина", pose: "стоит рядом с аккуратным carry-on luggage", prompt: "standing near discreet carry-on luggage inside jet cabin, polished travel styling" },
+  { slug: "galley-corner", name: "У galley-зоны", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит у compact galley, руки расслаблены", prompt: "standing near private jet galley corner, polished wood and leather details visible" },
+  { slug: "jet-hero", name: "Главный jet кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная premium travel поза в бизнес-джете", prompt: "signature private jet editorial travel pose, cabin luxury and aviation context clearly visible" },
+];
+
+const vipAirportPoseTemplates = [
+  { slug: "lounge-chair", name: "В VIP lounge", camera: "объектив 70 мм, уровень глаз", pose: "сидит в lounge-кресле аэропорта, руки видны", prompt: "seated in VIP airport lounge chair, hands visible, runway windows behind" },
+  { slug: "runway-window", name: "У окна на runway", camera: "объектив 85 мм, боковой свет", pose: "стоит у панорамного окна, взгляд на runway", prompt: "standing by panoramic airport window looking toward runway, refined travel outfit" },
+  { slug: "terminal-walk", name: "Проход через терминал", camera: "репортажный объектив 50 мм", pose: "идёт через VIP terminal с ручной кладью", prompt: "walking through VIP terminal with discreet carry-on luggage, natural stride, premium travel mood" },
+  { slug: "checkin-counter", name: "У VIP counter", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит у стойки VIP terminal, естественный жест", prompt: "standing beside private check-in counter, natural hand gesture, no readable signs" },
+  { slug: "sofa-waiting", name: "Ожидание рейса", camera: "объектив 85 мм, мягкий свет", pose: "сидит на sofa-зоне ожидания, спокойная поза", prompt: "seated on VIP lounge sofa waiting for flight, hands visible, elegant travel wardrobe" },
+  { slug: "jet-bridge-view", name: "У выхода", camera: "широкий объектив 35 мм", pose: "стоит у выхода или glass corridor, видна архитектура", prompt: "standing near private terminal boarding corridor, glass architecture and runway depth visible" },
+  { slug: "luggage-handle", name: "С чемоданом", camera: "объектив 70 мм, уровень глаз", pose: "держит ручку чемодана, расслабленная travel-поза", prompt: "holding suitcase handle naturally, refined airport styling, polished travel portrait" },
+  { slug: "coffee-lounge", name: "Lounge coffee moment", camera: "объектив 50 мм, документальный стиль", pose: "сидит с чашкой кофе в lounge, руки видны", prompt: "seated with coffee cup in VIP lounge, hands visible, calm pre-flight lifestyle moment" },
+  { slug: "terminal-wide", name: "Широкий VIP terminal", camera: "широкий объектив 35 мм", pose: "стоит далеко внутри терминала, локация доминирует", prompt: "wide VIP airport terminal shot, person smaller in frame, architecture and runway windows dominate" },
+  { slug: "vip-airport-hero", name: "Главный airport кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная travel-поза в VIP terminal", prompt: "signature VIP airport terminal editorial pose, premium travel atmosphere clear" },
+];
+
+const cityRooftopPoseTemplates = [
+  { slug: "glass-rail", name: "У стеклянного борта", camera: "объектив 70 мм, вечерний свет", pose: "стоит у glass railing, город за спиной", prompt: "standing by rooftop glass railing with city skyline behind, elegant evening city outfit" },
+  { slug: "lounge-sofa", name: "На rooftop sofa", camera: "объектив 85 мм, уровень глаз", pose: "сидит на rooftop lounge sofa, руки видны", prompt: "seated on rooftop lounge sofa, hands visible, skyline and terrace lights behind" },
+  { slug: "terrace-walk", name: "Проход по террасе", camera: "репортажный объектив 50 мм", pose: "идёт по террасе rooftop, естественный шаг", prompt: "walking across rooftop terrace, natural movement, city lights and glass rails visible" },
+  { slug: "skyline-profile", name: "Профиль на skyline", camera: "объектив 85 мм, боковой свет", pose: "профиль или полуоборот на фоне города", prompt: "side profile against skyline, evening light, confident calm expression" },
+  { slug: "bar-table", name: "У rooftop bar", camera: "объектив 50 мм, ракурс три четверти", pose: "стоит у bar table, естественный жест рукой", prompt: "standing near rooftop bar table, one natural hand gesture, premium nightlife atmosphere" },
+  { slug: "city-backlight", name: "Контровой city light", camera: "объектив 70 мм, контровой свет", pose: "стоит в мягком контровом свете города", prompt: "standing in soft backlight from city glow, elegant evening wardrobe, rooftop depth" },
+  { slug: "corner-view", name: "В углу террасы", camera: "широкий объектив 35 мм", pose: "стоит в углу rooftop, виден масштаб площадки", prompt: "standing at rooftop terrace corner, wide skyline and furniture context visible" },
+  { slug: "railing-lean", name: "Лёгкая опора", camera: "объектив 70 мм, уровень глаз", pose: "слегка опирается на перила, руки видны", prompt: "lightly leaning on glass railing, hands visible, relaxed confident rooftop posture" },
+  { slug: "night-lounge", name: "В вечернем lounge", camera: "объектив 85 мм, тёплый свет", pose: "сидит расслабленно в lounge-зоне ночью", prompt: "relaxed seated portrait in rooftop lounge at night, warm terrace lights, city bokeh" },
+  { slug: "rooftop-hero", name: "Главный rooftop кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная поза на rooftop с видом на город", prompt: "signature city rooftop editorial pose, skyline and premium terrace atmosphere clearly visible" },
+];
+
+const fineDiningPoseTemplates = [
+  { slug: "restaurant-table", name: "За столом fine dining", camera: "объектив 70 мм, мягкий вечерний свет", pose: "сидит за сервированным столом, руки видны", prompt: "seated at elegant fine dining table, hands visible, white tablecloth and refined setting, no readable menu" },
+  { slug: "bar-counter", name: "У барной стойки", camera: "объектив 85 мм, тёплый свет", pose: "стоит или сидит у marble bar, спокойная вечерняя поза", prompt: "standing or seated at marble restaurant bar, elegant dinner outfit, warm pendant lights" },
+  { slug: "host-stand", name: "У входа ресторана", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит у entrance или host-зоны, собранный образ", prompt: "standing near fine dining restaurant entrance or host area, polished evening styling" },
+  { slug: "table-gesture", name: "Естественный жест", camera: "объектив 50 мм, документальный стиль", pose: "сидит за столом и делает естественный жест рукой", prompt: "seated at table with natural hand gesture during conversation, elegant restaurant atmosphere" },
+  { slug: "wine-wall", name: "У wine wall", camera: "объектив 85 мм, мягкая глубина", pose: "стоит у wine wall или декоративной стены, руки расслаблены", prompt: "standing near wine display wall or decorative restaurant wall, no labels readable, refined evening mood" },
+  { slug: "banquette", name: "На banquette seating", camera: "объектив 70 мм, уровень глаз", pose: "сидит на banquette-диване, корпус и руки видны", prompt: "seated on restaurant banquette, hands visible, velvet seating and table settings nearby" },
+  { slug: "dining-walk", name: "Проход между столами", camera: "репортажный объектив 50 мм", pose: "идёт между столами, естественный шаг", prompt: "walking between fine dining tables, natural movement, warm hospitality lighting" },
+  { slug: "window-dinner", name: "У окна ресторана", camera: "объектив 85 мм, боковой свет", pose: "сидит или стоит у окна ресторана, вечерний профиль", prompt: "side profile near restaurant window, evening ambience, elegant dinner outfit" },
+  { slug: "restaurant-wide", name: "Широкий ресторанный кадр", camera: "широкий объектив 35 мм", pose: "стоит внутри зала, видна архитектура ресторана", prompt: "wide shot inside fine dining room, person integrated into elegant tables and lighting" },
+  { slug: "dining-hero", name: "Главный fine dining кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная элегантная поза в ресторане", prompt: "signature fine dining editorial pose, refined evening restaurant atmosphere clear" },
+];
+
+const golfClubPoseTemplates = [
+  { slug: "clubhouse-steps", name: "У clubhouse", camera: "объектив 70 мм, дневной свет", pose: "стоит у clubhouse, аккуратная спортивная осанка", prompt: "standing near premium golf clubhouse, refined country club outfit, green fairway behind" },
+  { slug: "fairway-walk", name: "Прогулка по fairway", camera: "репортажный объектив 50 мм", pose: "идёт по fairway, естественный шаг", prompt: "walking across golf fairway, natural movement, elegant golf lifestyle wardrobe" },
+  { slug: "golf-cart", name: "У golf cart", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит или сидит рядом с golf cart, руки видны", prompt: "standing or seated beside golf cart, hands visible, country club atmosphere" },
+  { slug: "club-hold", name: "С клюшкой", camera: "объектив 85 мм, мягкая глубина", pose: "держит клюшку спокойно, без активного замаха", prompt: "holding golf club calmly, no swing action, polished sport luxury portrait" },
+  { slug: "green-edge", name: "У green", camera: "широкий объектив 35 мм", pose: "стоит у green, поле и landscape видны", prompt: "standing near putting green, trimmed grass and landscape visible, refined golf setting" },
+  { slug: "terrace-seated", name: "На террасе клуба", camera: "объектив 70 мм, уровень глаз", pose: "сидит на террасе clubhouse, руки видны", prompt: "seated on clubhouse terrace, hands visible, fairway view, relaxed country club lifestyle" },
+  { slug: "tree-line", name: "У линии деревьев", camera: "объектив 85 мм, боковой свет", pose: "полуоборот на фоне деревьев и поля", prompt: "half-turn portrait by tree line and fairway, soft daylight, elegant golf outfit" },
+  { slug: "bunker-edge", name: "У bunker edge", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит рядом с песчаным bunker, аккуратно и спокойно", prompt: "standing near sand bunker edge, clean composed posture, golf landscape context" },
+  { slug: "wide-course", name: "Широкий кадр поля", camera: "широкий объектив 35 мм", pose: "стоит далеко на поле, локация доминирует", prompt: "wide golf course environmental shot, person smaller in frame, fairway and clubhouse scale visible" },
+  { slug: "golf-hero", name: "Главный golf кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная sport luxury поза в гольф-клубе", prompt: "signature premium golf club editorial pose, stylish sport luxury atmosphere" },
+];
+
+const italianVillaPoseTemplates = [
+  { slug: "stone-arch", name: "У каменной арки", camera: "объектив 70 мм, мягкий свет", pose: "стоит у каменной арки виллы, спокойная осанка", prompt: "standing under Italian villa stone arch, Mediterranean light, elegant vacation wardrobe" },
+  { slug: "garden-walk", name: "Прогулка по саду", camera: "репортажный объектив 50 мм", pose: "идёт по садовой дорожке, естественный шаг", prompt: "walking through villa garden path, cypress trees and terrace visible, natural movement" },
+  { slug: "terrace-seated", name: "На террасе виллы", camera: "объектив 85 мм, уровень глаз", pose: "сидит на terrace seating, руки видны", prompt: "seated on Italian villa terrace seating, hands visible, refined Mediterranean styling" },
+  { slug: "fountain-side", name: "У фонтана", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит у фонтана или stone basin, расслабленно", prompt: "standing near stone fountain or basin, relaxed elegant posture, villa garden atmosphere" },
+  { slug: "cypress-profile", name: "Профиль у кипарисов", camera: "объектив 85 мм, боковой свет", pose: "профиль или полуоборот на фоне кипарисов", prompt: "side profile with cypress trees and terracotta walls, warm Mediterranean light" },
+  { slug: "staircase", name: "На лестнице виллы", camera: "объектив 70 мм, уровень глаз", pose: "стоит или сидит на каменных ступенях, руки видны", prompt: "standing or seated on villa stone staircase, hands visible, elegant vacation editorial" },
+  { slug: "olive-grove", name: "У olive trees", camera: "широкий объектив 35 мм", pose: "стоит среди зелени сада, видна локация", prompt: "standing among olive trees and sculptural garden greenery, villa context visible" },
+  { slug: "doorway", name: "В doorway виллы", camera: "объектив 85 мм, мягкая глубина", pose: "стоит в doorway или у wooden door, спокойный взгляд", prompt: "standing in villa doorway near wooden door, refined Mediterranean fashion styling" },
+  { slug: "garden-wide", name: "Широкий садовый кадр", camera: "широкий объектив 35 мм", pose: "стоит далеко в саду виллы, архитектура и сад доминируют", prompt: "wide villa garden shot, person smaller in frame, stone arches and cypress trees dominate" },
+  { slug: "villa-hero", name: "Главный villa кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная элегантная поза в саду итальянской виллы", prompt: "signature Italian villa garden editorial pose, elegant Mediterranean atmosphere" },
+];
+
+const parisStreetPoseTemplates = [
+  { slug: "cafe-table", name: "У столика кафе", camera: "объектив 70 мм, дневной свет", pose: "сидит у маленького столика кафе, руки видны", prompt: "seated at small Parisian cafe table, hands visible, elegant European street atmosphere" },
+  { slug: "cobblestone-walk", name: "По брусчатке", camera: "репортажный объектив 50 мм", pose: "идёт по европейской улице, естественный шаг", prompt: "walking on cobblestone European street, natural movement, chic city outfit" },
+  { slug: "building-corner", name: "У фасада", camera: "объектив 85 мм, мягкая глубина", pose: "стоит у каменного фасада или витрины", prompt: "standing by Parisian stone facade or boutique window, refined effortless styling" },
+  { slug: "balcony-street", name: "Под балконами", camera: "широкий объектив 35 мм", pose: "стоит на улице под wrought iron balconies", prompt: "standing beneath wrought iron balconies, European street architecture visible" },
+  { slug: "newspaper-moment", name: "Кафейный момент", camera: "объектив 50 мм, документальный стиль", pose: "сидит у кафе с чашкой или журналом, естественно", prompt: "seated at cafe with coffee cup or magazine, natural editorial moment, no readable text" },
+  { slug: "crosswalk-paris", name: "Переход улицы", camera: "репортажный объектив 50 мм", pose: "переходит улицу, движение пальто или шарфа", prompt: "crossing Parisian street, coat or scarf movement, chic European editorial" },
+  { slug: "archway", name: "В арке квартала", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит в небольшой арке или passage, спокойная поза", prompt: "standing in European passage archway, elegant half-turn, stone details visible" },
+  { slug: "street-lamp", name: "У фонаря", camera: "объектив 85 мм, боковой свет", pose: "полуоборот у street lamp, мягкий свет", prompt: "half-turn near classic street lamp, soft Parisian light, refined city portrait" },
+  { slug: "avenue-wide", name: "Широкий квартал", camera: "широкий объектив 35 мм", pose: "стоит в перспективе европейского квартала", prompt: "wide European quarter street perspective, person integrated into cafe and stone facade environment" },
+  { slug: "paris-hero", name: "Главный Paris кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная chic-поза на парижской улице", prompt: "signature Paris street editorial pose, chic effortless European style" },
+];
+
+const tokyoNeonPoseTemplates = [
+  { slug: "neon-crosswalk", name: "На неоновом переходе", camera: "репортажный объектив 50 мм", pose: "идёт по мокрому переходу, отражения вокруг", prompt: "walking across wet neon crosswalk, colorful reflections, Tokyo night street fashion" },
+  { slug: "alley-light", name: "В неоновой alley", camera: "объектив 70 мм, цветной свет", pose: "стоит в узкой alley, свет витрин вокруг", prompt: "standing in compact neon-lit alley, colorful signs without readable text, stylish night outfit" },
+  { slug: "vending-wall", name: "У light wall", camera: "объектив 85 мм, мягкая глубина", pose: "стоит у светящейся стены или витрины, спокойный взгляд", prompt: "standing near glowing vending or shop light wall, no readable text, cinematic colored lighting" },
+  { slug: "umbrella-night", name: "С зонтом ночью", camera: "объектив 70 мм, боковой свет", pose: "держит зонт в дождливой ночной улице", prompt: "holding umbrella on rainy neon street, wet pavement reflections, elegant street-fashion pose" },
+  { slug: "station-exit", name: "У выхода станции", camera: "широкий объектив 35 мм", pose: "стоит у station exit, городская глубина видна", prompt: "standing near Tokyo station exit, neon urban depth, clean no-readable-sign environment" },
+  { slug: "railing-lean", name: "У городских перил", camera: "объектив 70 мм, уровень глаз", pose: "слегка опирается на городские перила, руки видны", prompt: "lightly leaning on urban railing, hands visible, neon bokeh behind" },
+  { slug: "night-phone", name: "Ночной street moment", camera: "объектив 50 мм, документальный стиль", pose: "идёт с телефоном в руке, естественно", prompt: "walking with phone in hand at night, natural city moment, neon reflections" },
+  { slug: "shopfront-profile", name: "Профиль у витрины", camera: "объектив 85 мм, боковой цветной свет", pose: "профиль или полуоборот у яркой витрины", prompt: "side profile near bright shopfront, colored light on face, no readable text" },
+  { slug: "neon-wide", name: "Широкий Tokyo кадр", camera: "широкий объектив 35 мм", pose: "стоит среди неоновой улицы, локация доминирует", prompt: "wide Tokyo neon street shot, person smaller in frame, wet pavement and lights dominate" },
+  { slug: "tokyo-hero", name: "Главный neon кадр", camera: "лучший cinematic-ракурс, объектив 70 мм", pose: "финальная уверенная поза на неоновой улице", prompt: "signature Tokyo neon night editorial pose, cinematic street fashion atmosphere" },
+];
+
+const newYorkStreetPoseTemplates = [
+  { slug: "fire-escape", name: "У fire escape", camera: "объектив 70 мм, городской свет", pose: "стоит у кирпичного фасада с fire escape", prompt: "standing by brick building with fire escape, New York editorial street style" },
+  { slug: "crosswalk-ny", name: "На crosswalk", camera: "репортажный объектив 50 мм", pose: "идёт по улице Нью-Йорка, естественный шаг", prompt: "walking across New York crosswalk, strong city perspective, fashion editorial movement" },
+  { slug: "stoop-seated", name: "На stoop", camera: "объектив 85 мм, уровень глаз", pose: "сидит на городских ступенях stoop, руки видны", prompt: "seated on New York stoop steps, hands visible, bold street fashion outfit" },
+  { slug: "yellow-accent", name: "С taxi-акцентом", camera: "объектив 70 мм, боковой ракурс", pose: "полуоборот на фоне городского yellow-акцента", prompt: "half-turn portrait with muted yellow taxi-like color accent blurred behind, no logos" },
+  { slug: "sidewalk-cafe", name: "У sidewalk cafe", camera: "объектив 50 мм, документальный стиль", pose: "стоит или сидит у sidewalk cafe, естественно", prompt: "standing or seated near sidewalk cafe, natural editorial city moment, no readable text" },
+  { slug: "subway-stairs", name: "У subway stairs", camera: "широкий объектив 35 мм", pose: "стоит у subway stairs или railing, городской контекст", prompt: "standing near subway stairs or railing, New York street architecture visible, no readable signs" },
+  { slug: "brick-wall", name: "У кирпичной стены", camera: "объектив 85 мм, мягкая глубина", pose: "опирается плечом на brick wall, спокойный взгляд", prompt: "lightly leaning shoulder against brick wall, confident editorial street portrait" },
+  { slug: "avenue-walk", name: "По avenue", camera: "репортажный объектив 50 мм", pose: "идёт по avenue, одежда в движении", prompt: "walking down city avenue, coat movement, strong editorial street fashion" },
+  { slug: "ny-wide", name: "Широкий NY кадр", camera: "широкий объектив 35 мм", pose: "стоит в плотной городской перспективе", prompt: "wide New York street environmental shot, person integrated into brick, crosswalk and city depth" },
+  { slug: "ny-hero", name: "Главный NY editorial кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная fashion-поза на улице Нью-Йорка", prompt: "signature New York editorial street pose, bold city fashion and urban rhythm" },
+];
+
 const studioPoseTemplates = {
   "modern-office": officePoseTemplates,
   "executive-boardroom": boardroomPoseTemplates,
@@ -787,6 +982,21 @@ const studioPoseTemplates = {
   "luxury-penthouse": penthousePoseTemplates,
   "art-gallery": galleryPoseTemplates,
   "wellness-spa": wellnessPoseTemplates,
+  "yacht-marina": yachtMarinaPoseTemplates,
+  "beach-club": beachClubPoseTemplates,
+  "metropolis-streets": metropolisStreetPoseTemplates,
+  "desert-dunes": desertDunesPoseTemplates,
+  "luxury-garage": luxuryGaragePoseTemplates,
+  "pit-lane-racing": pitLanePoseTemplates,
+  "private-jet": privateJetPoseTemplates,
+  "vip-airport-terminal": vipAirportPoseTemplates,
+  "city-rooftop": cityRooftopPoseTemplates,
+  "fine-dining-restaurant": fineDiningPoseTemplates,
+  "golf-club": golfClubPoseTemplates,
+  "italian-villa-garden": italianVillaPoseTemplates,
+  "paris-street": parisStreetPoseTemplates,
+  "tokyo-neon-night": tokyoNeonPoseTemplates,
+  "new-york-editorial-street": newYorkStreetPoseTemplates,
 };
 
 const distanceVariants = [

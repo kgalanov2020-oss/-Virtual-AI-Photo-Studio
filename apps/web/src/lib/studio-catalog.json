@@ -189,6 +189,291 @@
         "/studios/executive-boardroom/detail-shot.png",
         "/studios/executive-boardroom/alternate-wide.png"
       ]
+    },
+    {
+      "slug": "yacht-marina",
+      "name": "Яхта / марина",
+      "description": "Съёмка на яхте и в марине: белая палуба, море, солнечные блики, канаты, лаунж-зона и спокойный premium resort-образ.",
+      "preview_url": "/studios/yacht-marina/preview.png",
+      "base_prompt": "on a luxury yacht and marina setting with white deck, polished chrome rails, calm sea, marina docks, soft sunlight, nautical ropes, outdoor lounge seating, premium resort lifestyle atmosphere",
+      "wardrobe_prompt": "yacht marina wardrobe: elegant resort smart casual, linen shirt, light trousers, nautical blazer or refined summer dress, expensive relaxed styling, no swimwear",
+      "gallery_urls": [
+        "/studios/yacht-marina/master-wide.png",
+        "/studios/yacht-marina/angle-02.png",
+        "/studios/yacht-marina/angle-03.png",
+        "/studios/yacht-marina/angle-04.png",
+        "/studios/yacht-marina/angle-05.png",
+        "/studios/yacht-marina/angle-06.png",
+        "/studios/yacht-marina/angle-07.png",
+        "/studios/yacht-marina/detail-shot.png",
+        "/studios/yacht-marina/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "beach-club",
+      "name": "Пляж / beach club",
+      "description": "Beach club у моря: светлый песок, шезлонги, зонты, мягкий дневной свет и расслабленная курортная эстетика.",
+      "preview_url": "/studios/beach-club/preview.png",
+      "base_prompt": "at an elegant beach club with pale sand, cream umbrellas, designer sunbeds, cabanas, ocean horizon, warm daylight, natural coastal textures, upscale summer lifestyle atmosphere",
+      "wardrobe_prompt": "beach club wardrobe: elegant fully clothed resort look, linen set, light dress, summer shirt, sandals or loafers, stylish relaxed beach club outfit, no swimsuit, no revealing clothes",
+      "gallery_urls": [
+        "/studios/beach-club/master-wide.png",
+        "/studios/beach-club/angle-02.png",
+        "/studios/beach-club/angle-03.png",
+        "/studios/beach-club/angle-04.png",
+        "/studios/beach-club/angle-05.png",
+        "/studios/beach-club/angle-06.png",
+        "/studios/beach-club/angle-07.png",
+        "/studios/beach-club/detail-shot.png",
+        "/studios/beach-club/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "metropolis-streets",
+      "name": "Улицы мегаполиса",
+      "description": "Большой город: стеклянные фасады, переходы, отражения, движение улицы и современный editorial street-style.",
+      "preview_url": "/studios/metropolis-streets/preview.png",
+      "base_prompt": "on modern metropolis streets with glass high-rise buildings, crosswalks, reflections, clean sidewalks, urban depth, soft city light, premium editorial street photography atmosphere",
+      "wardrobe_prompt": "metropolis street wardrobe: stylish city editorial outfit, trench coat, tailored jacket, denim or structured casual pieces, fashionable urban styling",
+      "gallery_urls": [
+        "/studios/metropolis-streets/master-wide.png",
+        "/studios/metropolis-streets/angle-02.png",
+        "/studios/metropolis-streets/angle-03.png",
+        "/studios/metropolis-streets/angle-04.png",
+        "/studios/metropolis-streets/angle-05.png",
+        "/studios/metropolis-streets/angle-06.png",
+        "/studios/metropolis-streets/angle-07.png",
+        "/studios/metropolis-streets/detail-shot.png",
+        "/studios/metropolis-streets/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "desert-dunes",
+      "name": "Дюны и барханы",
+      "description": "Пустынные дюны: песчаные линии, мягкий закатный свет, ветер, минимализм и кинематографичная fashion-серия.",
+      "preview_url": "/studios/desert-dunes/preview.png",
+      "base_prompt": "among desert dunes and sand ridges with soft golden hour light, wind-shaped lines, open horizon, minimal cinematic landscape, luxury editorial fashion atmosphere",
+      "wardrobe_prompt": "desert dunes wardrobe: elegant desert editorial look, flowing linen, structured safari jacket, neutral fabrics, scarf or coat movement, fully clothed fashion styling",
+      "gallery_urls": [
+        "/studios/desert-dunes/master-wide.png",
+        "/studios/desert-dunes/angle-02.png",
+        "/studios/desert-dunes/angle-03.png",
+        "/studios/desert-dunes/angle-04.png",
+        "/studios/desert-dunes/angle-05.png",
+        "/studios/desert-dunes/angle-06.png",
+        "/studios/desert-dunes/angle-07.png",
+        "/studios/desert-dunes/detail-shot.png",
+        "/studios/desert-dunes/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "luxury-garage",
+      "name": "Автогараж / luxury garage",
+      "description": "Luxury garage с дорогими авто: бетон, тёплый свет, глянец кузова, leather-акценты и уверенный city luxury.",
+      "preview_url": "/studios/luxury-garage/preview.png",
+      "base_prompt": "inside a luxury car garage with premium sports cars, polished concrete floor, warm linear lighting, dark wood and metal details, reflective car paint, high-end automotive lifestyle atmosphere, no visible logos",
+      "wardrobe_prompt": "luxury garage wardrobe: sharp urban luxury outfit, leather jacket, tailored coat, monochrome suit or premium casual, confident automotive editorial styling",
+      "gallery_urls": [
+        "/studios/luxury-garage/master-wide.png",
+        "/studios/luxury-garage/angle-02.png",
+        "/studios/luxury-garage/angle-03.png",
+        "/studios/luxury-garage/angle-04.png",
+        "/studios/luxury-garage/angle-05.png",
+        "/studios/luxury-garage/angle-06.png",
+        "/studios/luxury-garage/angle-07.png",
+        "/studios/luxury-garage/detail-shot.png",
+        "/studios/luxury-garage/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "pit-lane-racing",
+      "name": "Мотогонки / pit lane",
+      "description": "Pit lane и мотоспорт: боксы, разметка, техника, динамичный свет и собранный racing editorial-образ.",
+      "preview_url": "/studios/pit-lane-racing/preview.png",
+      "base_prompt": "in a professional motorcycle racing pit lane with garage bays, race track markings, tools, matte bikes without logos, motion energy, cinematic paddock lighting, premium motorsport editorial atmosphere",
+      "wardrobe_prompt": "pit lane wardrobe: stylish motorsport-inspired outfit, racing jacket, black trousers, technical fabrics, boots, fully clothed editorial racing look, no brand logos",
+      "gallery_urls": [
+        "/studios/pit-lane-racing/master-wide.png",
+        "/studios/pit-lane-racing/angle-02.png",
+        "/studios/pit-lane-racing/angle-03.png",
+        "/studios/pit-lane-racing/angle-04.png",
+        "/studios/pit-lane-racing/angle-05.png",
+        "/studios/pit-lane-racing/angle-06.png",
+        "/studios/pit-lane-racing/angle-07.png",
+        "/studios/pit-lane-racing/detail-shot.png",
+        "/studios/pit-lane-racing/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "private-jet",
+      "name": "Частный самолёт / бизнес-джет",
+      "description": "Интерьер бизнес-джета: светлая кожа, овальные окна, лакированные панели и приватная premium travel-атмосфера.",
+      "preview_url": "/studios/private-jet/preview.png",
+      "base_prompt": "inside a private business jet cabin with cream leather seats, oval airplane windows, polished wood panels, soft daylight, compact luxury travel interior, premium aviation lifestyle atmosphere",
+      "wardrobe_prompt": "private jet wardrobe: elegant travel business outfit, blazer, cashmere knit, tailored trousers, quiet luxury styling, polished but relaxed",
+      "gallery_urls": [
+        "/studios/private-jet/master-wide.png",
+        "/studios/private-jet/angle-02.png",
+        "/studios/private-jet/angle-03.png",
+        "/studios/private-jet/angle-04.png",
+        "/studios/private-jet/angle-05.png",
+        "/studios/private-jet/angle-06.png",
+        "/studios/private-jet/angle-07.png",
+        "/studios/private-jet/detail-shot.png",
+        "/studios/private-jet/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "vip-airport-terminal",
+      "name": "Аэропорт / VIP terminal",
+      "description": "VIP terminal аэропорта: lounge, панорамные окна, чемоданы, мягкая подсветка и образ премиального путешествия.",
+      "preview_url": "/studios/vip-airport-terminal/preview.png",
+      "base_prompt": "inside a VIP airport terminal lounge with panoramic runway windows, cream lounge chairs, polished stone floor, discreet luggage, warm architectural lighting, premium travel atmosphere",
+      "wardrobe_prompt": "VIP airport wardrobe: refined travel outfit, blazer, coat, smart casual layers, stylish carry-on mood, comfortable luxury travel styling",
+      "gallery_urls": [
+        "/studios/vip-airport-terminal/master-wide.png",
+        "/studios/vip-airport-terminal/angle-02.png",
+        "/studios/vip-airport-terminal/angle-03.png",
+        "/studios/vip-airport-terminal/angle-04.png",
+        "/studios/vip-airport-terminal/angle-05.png",
+        "/studios/vip-airport-terminal/angle-06.png",
+        "/studios/vip-airport-terminal/angle-07.png",
+        "/studios/vip-airport-terminal/detail-shot.png",
+        "/studios/vip-airport-terminal/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "city-rooftop",
+      "name": "Rooftop с видом на город",
+      "description": "Городской rooftop: огни skyline, терраса, glass railings, вечерний воздух и статусная lifestyle-серия.",
+      "preview_url": "/studios/city-rooftop/preview.png",
+      "base_prompt": "on a luxury city rooftop terrace with skyline view, glass railings, outdoor lounge furniture, warm evening light, urban depth, high-end rooftop lifestyle atmosphere",
+      "wardrobe_prompt": "rooftop wardrobe: stylish evening city outfit, tailored blazer, cocktail smart casual, premium shoes, confident urban nightlife styling",
+      "gallery_urls": [
+        "/studios/city-rooftop/master-wide.png",
+        "/studios/city-rooftop/angle-02.png",
+        "/studios/city-rooftop/angle-03.png",
+        "/studios/city-rooftop/angle-04.png",
+        "/studios/city-rooftop/angle-05.png",
+        "/studios/city-rooftop/angle-06.png",
+        "/studios/city-rooftop/angle-07.png",
+        "/studios/city-rooftop/detail-shot.png",
+        "/studios/city-rooftop/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "fine-dining-restaurant",
+      "name": "Ресторан fine dining",
+      "description": "Fine dining restaurant: белые скатерти, тёплый свет, сервировка, бар и элегантная вечерняя атмосфера.",
+      "preview_url": "/studios/fine-dining-restaurant/preview.png",
+      "base_prompt": "inside a fine dining restaurant with white tablecloths, elegant table settings, warm pendant lights, marble bar, velvet seating, refined evening hospitality atmosphere, no readable menus",
+      "wardrobe_prompt": "fine dining wardrobe: elegant dinner outfit, cocktail dress or dark suit, refined evening styling, polished restaurant atmosphere",
+      "gallery_urls": [
+        "/studios/fine-dining-restaurant/master-wide.png",
+        "/studios/fine-dining-restaurant/angle-02.png",
+        "/studios/fine-dining-restaurant/angle-03.png",
+        "/studios/fine-dining-restaurant/angle-04.png",
+        "/studios/fine-dining-restaurant/angle-05.png",
+        "/studios/fine-dining-restaurant/angle-06.png",
+        "/studios/fine-dining-restaurant/angle-07.png",
+        "/studios/fine-dining-restaurant/detail-shot.png",
+        "/studios/fine-dining-restaurant/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "golf-club",
+      "name": "Гольф-клуб",
+      "description": "Гольф-клуб: зелёные поля, clubhouse, тележка, мягкий свет и аккуратный sport-luxury образ.",
+      "preview_url": "/studios/golf-club/preview.png",
+      "base_prompt": "at a premium golf club with green fairway, clubhouse architecture, golf cart, trimmed grass, soft daylight, open landscape, refined sport luxury atmosphere",
+      "wardrobe_prompt": "golf club wardrobe: elegant golf lifestyle outfit, polo, knit vest, tailored shorts or trousers, clean sneakers or loafers, refined country club styling",
+      "gallery_urls": [
+        "/studios/golf-club/master-wide.png",
+        "/studios/golf-club/angle-02.png",
+        "/studios/golf-club/angle-03.png",
+        "/studios/golf-club/angle-04.png",
+        "/studios/golf-club/angle-05.png",
+        "/studios/golf-club/angle-06.png",
+        "/studios/golf-club/angle-07.png",
+        "/studios/golf-club/detail-shot.png",
+        "/studios/golf-club/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "italian-villa-garden",
+      "name": "Сад виллы / итальянская вилла",
+      "description": "Итальянская вилла: каменные арки, кипарисы, сад, терраса, солнечные стены и мягкий vacation editorial.",
+      "preview_url": "/studios/italian-villa-garden/preview.png",
+      "base_prompt": "in an Italian villa garden with stone arches, cypress trees, terracotta walls, terrace, sculptural greenery, warm Mediterranean daylight, elegant vacation editorial atmosphere",
+      "wardrobe_prompt": "Italian villa wardrobe: elegant Mediterranean outfit, linen suit, summer dress, silk scarf, soft neutral or rich natural colors, refined villa lifestyle styling",
+      "gallery_urls": [
+        "/studios/italian-villa-garden/master-wide.png",
+        "/studios/italian-villa-garden/angle-02.png",
+        "/studios/italian-villa-garden/angle-03.png",
+        "/studios/italian-villa-garden/angle-04.png",
+        "/studios/italian-villa-garden/angle-05.png",
+        "/studios/italian-villa-garden/angle-06.png",
+        "/studios/italian-villa-garden/angle-07.png",
+        "/studios/italian-villa-garden/detail-shot.png",
+        "/studios/italian-villa-garden/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "paris-street",
+      "name": "Парижская улица / европейский квартал",
+      "description": "Европейская улица: кафе, каменные фасады, балконы, мягкий свет и спокойный Paris editorial-style.",
+      "preview_url": "/studios/paris-street/preview.png",
+      "base_prompt": "on a Parisian European street with stone facades, wrought iron balconies, small cafe tables, cobblestones, soft daylight, elegant urban European editorial atmosphere",
+      "wardrobe_prompt": "Paris street wardrobe: chic European outfit, trench coat, blazer, silk blouse, loafers, refined effortless city styling",
+      "gallery_urls": [
+        "/studios/paris-street/master-wide.png",
+        "/studios/paris-street/angle-02.png",
+        "/studios/paris-street/angle-03.png",
+        "/studios/paris-street/angle-04.png",
+        "/studios/paris-street/angle-05.png",
+        "/studios/paris-street/angle-06.png",
+        "/studios/paris-street/angle-07.png",
+        "/studios/paris-street/detail-shot.png",
+        "/studios/paris-street/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "tokyo-neon-night",
+      "name": "Токио ночью / неоновые улицы",
+      "description": "Ночной Токио: неон, мокрый асфальт, витрины, отражения и яркий cinematic street-fashion.",
+      "preview_url": "/studios/tokyo-neon-night/preview.png",
+      "base_prompt": "on Tokyo neon night streets with glowing signs without readable text, wet pavement reflections, compact city alleys, colorful cinematic light, stylish urban night editorial atmosphere",
+      "wardrobe_prompt": "Tokyo neon wardrobe: modern street-fashion outfit, dark coat, technical jacket, layered monochrome with color accents, stylish night city look",
+      "gallery_urls": [
+        "/studios/tokyo-neon-night/master-wide.png",
+        "/studios/tokyo-neon-night/angle-02.png",
+        "/studios/tokyo-neon-night/angle-03.png",
+        "/studios/tokyo-neon-night/angle-04.png",
+        "/studios/tokyo-neon-night/angle-05.png",
+        "/studios/tokyo-neon-night/angle-06.png",
+        "/studios/tokyo-neon-night/angle-07.png",
+        "/studios/tokyo-neon-night/detail-shot.png",
+        "/studios/tokyo-neon-night/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "new-york-editorial-street",
+      "name": "Нью-Йорк editorial street",
+      "description": "New York street editorial: лестницы, кирпич, такси-цвет, плотная городская перспектива и fashion-ритм.",
+      "preview_url": "/studios/new-york-editorial-street/preview.png",
+      "base_prompt": "on a New York editorial street with brick buildings, fire escapes, urban crosswalk, muted yellow taxi-like color accents without logos, strong city perspective, fashion street photography atmosphere",
+      "wardrobe_prompt": "New York editorial wardrobe: bold city fashion outfit, oversized blazer, trench, denim, boots, confident editorial street style",
+      "gallery_urls": [
+        "/studios/new-york-editorial-street/master-wide.png",
+        "/studios/new-york-editorial-street/angle-02.png",
+        "/studios/new-york-editorial-street/angle-03.png",
+        "/studios/new-york-editorial-street/angle-04.png",
+        "/studios/new-york-editorial-street/angle-05.png",
+        "/studios/new-york-editorial-street/angle-06.png",
+        "/studios/new-york-editorial-street/angle-07.png",
+        "/studios/new-york-editorial-street/detail-shot.png",
+        "/studios/new-york-editorial-street/alternate-wide.png"
+      ]
     }
   ]
 }

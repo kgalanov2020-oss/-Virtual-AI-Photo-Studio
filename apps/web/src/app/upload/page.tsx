@@ -39,22 +39,6 @@ const selfieGuide = [
     title: "Правый профиль",
     image: "/selfie-guide/06-right-profile.jpg",
   },
-  {
-    title: "Фото немного сверху",
-    image: "/selfie-guide/07-from-above.jpg",
-  },
-  {
-    title: "Фото немного снизу",
-    image: "/selfie-guide/08-from-below.jpg",
-  },
-  {
-    title: "Фото при дневном свете",
-    image: "/selfie-guide/09-daylight.jpg",
-  },
-  {
-    title: "Без солнцезащитных очков и сильных теней",
-    image: "/selfie-guide/10-clean-face.jpg",
-  },
 ];
 
 const acceptedImageTypes = ".jpg,.jpeg,.png,.webp,.heic,.heif,.avif";
@@ -72,13 +56,12 @@ export default function UploadPage() {
   const [uploadResult, setUploadResult] = useState<string | null>(null);
 
   const readyCount = selfies.length;
-  const isReady = readyCount >= 8;
+  const isReady = readyCount >= 6;
   const canContinue = isReady && acceptedLegal && acceptedPhotoRights;
   const statusText = useMemo(() => {
-    if (readyCount === 0) return "Загрузите 8-10 селфи, чтобы начать.";
-    if (readyCount < 8) return `Нужно ещё ${8 - readyCount} фото.`;
-    if (readyCount <= 10) return "Набор фото готов для проверки качества.";
-    return "Лучше оставить 10 самых разных фото.";
+    if (readyCount === 0) return "Загрузите 6 селфи, чтобы начать.";
+    if (readyCount < 6) return `Нужно ещё ${6 - readyCount} фото.`;
+    return "Набор фото готов для проверки качества.";
   }, [readyCount]);
 
   useEffect(() => {
@@ -232,11 +215,6 @@ export default function UploadPage() {
         <div className="upload-copy">
           <p className="eyebrow">Шаг 1 из 3</p>
           <h1>Загрузите фото</h1>
-          <p className="lead">
-            Нужны 8-10 обычных фото с телефона: анфас, полуобороты, профиль и
-            несколько вариантов освещения.
-          </p>
-
         </div>
       </section>
 
@@ -244,9 +222,12 @@ export default function UploadPage() {
         <div className="section-header">
           <div>
             <h2>Какие фото нужны</h2>
-            <p>Сделайте фото на телефон при хорошем свете, без фильтров и сильной ретуши.</p>
+            <p>
+              От 6 обычных фото с телефона: анфас, полуобороты, профиль при
+              дневном свете, без солнцезащитных очков и сильных теней.
+              Чем больше подходящих фото, тем точнее результат.
+            </p>
           </div>
-          <div className="count-pill">Минимум 8 фото</div>
         </div>
 
         <div className="guide-grid">
@@ -283,7 +264,7 @@ export default function UploadPage() {
         <label className="upload-dropzone">
           <input accept={acceptedImageTypes} multiple onChange={handleFiles} type="file" />
           <span>Выбрать фото</span>
-          <strong>Загрузите 8-10 селфи одним разом</strong>
+          <strong>Загрузите от 6 селфи одним разом</strong>
           <em>JPG, PNG, WEBP, HEIC, HEIF или AVIF</em>
         </label>
       </section>

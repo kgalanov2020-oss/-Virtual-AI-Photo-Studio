@@ -1,15 +1,15 @@
 :root {
   color-scheme: light;
   --bg: #f5f5f2;
-  --panel: #ffffff;
+  --panel: #fbfbf8;
   --panel-soft: #ecece8;
-  --text: #111111;
+  --text: #1d1b18;
   --muted: #666666;
   --line: #ddddda;
-  --accent: #111111;
-  --accent-dark: #000000;
-  --warm: #111111;
-  --ink: #111111;
+  --accent: #807468;
+  --accent-dark: #62584f;
+  --warm: #2a2621;
+  --ink: #1d1b18;
   --shadow: 0 18px 48px rgba(0, 0, 0, 0.1);
 }
 
@@ -86,14 +86,14 @@ a {
 }
 
 .topnav a {
-  color: var(--muted);
+  color: var(--text);
   font-size: 14px;
   font-weight: 800;
 }
 
 .atelier-hero {
-  background: #111111;
-  color: #ffffff;
+  background: #1d1b18;
+  color: #f6f3ed;
   display: grid;
   min-height: min(760px, 92vh);
   overflow: hidden;
@@ -169,7 +169,7 @@ a {
 }
 
 .atelier-hero-copy > p:not(.atelier-kicker) {
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(246, 243, 237, 0.88);
   font-size: clamp(18px, 1.6vw, 23px);
   line-height: 1.45;
   margin: 26px 0 0 auto;
@@ -181,7 +181,10 @@ a {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
+  justify-content: flex-end;
   margin-top: 34px;
+  margin-left: auto;
+  max-width: min(520px, 42vw);
 }
 
 .atelier-button {
@@ -197,17 +200,17 @@ a {
 
 .atelier-button-light {
   background: var(--accent);
-  color: white;
+  color: #f7f3ee;
 }
 
 .atelier-button-ghost {
-  border: 1px solid rgba(255, 255, 255, 0.55);
-  color: #ffffff;
+  border: 1px solid rgba(246, 243, 237, 0.55);
+  color: #f6f3ed;
 }
 
 .atelier-button-dark {
   background: var(--accent);
-  color: white;
+  color: #f7f3ee;
 }
 
 .atelier-hero-stats {
@@ -221,8 +224,8 @@ a {
 
 .atelier-hero-stats span {
   backdrop-filter: blur(18px);
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  background: rgba(246, 243, 237, 0.12);
+  border: 1px solid rgba(246, 243, 237, 0.24);
   display: grid;
   min-width: 150px;
   padding: 16px 18px;
@@ -297,6 +300,44 @@ a {
   text-align: right;
 }
 
+.atelier-section-head-reverse > p {
+  text-align: left;
+}
+
+.atelier-intro > p {
+  text-align: right;
+}
+
+.atelier-footer {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 28px clamp(22px, 5vw, 72px);
+}
+
+.atelier-footer span {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.atelier-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 22px;
+  justify-content: flex-end;
+}
+
+.atelier-footer a {
+  font-size: 14px;
+  font-weight: 700;
+}
+
 .atelier-studio-grid {
   display: grid;
   gap: 16px;
@@ -313,9 +354,14 @@ a {
 }
 
 .atelier-studio-tile:nth-child(1),
-.atelier-studio-tile:nth-child(6) {
+.atelier-studio-tile:nth-child(7) {
   aspect-ratio: 16 / 10;
   grid-column: span 3;
+}
+
+.atelier-studio-tile:nth-child(6) {
+  aspect-ratio: 4 / 5;
+  grid-column: 2 / span 2;
 }
 
 .atelier-studio-tile img {
@@ -353,8 +399,13 @@ a {
   justify-self: start;
 }
 
-.atelier-studio-tile:nth-child(1) a > div,
-.atelier-studio-tile:nth-child(6) a > div {
+.atelier-studio-tile:nth-child(1) a > div {
+  justify-self: start;
+  text-align: left;
+}
+
+.atelier-studio-tile:nth-child(2) a > div,
+.atelier-studio-tile:nth-child(7) a > div {
   justify-self: end;
   text-align: right;
 }
@@ -828,6 +879,22 @@ h1 {
   margin-top: 30px;
 }
 
+.actions-bottom {
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
+.studio-actions {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 620px;
+}
+
+.studio-actions .button {
+  width: 100%;
+}
+
 .button {
   align-items: center;
   border-radius: 999px;
@@ -836,6 +903,7 @@ h1 {
   justify-content: center;
   min-height: 48px;
   padding: 0 20px;
+  text-align: center;
   transition:
     background 0.16s ease,
     border-color 0.16s ease,
@@ -848,7 +916,7 @@ h1 {
 
 .button-primary {
   background: var(--accent);
-  color: white;
+  color: #f7f3ee;
 }
 
 .button:disabled {
@@ -857,7 +925,7 @@ h1 {
 }
 
 .button-secondary {
-  background: transparent;
+  background: rgba(251, 251, 248, 0.7);
   border: 1px solid var(--line);
   color: var(--text);
 }
@@ -1052,6 +1120,18 @@ h1 {
 
 .interior-gallery img:nth-child(n + 2):nth-child(-n + 8) {
   grid-column: span 2;
+}
+
+.interior-gallery-cta {
+  align-items: end;
+  display: flex;
+  grid-column: span 3;
+  justify-content: flex-end;
+  min-height: 100%;
+}
+
+.interior-gallery-cta .actions {
+  max-width: 620px;
 }
 
 .section {
@@ -2029,6 +2109,22 @@ h1 {
 
   .interior-gallery {
     grid-template-columns: 1fr;
+  }
+
+  .interior-gallery-cta {
+    grid-column: auto;
+    justify-content: stretch;
+  }
+
+  .interior-gallery-cta .actions,
+  .studio-actions {
+    grid-template-columns: 1fr;
+    max-width: none;
+    width: 100%;
+  }
+
+  .studio-actions .button:first-child {
+    grid-column: auto;
   }
 
   .generation-slots {
