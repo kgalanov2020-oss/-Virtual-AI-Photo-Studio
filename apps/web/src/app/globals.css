@@ -727,6 +727,27 @@ h1 {
   padding: 18px 0;
 }
 
+.checkout-field {
+  display: grid;
+  gap: 8px;
+}
+
+.checkout-field span {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.checkout-field input {
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  min-height: 46px;
+  padding: 0 14px;
+}
+
 .quality-hero {
   align-items: end;
   display: grid;

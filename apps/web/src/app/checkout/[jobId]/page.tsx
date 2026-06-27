@@ -25,8 +25,10 @@ export default function CheckoutPage() {
   const searchParams = useSearchParams();
   const jobId = params.jobId;
   const sessionId = searchParams.get("session_id");
+  const paymentReturn = searchParams.get("payment_return");
   const cancelled = searchParams.get("cancelled");
   const [job, setJob] = useState<Job | null>(null);
+  const [customerEmail, setCustomerEmail] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isPaying, setIsPaying] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -45,11 +47,13 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (sessionId) {
       confirmPayment(sessionId);
+    } else if (paymentReturn) {
+      confirmLatestPendingPayment();
     } else if (cancelled) {
       setMessage("Оплата отменена. Можно попробовать ещё раз.");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, cancelled]);
+  }, [sessionId, paymentReturn, cancelled]);
 
   async function loadCheckout() {
     setIsLoading(true);
@@ -97,7 +101,7 @@ export default function CheckoutPage() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ jobId }),
+        body: JSON.stringify({ jobId, email: customerEmail.trim() }),
       });
       const data = (await response.json()) as CheckoutResponse;
 
@@ -117,6 +121,37 @@ export default function CheckoutPage() {
       window.location.href = data.checkoutUrl;
     } catch (paymentError) {
       setError(paymentError instanceof Error ? paymentError.message : "Ошибка оплаты.");
+      setIsPaying(false);
+    }
+  }
+
+  async function confirmLatestPendingPayment() {
+    setIsPaying(true);
+    setError(null);
+    setMessage("Проверяем платёж...");
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { data: orders, error: orderError } = await supabase
+        .from("orders")
+        .select("provider_session_id")
+        .eq("job_id", jobId)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (orderError) {
+        throw new Error(orderError.message);
+      }
+
+      const paymentId = orders?.[0]?.provider_session_id;
+      if (!paymentId) {
+        throw new Error("Не найден ожидающий платёж для этого заказа.");
+      }
+
+      await confirmPayment(paymentId);
+    } catch (confirmError) {
+      setError(confirmError instanceof Error ? confirmError.message : "Ошибка подтверждения оплаты.");
       setIsPaying(false);
     }
   }
@@ -183,6 +218,17 @@ export default function CheckoutPage() {
           <strong>{PHOTO_PACKAGE_NAME}</strong>
           <p>{PHOTO_PACKAGE_DESCRIPTION}</p>
           <div className="checkout-price">{price}</div>
+          <label className="checkout-field">
+            <span>Email для чека</span>
+            <input
+              autoComplete="email"
+              disabled={isLoading || isPaying || job?.payment_status === "paid"}
+              onChange={(event) => setCustomerEmail(event.target.value)}
+              placeholder="you@example.com"
+              type="email"
+              value={customerEmail}
+            />
+          </label>
           <div className={job?.payment_status === "paid" ? "badge ok" : "badge pending"}>
             {job?.payment_status === "paid" ? "Оплачено" : "Ожидает оплату"}
           </div>

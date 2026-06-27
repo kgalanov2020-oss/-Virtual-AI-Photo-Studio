@@ -11,30 +11,37 @@ import { createSupabaseAdminClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
-type StripeSession = {
+type YooKassaPayment = {
   id: string;
-  url: string;
-  payment_status?: string;
+  status: string;
+  confirmation?: {
+    confirmation_url?: string;
+  };
 };
 
 export async function POST(request: NextRequest) {
   try {
     const token = readBearerToken(request);
-    const { jobId } = (await request.json()) as { jobId?: string };
+    const { jobId, email } = (await request.json()) as { jobId?: string; email?: string };
 
     if (!jobId) {
       return NextResponse.json({ error: "Не передан jobId." }, { status: 400 });
     }
 
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeSecretKey) {
+    const yookassaShopId = process.env.YOOKASSA_SHOP_ID;
+    const yookassaSecretKey = process.env.YOOKASSA_SECRET_KEY;
+    if (!yookassaShopId || !yookassaSecretKey) {
       return NextResponse.json(
         {
           error:
-            "Оплата ещё не настроена: добавьте STRIPE_SECRET_KEY в Render. Можно оставить загрузку и проверку фото, но генерация будет доступна после подключения платежей.",
+            "Оплата ещё не настроена: добавьте YOOKASSA_SHOP_ID и YOOKASSA_SECRET_KEY в Render. Можно оставить загрузку и проверку фото, но генерация будет доступна после подключения платежей.",
         },
         { status: 501 },
       );
+    }
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: "Введите email для электронного чека." }, { status: 400 });
     }
 
     const supabase = createSupabaseAdminClient();
@@ -64,20 +71,27 @@ export async function POST(request: NextRequest) {
     }
 
     const origin = request.headers.get("origin") ?? new URL(request.url).origin;
-    const session = await createStripeCheckoutSession({
-      apiKey: stripeSecretKey,
+    const payment = await createYooKassaPayment({
+      shopId: yookassaShopId,
+      secretKey: yookassaSecretKey,
       origin,
       jobId,
       userId,
+      email,
     });
+    const checkoutUrl = payment.confirmation?.confirmation_url;
+
+    if (!checkoutUrl) {
+      throw new Error("ЮKassa не вернула ссылку на оплату.");
+    }
 
     const { error: orderError } = await supabase.from("orders").insert({
       job_id: jobId,
       user_id: userId,
       status: "pending",
-      provider: "stripe",
-      provider_session_id: session.id,
-      checkout_url: session.url,
+      provider: "yookassa",
+      provider_session_id: payment.id,
+      checkout_url: checkoutUrl,
       amount_cents: PHOTO_PACKAGE_AMOUNT_CENTS,
       currency: PAYMENT_CURRENCY,
       product_code: PHOTO_PACKAGE_CODE,
@@ -105,7 +119,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      checkoutUrl: session.url,
+      checkoutUrl,
       label: formatMoney(),
     });
   } catch (error) {
@@ -116,43 +130,73 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function createStripeCheckoutSession({
-  apiKey,
+async function createYooKassaPayment({
+  shopId,
+  secretKey,
   origin,
   jobId,
   userId,
+  email,
 }: {
-  apiKey: string;
+  shopId: string;
+  secretKey: string;
   origin: string;
   jobId: string;
   userId: string;
+  email: string;
 }) {
-  const body = new URLSearchParams();
-
-  body.set("mode", "payment");
-  body.set("success_url", `${origin}/checkout/${jobId}?session_id={CHECKOUT_SESSION_ID}`);
-  body.set("cancel_url", `${origin}/checkout/${jobId}?cancelled=1`);
-  body.set("client_reference_id", jobId);
-  body.set("metadata[job_id]", jobId);
-  body.set("metadata[user_id]", userId);
-  body.set("line_items[0][quantity]", "1");
-  body.set("line_items[0][price_data][currency]", PAYMENT_CURRENCY);
-  body.set("line_items[0][price_data][unit_amount]", String(PHOTO_PACKAGE_AMOUNT_CENTS));
-  body.set("line_items[0][price_data][product_data][name]", PHOTO_PACKAGE_NAME);
-  body.set("line_items[0][price_data][product_data][description]", PHOTO_PACKAGE_DESCRIPTION);
-
-  const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+  const amountValue = (PHOTO_PACKAGE_AMOUNT_CENTS / 100).toFixed(2);
+  const response = await fetch("https://api.yookassa.ru/v3/payments", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: `Basic ${Buffer.from(`${shopId}:${secretKey}`).toString("base64")}`,
+      "Content-Type": "application/json",
+      "Idempotence-Key": crypto.randomUUID(),
     },
-    body,
+    body: JSON.stringify({
+      amount: {
+        value: amountValue,
+        currency: PAYMENT_CURRENCY.toUpperCase(),
+      },
+      capture: true,
+      confirmation: {
+        type: "redirect",
+        return_url: `${origin}/checkout/${jobId}?payment_return=1`,
+      },
+      description: PHOTO_PACKAGE_NAME,
+      metadata: {
+        job_id: jobId,
+        user_id: userId,
+        product_code: PHOTO_PACKAGE_CODE,
+        email,
+      },
+      receipt: {
+        customer: {
+          email,
+        },
+        items: [
+          {
+            description: PHOTO_PACKAGE_DESCRIPTION,
+            quantity: "1.00",
+            amount: {
+              value: amountValue,
+              currency: PAYMENT_CURRENCY.toUpperCase(),
+            },
+            vat_code: 1,
+            payment_subject: "service",
+            payment_mode: "full_payment",
+          },
+        ],
+      },
+    }),
   });
-  const data = (await response.json()) as StripeSession & { error?: { message?: string } };
+  const data = (await response.json()) as YooKassaPayment & {
+    description?: string;
+    error?: { message?: string };
+  };
 
-  if (!response.ok || !data.url) {
-    throw new Error(data.error?.message ?? "Stripe не создал checkout-сессию.");
+  if (!response.ok) {
+    throw new Error(data.description ?? data.error?.message ?? "ЮKassa не создала платёж.");
   }
 
   return data;

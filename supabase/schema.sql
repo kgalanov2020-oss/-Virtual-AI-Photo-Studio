@@ -57,7 +57,7 @@ create table if not exists public.orders (
   user_id uuid not null references auth.users(id) on delete cascade,
   status text not null default 'pending'
     check (status in ('pending', 'paid', 'cancelled', 'failed', 'refunded')),
-  provider text not null default 'stripe',
+  provider text not null default 'yookassa',
   provider_session_id text unique,
   provider_payment_id text,
   checkout_url text,

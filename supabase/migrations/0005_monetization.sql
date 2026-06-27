@@ -22,7 +22,7 @@ create table if not exists public.orders (
   user_id uuid not null references auth.users(id) on delete cascade,
   status text not null default 'pending'
     check (status in ('pending', 'paid', 'cancelled', 'failed', 'refunded')),
-  provider text not null default 'stripe',
+  provider text not null default 'yookassa',
   provider_session_id text unique,
   provider_payment_id text,
   checkout_url text,
@@ -38,6 +38,9 @@ create table if not exists public.orders (
 create index if not exists orders_job_id_idx on public.orders(job_id);
 create index if not exists orders_user_id_idx on public.orders(user_id);
 create index if not exists orders_provider_session_id_idx on public.orders(provider_session_id);
+
+alter table public.orders
+alter column provider set default 'yookassa';
 
 alter table public.orders enable row level security;
 

@@ -3,11 +3,9 @@ import { createSupabaseAdminClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
 
-type StripeSession = {
+type YooKassaPayment = {
   id: string;
-  client_reference_id?: string;
-  payment_intent?: string;
-  payment_status?: string;
+  status?: string;
   metadata?: {
     job_id?: string;
     user_id?: string;
@@ -26,9 +24,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Не переданы jobId или sessionId." }, { status: 400 });
     }
 
-    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeSecretKey) {
-      return NextResponse.json({ error: "STRIPE_SECRET_KEY не настроен." }, { status: 501 });
+    const yookassaShopId = process.env.YOOKASSA_SHOP_ID;
+    const yookassaSecretKey = process.env.YOOKASSA_SECRET_KEY;
+    if (!yookassaShopId || !yookassaSecretKey) {
+      return NextResponse.json({ error: "YOOKASSA_SHOP_ID или YOOKASSA_SECRET_KEY не настроены." }, { status: 501 });
     }
 
     const supabase = createSupabaseAdminClient();
@@ -39,14 +38,14 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = userData.user.id;
-    const session = await retrieveStripeSession(stripeSecretKey, sessionId);
-    const sessionJobId = session.metadata?.job_id ?? session.client_reference_id;
+    const session = await retrieveYooKassaPayment(yookassaShopId, yookassaSecretKey, sessionId);
+    const sessionJobId = session.metadata?.job_id;
 
     if (sessionJobId !== jobId || session.metadata?.user_id !== userId) {
       return NextResponse.json({ error: "Оплата не относится к этому заказу." }, { status: 403 });
     }
 
-    if (session.payment_status !== "paid") {
+    if (session.status !== "succeeded") {
       return NextResponse.json(
         { error: "Платёж ещё не подтверждён платёжной системой." },
         { status: 409 },
@@ -58,8 +57,7 @@ export async function POST(request: NextRequest) {
       .from("orders")
       .update({
         status: "paid",
-        provider_payment_id:
-          typeof session.payment_intent === "string" ? session.payment_intent : null,
+        provider_payment_id: session.id,
         paid_at: paidAt,
         updated_at: paidAt,
       })
@@ -97,16 +95,16 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function retrieveStripeSession(apiKey: string, sessionId: string) {
-  const response = await fetch(`https://api.stripe.com/v1/checkout/sessions/${sessionId}`, {
+async function retrieveYooKassaPayment(shopId: string, secretKey: string, paymentId: string) {
+  const response = await fetch(`https://api.yookassa.ru/v3/payments/${paymentId}`, {
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      Authorization: `Basic ${Buffer.from(`${shopId}:${secretKey}`).toString("base64")}`,
     },
   });
-  const data = (await response.json()) as StripeSession & { error?: { message?: string } };
+  const data = (await response.json()) as YooKassaPayment & { description?: string; error?: { message?: string } };
 
   if (!response.ok) {
-    throw new Error(data.error?.message ?? "Не удалось проверить Stripe-сессию.");
+    throw new Error(data.description ?? data.error?.message ?? "Не удалось проверить платёж ЮKassa.");
   }
 
   return data;

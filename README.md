@@ -17,7 +17,7 @@ The MVP starts with one studio, `Modern Business Studio`, instead of a broad gen
 - Auth, database, storage: Supabase
 - AI worker: RunPod, ComfyUI, InstantID, IP-Adapter or FaceID
 - Queue: Redis with RQ/Celery
-- Payments: Stripe
+- Payments: YooKassa
 
 ## Current Contents
 
