@@ -3,18 +3,25 @@ import { getActiveStudios } from "@/lib/studios";
 
 export const dynamic = "force-dynamic";
 
-const scenarioLabels: Record<string, string> = {
-  "modern-office": "Для личного бренда и делового образа",
-  "premium-gym": "Для спортивного lifestyle-контента",
-  "boutique-hotel": "Для элегантной вечерней серии",
-  "castle-library": "Для классического статусного портрета",
-  "hi-tech-lab": "Для технологичного и современного образа",
-  "urban-loft": "Для смелой editorial-съёмки",
-  "luxury-penthouse": "Для премиального lifestyle",
-  "art-gallery": "Для творческого и модного портрета",
-  "wellness-spa": "Для спокойной relaxed-серии",
-  "executive-boardroom": "Для строгого executive-портрета",
+const studioLabels: Record<string, string> = {
+  "modern-office": "Деловая серия",
+  "premium-gym": "Спортивный lifestyle",
+  "boutique-hotel": "Вечерний образ",
+  "castle-library": "Классический портрет",
+  "hi-tech-lab": "Технологичный стиль",
+  "urban-loft": "Editorial mood",
+  "luxury-penthouse": "Premium lifestyle",
+  "art-gallery": "Арт-портрет",
+  "wellness-spa": "Relaxed-серия",
+  "executive-boardroom": "Executive portrait",
 };
+
+const selfiePreview = [
+  "/selfie-guide/01-front-neutral.jpg",
+  "/selfie-guide/03-left-three-quarter.jpg",
+  "/selfie-guide/05-left-profile.jpg",
+  "/selfie-guide/09-daylight.jpg",
+];
 
 export default async function Home() {
   const studiosResult = await getActiveStudios();
@@ -31,109 +38,117 @@ export default async function Home() {
   const featuredStudio = studios.find((studio) => studio.slug === "modern-office") ?? studios[0];
 
   return (
-    <main className="page">
-      <header className="topbar landing-topbar">
-        <div className="brand">Виртуальная AI Фотостудия</div>
-        <nav className="landing-nav" aria-label="Главная навигация">
+    <main className="atelier-page">
+      <header className="atelier-nav">
+        <a className="atelier-brand" href="/">
+          <span>Atelier</span>
+          <em>Studio</em>
+        </a>
+        <nav aria-label="Главная навигация">
           <a href="#studios">Интерьеры</a>
           <a href="#process">Как работает</a>
-          <a href="#result">Что получите</a>
+          <a href="#selfies">Селфи</a>
         </nav>
+        <a className="atelier-nav-cta" href="#studios">
+          Выбрать интерьер
+        </a>
       </header>
 
-      <section className="landing-hero">
-        <div className="landing-hero-content">
-          <p className="eyebrow">Виртуальная фотостудия</p>
-          <h1>Фотосессия в интерьере, который выглядит как реальная локация.</h1>
-          <p className="lead">
-            Вы выбираете готовое пространство, загружаете селфи и получаете серию
-            портретов с продуманной одеждой, позами, светом и дистанциями камеры.
+      <section className="atelier-hero">
+        <div className="atelier-hero-media" aria-hidden="true" />
+        <div className="atelier-hero-copy">
+          <p className="atelier-kicker">
+            <span />
+            Виртуальная фотостудия
           </p>
-          <div className="actions">
-            <a className="button button-primary" href="#studios">
+          <h1>Фотосессия в интерьере, который выглядит как реальная локация</h1>
+          <p>
+            Выберите готовое пространство, загрузите несколько селфи и получите
+            серию профессиональных портретов, снятых так, будто вы действительно
+            были там.
+          </p>
+          <div className="atelier-actions">
+            <a className="atelier-button atelier-button-light" href="#studios">
               Выбрать интерьер
             </a>
-            <a className="button button-secondary button-on-hero" href={`/upload?studio=${featuredStudio?.slug ?? "modern-office"}`}>
+            <a
+              className="atelier-button atelier-button-ghost"
+              href={`/upload?studio=${featuredStudio?.slug ?? "modern-office"}`}
+            >
               Загрузить селфи
             </a>
           </div>
-          <div className="hero-facts" aria-label="Параметры фотосессии">
-            <span>
-              <strong>{studios.length}</strong>
-              интерьеров
-            </span>
-            <span>
-              <strong>{PRODUCT_IMAGES_PER_STUDIO}</strong>
-              фото в серии
-            </span>
-            <span>
-              <strong>10</strong>
-              сцен съёмки
-            </span>
-          </div>
+        </div>
+        <div className="atelier-hero-stats" aria-label="Параметры фотосессии">
+          <span>
+            <strong>{studios.length}</strong>
+            интерьеров
+          </span>
+          <span>
+            <strong>{PRODUCT_IMAGES_PER_STUDIO}</strong>
+            фото
+          </span>
+          <span>
+            <strong>{TARGET_SHOTS_PER_STUDIO}</strong>
+            сцен
+          </span>
         </div>
       </section>
 
-      <section className="section landing-intro">
+      <section className="atelier-section atelier-intro">
         <div>
-          <p className="eyebrow">Сначала пространство</p>
-          <h2>Пользователь выбирает не фильтр, а место будущей съёмки.</h2>
+          <p className="atelier-eyebrow">Не генератор</p>
+          <h2>Это каталог виртуальных студий, где каждая локация уже продумана.</h2>
         </div>
         <p>
-          Каждый интерьер работает как отдельная фотостудия: у него есть 9 ракурсов
-          пространства, свой свет, настроение, гардероб и сценарии позирования.
+          У каждого пространства есть свои ракурсы, свет, мебель, настроение,
+          одежда и сценарии позирования. Пользователь выбирает не “эффект”, а
+          атмосферу будущей съёмки.
         </p>
       </section>
 
-      <section className="section" id="studios">
-        <div className="section-header">
+      <section className="atelier-section" id="studios">
+        <div className="atelier-section-head">
           <div>
-            <h2>Готовые интерьеры</h2>
-            <p>Откройте пространство, посмотрите ракурсы и выберите атмосферу будущей серии.</p>
+            <p className="atelier-eyebrow">Интерьеры</p>
+            <h2>Выберите пространство для фотосессии</h2>
           </div>
-          <div className="count-pill">{studios.length} пространств</div>
+          <p>
+            Внутри каждого интерьера можно посмотреть 9 ракурсов самой локации и
+            начать загрузку селфи.
+          </p>
         </div>
 
-        <div className="landing-studio-grid">
-          {studios.map((studio) => (
-            <article className="landing-studio-card" key={studio.id}>
-              {studio.preview_url ? (
-                <img alt={studio.name} src={studio.preview_url} />
-              ) : (
-                <div className="studio-card-placeholder">{studio.name}</div>
-              )}
-              <div>
-                <span>{scenarioLabels[studio.slug] ?? "Для профессиональной фотосессии"}</span>
-                <h3>{studio.name}</h3>
-                <p>{studio.description}</p>
-                <div className="studio-card-actions">
-                  <a className="button button-secondary" href={`/studios/${studio.slug}`}>
-                    Смотреть интерьер
-                  </a>
-                  <a className="button button-primary" href={`/upload?studio=${studio.slug}`}>
-                    Выбрать
-                  </a>
+        <div className="atelier-studio-grid">
+          {studios.map((studio, index) => (
+            <article className="atelier-studio-tile" key={studio.id}>
+              {studio.preview_url ? <img alt={studio.name} src={studio.preview_url} /> : null}
+              <a href={`/studios/${studio.slug}`}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <em>{studioLabels[studio.slug] ?? "Портретная серия"}</em>
+                  <strong>{studio.name}</strong>
                 </div>
-              </div>
+              </a>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="section process-section" id="process">
-        <div className="section-header">
+      <section className="atelier-section atelier-process" id="process">
+        <div className="atelier-section-head">
           <div>
-            <h2>Как проходит съёмка</h2>
-            <p>Путь должен ощущаться как запись в студию, а не как работа с техническим инструментом.</p>
+            <p className="atelier-eyebrow">Процесс</p>
+            <h2>Похоже на запись в студию, только без поездки на съёмку.</h2>
           </div>
         </div>
-        <div className="process-grid">
+        <div className="atelier-process-grid">
           {[
-            ["01", "Выберите интерьер", "Откройте офис, спортзал, отель, галерею или другое пространство и посмотрите его ракурсы."],
-            ["02", "Загрузите селфи", "Подойдут обычные фото с телефона: JPG, PNG, WEBP, HEIC, HEIF или AVIF."],
-            ["03", "Получите серию", "Сервис создаёт фотографии с разными позами, планами и одеждой под выбранную атмосферу."],
+            ["01", "Выберите интерьер", "Офис, отель, спортзал, галерея, пентхаус, замок или другое пространство."],
+            ["02", "Загрузите селфи", "Подойдут обычные фото с телефона при хорошем свете и без сильной ретуши."],
+            ["03", "Получите серию", "40 фото в выбранном пространстве: разные позы, планы и дистанции камеры."],
           ].map(([step, title, text]) => (
-            <article className="process-item" key={step}>
+            <article key={step}>
               <span>{step}</span>
               <h3>{title}</h3>
               <p>{text}</p>
@@ -142,30 +157,53 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="section result-section" id="result">
-        <div className="result-copy">
-          <p className="eyebrow">Финальный результат</p>
-          <h2>{PRODUCT_IMAGES_PER_STUDIO} фото в одном выбранном пространстве</h2>
+      <section className="atelier-section atelier-result">
+        <div className="atelier-result-media">
+          <img alt="Современный офис" src="/studios/modern-office/master-wide.png" />
+          <img alt="Бутик-отель" src="/studios/boutique-hotel/master-wide.png" />
+        </div>
+        <div className="atelier-result-copy">
+          <p className="atelier-eyebrow">Результат</p>
+          <h2>{PRODUCT_IMAGES_PER_STUDIO} фотографий в одном выбранном интерьере</h2>
           <p>
-            В серии используется {TARGET_SHOTS_PER_STUDIO} постановочных сцен. Для
-            каждой сцены создаются разные дистанции камеры: ближе к объективу,
-            чуть дальше, ещё дальше и общий план. Позы не повторяются механически:
-            часть кадров сидячие, часть стоячие, часть в движении или relaxed.
+            Серия строится как реальная фотосессия: близкий портрет, средний план,
+            дальний план и общий кадр. Одежда и позы подбираются под атмосферу
+            локации.
           </p>
-          <a className="button button-primary" href="#studios">
-            Начать с выбора интерьера
+          <a className="atelier-button atelier-button-dark" href="#studios">
+            Смотреть интерьеры
           </a>
         </div>
-        <div className="result-mosaic">
-          {[
-            "/studios/modern-office/master-wide.png",
-            "/studios/boutique-hotel/master-wide.png",
-            "/studios/premium-gym/master-wide.png",
-            "/studios/art-gallery/master-wide.png",
-          ].map((url) => (
-            <img alt="Пример интерьера фотостудии" key={url} src={url} />
+      </section>
+
+      <section className="atelier-section atelier-selfies" id="selfies">
+        <div>
+          <p className="atelier-eyebrow">Селфи</p>
+          <h2>Обычные фото с телефона, без студийной подготовки.</h2>
+          <p>
+            Нужны 8-10 ракурсов лица: анфас, полуобороты, профиль и несколько
+            вариантов света. Это помогает сохранить похожесть в готовой серии.
+          </p>
+          <a
+            className="atelier-button atelier-button-dark"
+            href={`/upload?studio=${featuredStudio?.slug ?? "modern-office"}`}
+          >
+            Перейти к загрузке
+          </a>
+        </div>
+        <div className="atelier-selfie-strip">
+          {selfiePreview.map((src, index) => (
+            <img alt={`Пример селфи ${index + 1}`} key={src} src={src} />
           ))}
         </div>
+      </section>
+
+      <section className="atelier-final">
+        <p>Virtual AI Photo Studio</p>
+        <h2>Начните с выбора интерьера.</h2>
+        <a className="atelier-button atelier-button-light" href="#studios">
+          Открыть каталог
+        </a>
       </section>
     </main>
   );
