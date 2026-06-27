@@ -15,16 +15,46 @@ type SelectedSelfie = {
 };
 
 const selfieGuide = [
-  "Анфас с нейтральным выражением лица",
-  "Анфас с лёгкой улыбкой",
-  "Левый полуоборот",
-  "Правый полуоборот",
-  "Левый профиль",
-  "Правый профиль",
-  "Фото немного сверху",
-  "Фото немного снизу",
-  "Фото при дневном свете",
-  "Без солнцезащитных очков и сильных теней",
+  {
+    title: "Анфас с нейтральным выражением лица",
+    visual: "front-neutral",
+  },
+  {
+    title: "Анфас с лёгкой улыбкой",
+    visual: "front-smile",
+  },
+  {
+    title: "Левый полуоборот",
+    visual: "left-three-quarter",
+  },
+  {
+    title: "Правый полуоборот",
+    visual: "right-three-quarter",
+  },
+  {
+    title: "Левый профиль",
+    visual: "left-profile",
+  },
+  {
+    title: "Правый профиль",
+    visual: "right-profile",
+  },
+  {
+    title: "Фото немного сверху",
+    visual: "from-above",
+  },
+  {
+    title: "Фото немного снизу",
+    visual: "from-below",
+  },
+  {
+    title: "Фото при дневном свете",
+    visual: "daylight",
+  },
+  {
+    title: "Без солнцезащитных очков и сильных теней",
+    visual: "clean-face",
+  },
 ];
 
 const acceptedImageTypes = ".jpg,.jpeg,.png,.webp,.heic,.heif,.avif";
@@ -249,9 +279,10 @@ export default function UploadPage() {
 
         <div className="guide-grid">
           {selfieGuide.map((item, index) => (
-            <article className="guide-card" key={item}>
+            <article className="guide-card" key={item.title}>
+              <SelfieGuideVisual variant={item.visual} />
               <span>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{item}</strong>
+              <strong>{item.title}</strong>
             </article>
           ))}
         </div>
@@ -359,6 +390,26 @@ export default function UploadPage() {
         {uploadResult ? <div className="upload-message success">{uploadResult}</div> : null}
       </section>
     </main>
+  );
+}
+
+function SelfieGuideVisual({ variant }: { variant: string }) {
+  return (
+    <div className={`guide-visual ${variant}`} aria-hidden="true">
+      <div className="guide-phone-frame">
+        <div className="guide-light" />
+        <div className="guide-person">
+          <div className="guide-head">
+            <i className="guide-eye guide-eye-left" />
+            <i className="guide-eye guide-eye-right" />
+            <i className="guide-nose" />
+            <i className="guide-mouth" />
+          </div>
+          <div className="guide-neck" />
+          <div className="guide-shoulders" />
+        </div>
+      </div>
+    </div>
   );
 }
 
