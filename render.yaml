@@ -3,12 +3,14 @@ services:
     name: virtual-ai-photo-studio
     runtime: node
     plan: free
-    rootDir: .
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /
     buildCommand: corepack enable && corepack prepare pnpm@11.7.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @ai-photo-studio/web build
-    startCommand: pnpm --filter @ai-photo-studio/web start -- -p $PORT
+    startCommand: corepack enable && corepack prepare pnpm@11.7.0 --activate && pnpm --dir apps/web exec next start -H 0.0.0.0 -p $PORT
     envVars:
       - key: NODE_VERSION
-        value: 24.16.0
+        value: 20.19.0
       - key: PNPM_VERSION
         value: 11.7.0
       - key: AI_IMAGE_PROVIDER
