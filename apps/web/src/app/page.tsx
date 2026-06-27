@@ -16,13 +16,6 @@ const studioLabels: Record<string, string> = {
   "executive-boardroom": "Executive portrait",
 };
 
-const selfiePreview = [
-  "/selfie-guide/01-front-neutral.jpg",
-  "/selfie-guide/03-left-three-quarter.jpg",
-  "/selfie-guide/05-left-profile.jpg",
-  "/selfie-guide/09-daylight.jpg",
-];
-
 export default async function Home() {
   const studiosResult = await getActiveStudios();
 
@@ -44,36 +37,24 @@ export default async function Home() {
           <span>Virtual AI Photo Studio</span>
         </a>
         <nav aria-label="Главная навигация">
-          <a href="#studios">Интерьеры</a>
-          <a href="#process">Как работает</a>
-          <a href="#selfies">Селфи</a>
+          <a href="#studios">Каталог</a>
         </nav>
-        <a className="atelier-nav-cta" href="#studios">
-          Выбрать интерьер
-        </a>
       </header>
 
       <section className="atelier-hero">
         <div className="atelier-hero-media" aria-hidden="true" />
         <div className="atelier-hero-copy">
-          <p className="atelier-kicker">
-            <span />
-            Виртуальная фотостудия
-          </p>
-          <h1>Профессиональная фотосессия в выбранном интерьере</h1>
+          <h1>
+            <span>Профессиональная фотосессия</span>
+            <small>в выбранном интерьере</small>
+          </h1>
           <p>
             Выберите готовое пространство, загрузите селфи и получите серию
-            портретов с подходящей одеждой, позами, светом и атмосферой.
+            портретов с подходящей одеждой, позами, светом и атмосферой
           </p>
           <div className="atelier-actions">
             <a className="atelier-button atelier-button-light" href="#studios">
               Выбрать интерьер
-            </a>
-            <a
-              className="atelier-button atelier-button-ghost"
-              href={`/upload?studio=${featuredStudio?.slug ?? "modern-office"}`}
-            >
-              Загрузить селфи
             </a>
           </div>
         </div>
@@ -95,26 +76,20 @@ export default async function Home() {
 
       <section className="atelier-section atelier-intro">
         <div>
-          <p className="atelier-eyebrow">Не генератор</p>
-          <h2>Это каталог виртуальных студий, где каждая локация уже продумана.</h2>
+          <h2>Каталог виртуальных студий</h2>
         </div>
-        <p>
-          У каждого пространства есть свои ракурсы, свет, мебель, настроение,
-          одежда и сценарии позирования. Пользователь выбирает не “эффект”, а
-          атмосферу будущей съёмки.
-        </p>
+        <p>Готовые пространства с продуманным светом, одеждой и позами.</p>
       </section>
 
       <section className="atelier-section" id="studios">
-        <div className="atelier-section-head">
-          <div>
-            <p className="atelier-eyebrow">Интерьеры</p>
-            <h2>Выберите пространство для фотосессии</h2>
-          </div>
+        <div className="atelier-section-head atelier-section-head-reverse">
           <p>
             Внутри каждого интерьера можно посмотреть 9 ракурсов самой локации и
             начать загрузку селфи.
           </p>
+          <div>
+            <h2>Выберите пространство для фотосессии</h2>
+          </div>
         </div>
 
         <div className="atelier-studio-grid">
@@ -133,76 +108,6 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="atelier-section atelier-process" id="process">
-        <div className="atelier-section-head">
-          <div>
-            <p className="atelier-eyebrow">Процесс</p>
-            <h2>Похоже на запись в студию, только без поездки на съёмку.</h2>
-          </div>
-        </div>
-        <div className="atelier-process-grid">
-          {[
-            ["01", "Выберите интерьер", "Офис, отель, спортзал, галерея, пентхаус, замок или другое пространство."],
-            ["02", "Загрузите селфи", "Подойдут обычные фото с телефона при хорошем свете и без сильной ретуши."],
-            ["03", "Получите серию", "40 фото в выбранном пространстве: разные позы, планы и дистанции камеры."],
-          ].map(([step, title, text]) => (
-            <article key={step}>
-              <span>{step}</span>
-              <h3>{title}</h3>
-              <p>{text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="atelier-section atelier-result">
-        <div className="atelier-result-media">
-          <img alt="Современный офис" src="/studios/modern-office/master-wide.png" />
-          <img alt="Бутик-отель" src="/studios/boutique-hotel/master-wide.png" />
-        </div>
-        <div className="atelier-result-copy">
-          <p className="atelier-eyebrow">Результат</p>
-          <h2>{PRODUCT_IMAGES_PER_STUDIO} фотографий в одном выбранном интерьере</h2>
-          <p>
-            Серия строится как реальная фотосессия: близкий портрет, средний план,
-            дальний план и общий кадр. Одежда и позы подбираются под атмосферу
-            локации.
-          </p>
-          <a className="atelier-button atelier-button-dark" href="#studios">
-            Смотреть интерьеры
-          </a>
-        </div>
-      </section>
-
-      <section className="atelier-section atelier-selfies" id="selfies">
-        <div>
-          <p className="atelier-eyebrow">Селфи</p>
-          <h2>Обычные фото с телефона, без студийной подготовки.</h2>
-          <p>
-            Нужны 8-10 ракурсов лица: анфас, полуобороты, профиль и несколько
-            вариантов света. Это помогает сохранить похожесть в готовой серии.
-          </p>
-          <a
-            className="atelier-button atelier-button-dark"
-            href={`/upload?studio=${featuredStudio?.slug ?? "modern-office"}`}
-          >
-            Перейти к загрузке
-          </a>
-        </div>
-        <div className="atelier-selfie-strip">
-          {selfiePreview.map((src, index) => (
-            <img alt={`Пример селфи ${index + 1}`} key={src} src={src} />
-          ))}
-        </div>
-      </section>
-
-      <section className="atelier-final">
-        <p>Virtual AI Photo Studio</p>
-        <h2>Начните с выбора интерьера.</h2>
-        <a className="atelier-button atelier-button-light" href="#studios">
-          Открыть каталог
-        </a>
-      </section>
     </main>
   );
 }

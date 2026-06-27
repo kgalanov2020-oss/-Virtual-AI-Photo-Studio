@@ -1,16 +1,16 @@
 :root {
   color-scheme: light;
-  --bg: #f4f4f1;
+  --bg: #f5f5f2;
   --panel: #ffffff;
-  --panel-soft: #eff1ee;
-  --text: #171715;
-  --muted: #686d68;
-  --line: #dadbd5;
-  --accent: #8a3d54;
-  --accent-dark: #5a2435;
-  --warm: #b79a62;
-  --ink: #11100e;
-  --shadow: 0 24px 70px rgba(20, 24, 22, 0.12);
+  --panel-soft: #ecece8;
+  --text: #111111;
+  --muted: #666666;
+  --line: #ddddda;
+  --accent: #111111;
+  --accent-dark: #000000;
+  --warm: #111111;
+  --ink: #111111;
+  --shadow: 0 18px 48px rgba(0, 0, 0, 0.1);
 }
 
 * {
@@ -19,9 +19,7 @@
 
 body {
   margin: 0;
-  background:
-    linear-gradient(180deg, #fbfbf8 0, var(--bg) 460px),
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
   font-family:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -34,17 +32,19 @@ a {
 }
 
 .atelier-page {
-  background: #eee8dd;
-  color: #221a14;
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
 }
 
 .atelier-nav {
   align-items: center;
-  background: rgba(24, 17, 13, 0.28);
-  color: #fffaf0;
+  backdrop-filter: blur(18px);
+  background: rgba(245, 245, 242, 0.92);
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr auto;
   left: 0;
   padding: 26px clamp(22px, 5vw, 72px);
   position: absolute;
@@ -61,17 +61,10 @@ a {
 
 .atelier-brand span {
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 900;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.08em;
   line-height: 1;
-}
-
-.atelier-brand em {
-  font-size: 13px;
-  font-style: normal;
-  font-weight: 800;
-  letter-spacing: 0.38em;
   text-transform: uppercase;
 }
 
@@ -80,19 +73,27 @@ a {
   gap: clamp(20px, 3vw, 42px);
 }
 
-.atelier-nav nav a,
-.atelier-nav-cta {
+.atelier-nav nav a {
+  color: var(--muted);
   font-size: 15px;
   font-weight: 700;
 }
 
-.atelier-nav-cta {
-  justify-self: end;
+.topnav {
+  align-items: center;
+  display: flex;
+  gap: 22px;
+}
+
+.topnav a {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
 }
 
 .atelier-hero {
-  background: #171512;
-  color: #fffaf0;
+  background: #111111;
+  color: #ffffff;
   display: grid;
   min-height: min(760px, 92vh);
   overflow: hidden;
@@ -102,8 +103,8 @@ a {
 
 .atelier-hero-media {
   background:
-    linear-gradient(90deg, rgba(18, 15, 12, 0.82) 0%, rgba(18, 15, 12, 0.54) 42%, rgba(18, 15, 12, 0.16) 100%),
-    linear-gradient(0deg, rgba(18, 15, 12, 0.56), transparent 54%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.48) 42%, rgba(0, 0, 0, 0.12) 100%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.52), transparent 54%),
     url("/studios/modern-office/master-wide.png") center / cover;
   inset: 0;
   position: absolute;
@@ -141,34 +142,46 @@ a {
 .atelier-result-copy h2,
 .atelier-selfies h2,
 .atelier-final h2 {
-  font-family: Georgia, "Times New Roman", serif;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-weight: 780;
+  letter-spacing: -0.045em;
   margin: 0;
 }
 
 .atelier-hero h1 {
+  display: grid;
+  gap: 10px;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(42px, 5.2vw, 72px);
-  font-weight: 900;
+  font-weight: 780;
   letter-spacing: -0.04em;
   line-height: 0.98;
   max-width: 780px;
 }
 
+.atelier-hero h1 small {
+  display: block;
+  font: inherit;
+  font-size: clamp(27px, 3vw, 42px);
+  letter-spacing: inherit;
+  line-height: 1.02;
+  white-space: nowrap;
+}
+
 .atelier-hero-copy > p:not(.atelier-kicker) {
-  color: rgba(255, 250, 240, 0.9);
+  color: rgba(255, 255, 255, 0.88);
   font-size: clamp(18px, 1.6vw, 23px);
   line-height: 1.45;
-  margin: 26px 0 0;
+  margin: 26px 0 0 auto;
   max-width: 680px;
+  text-align: right;
 }
 
 .atelier-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-top: 44px;
+  margin-top: 34px;
 }
 
 .atelier-button {
@@ -179,49 +192,51 @@ a {
   font-weight: 850;
   justify-content: center;
   min-height: 56px;
-  padding: 0 28px;
+  padding: 0 30px;
 }
 
 .atelier-button-light {
-  background: #fffaf0;
-  color: #211812;
+  background: var(--accent);
+  color: white;
 }
 
 .atelier-button-ghost {
-  border: 1px solid rgba(255, 250, 240, 0.55);
-  color: #fffaf0;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #ffffff;
 }
 
 .atelier-button-dark {
-  background: #211812;
-  color: #fffaf0;
+  background: var(--accent);
+  color: white;
 }
 
 .atelier-hero-stats {
   align-self: end;
   display: flex;
   gap: 10px;
+  margin-top: 44px;
   position: relative;
   z-index: 1;
 }
 
 .atelier-hero-stats span {
   backdrop-filter: blur(18px);
-  background: rgba(255, 250, 240, 0.12);
-  border: 1px solid rgba(255, 250, 240, 0.24);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.24);
   display: grid;
   min-width: 150px;
   padding: 16px 18px;
 }
 
 .atelier-hero-stats strong {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: 34px;
+  font-weight: 900;
   line-height: 1;
 }
 
 .atelier-section {
-  padding: clamp(64px, 8vw, 118px) clamp(22px, 5vw, 72px);
+  padding: clamp(48px, 6vw, 82px) clamp(22px, 5vw, 72px);
 }
 
 .atelier-intro,
@@ -233,8 +248,17 @@ a {
   grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
 }
 
+.atelier-intro {
+  padding-bottom: clamp(30px, 3.5vw, 48px);
+  padding-top: clamp(30px, 3.5vw, 48px);
+}
+
+.atelier-intro + .atelier-section {
+  padding-top: clamp(30px, 3.5vw, 48px);
+}
+
 .atelier-eyebrow {
-  color: #8b5d3c;
+  color: var(--muted);
   margin-bottom: 22px;
 }
 
@@ -243,15 +267,15 @@ a {
 .atelier-result-copy h2,
 .atelier-selfies h2,
 .atelier-final h2 {
-  font-size: clamp(38px, 5.4vw, 78px);
-  line-height: 0.98;
+  font-size: clamp(32px, 3.8vw, 54px);
+  line-height: 1.02;
 }
 
 .atelier-intro > p,
 .atelier-section-head > p,
 .atelier-result-copy p,
 .atelier-selfies p {
-  color: #6d6256;
+  color: var(--muted);
   font-size: clamp(18px, 1.55vw, 22px);
   line-height: 1.62;
   margin: 0;
@@ -265,6 +289,14 @@ a {
   margin-bottom: 34px;
 }
 
+.atelier-section-head-reverse {
+  grid-template-columns: minmax(320px, 0.52fr) minmax(0, 1fr);
+}
+
+.atelier-section-head-reverse > div {
+  text-align: right;
+}
+
 .atelier-studio-grid {
   display: grid;
   gap: 16px;
@@ -273,7 +305,7 @@ a {
 
 .atelier-studio-tile {
   aspect-ratio: 4 / 5;
-  background: #261b14;
+  background: var(--text);
   border-radius: 2px;
   grid-column: span 2;
   overflow: hidden;
@@ -308,18 +340,28 @@ a {
 
 .atelier-studio-tile a {
   align-items: end;
-  color: #fffaf0;
-  display: flex;
+  color: #ffffff;
+  display: grid;
   inset: 0;
-  justify-content: space-between;
+  gap: 18px;
   padding: 22px;
   position: absolute;
   z-index: 1;
 }
 
+.atelier-studio-tile a > div {
+  justify-self: start;
+}
+
+.atelier-studio-tile:nth-child(1) a > div,
+.atelier-studio-tile:nth-child(6) a > div {
+  justify-self: end;
+  text-align: right;
+}
+
 .atelier-studio-tile span,
 .atelier-studio-tile em {
-  color: rgba(255, 250, 240, 0.72);
+  color: rgba(255, 255, 255, 0.72);
   font-size: 12px;
   font-style: normal;
   font-weight: 800;
@@ -329,50 +371,71 @@ a {
 
 .atelier-studio-tile strong {
   display: block;
-  font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(24px, 2.6vw, 40px);
+  font-weight: 900;
   line-height: 1;
   margin-top: 8px;
 }
 
 .atelier-process {
-  background: #211812;
-  color: #fffaf0;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+  color: var(--text);
 }
 
 .atelier-process .atelier-eyebrow,
 .atelier-process .atelier-section-head > p {
-  color: rgba(255, 250, 240, 0.68);
+  color: var(--muted);
 }
 
 .atelier-process-grid {
   display: grid;
-  gap: 1px;
+  gap: 16px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .atelier-process-grid article {
-  background: rgba(255, 250, 240, 0.08);
-  min-height: 300px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  min-height: 260px;
   padding: 34px;
 }
 
 .atelier-process-grid span {
-  color: #caa678;
+  color: var(--muted);
   font-size: 13px;
   font-weight: 900;
   letter-spacing: 0.18em;
 }
 
 .atelier-process-grid h3 {
-  font-family: Georgia, "Times New Roman", serif;
   font-size: 34px;
+  font-weight: 900;
   line-height: 1;
   margin: 70px 0 18px;
 }
 
+.atelier-process .atelier-section-head h2 {
+  display: grid;
+  gap: 8px;
+}
+
+.atelier-process .atelier-section-head h2 span {
+  display: block;
+}
+
+.atelier-process .atelier-section-head h2 small {
+  display: block;
+  font: inherit;
+  font-size: clamp(24px, 2.7vw, 34px);
+  letter-spacing: inherit;
+  line-height: 1.08;
+  white-space: nowrap;
+}
+
 .atelier-process-grid p {
-  color: rgba(255, 250, 240, 0.76);
+  color: var(--muted);
   line-height: 1.58;
   margin: 0;
 }
@@ -400,7 +463,7 @@ a {
 }
 
 .atelier-selfies {
-  background: #f8f4ed;
+  background: var(--bg);
 }
 
 .atelier-selfies > div:first-child {
@@ -426,10 +489,8 @@ a {
 }
 
 .atelier-final {
-  background:
-    linear-gradient(0deg, rgba(20, 13, 9, 0.72), rgba(20, 13, 9, 0.72)),
-    url("/studios/luxury-penthouse/master-wide.png") center / cover;
-  color: #fffaf0;
+  background: var(--text);
+  color: #ffffff;
   display: grid;
   justify-items: center;
   padding: clamp(88px, 12vw, 160px) 22px;
@@ -454,7 +515,7 @@ a {
 .topbar {
   align-items: center;
   backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(224, 216, 204, 0.68);
+  border-bottom: 1px solid var(--line);
   display: flex;
   justify-content: space-between;
   padding: 18px clamp(22px, 5vw, 72px);
@@ -462,7 +523,7 @@ a {
 
 .brand {
   font-size: 14px;
-  font-weight: 850;
+  font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1040,13 +1101,19 @@ h1 {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
-  min-height: 220px;
+  min-height: 124px;
   padding: 18px;
 }
 
 .shot-card h3 {
   font-size: 18px;
-  margin: 0 0 12px;
+  margin: 0;
+}
+
+.shot-card p {
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 14px 0 0;
 }
 
 .meta-list {
@@ -1099,13 +1166,13 @@ h1 {
 
 .upload-layout {
   display: grid;
-  gap: 36px;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 520px);
-  padding: 58px clamp(22px, 5vw, 72px) 28px;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 58px clamp(22px, 5vw, 72px) 18px;
 }
 
 .upload-copy {
-  max-width: 760px;
+  max-width: 980px;
 }
 
 .upload-status {
@@ -1132,10 +1199,19 @@ h1 {
   max-width: 560px;
 }
 
+.child-mode-section {
+  padding-top: 0;
+  padding-bottom: 28px;
+}
+
+.child-mode-section .mode-option {
+  width: 100%;
+}
+
 .mode-option {
   align-items: flex-start;
-  background: #f3eef1;
-  border: 1px solid #ddcbd3;
+  background: var(--panel);
+  border: 1px solid var(--line);
   border-radius: 10px;
   cursor: pointer;
   display: flex;
@@ -1160,18 +1236,32 @@ h1 {
 
 .upload-dropzone {
   align-items: center;
-  background:
-    linear-gradient(135deg, rgba(138, 61, 84, 0.13), transparent 48%),
-    var(--panel);
-  border: 1px dashed rgba(138, 61, 84, 0.5);
-  border-radius: 14px;
+  background: var(--panel);
+  border: 1px dashed var(--text);
+  border-radius: 8px;
   box-shadow: var(--shadow);
   cursor: pointer;
   display: grid;
   justify-items: center;
-  min-height: 320px;
+  min-height: 240px;
   padding: 34px;
   text-align: center;
+}
+
+.upload-action-section {
+  padding-top: 0;
+}
+
+.studio-upload-cta {
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  min-height: 220px;
+  padding-top: 0;
+}
+
+.studio-upload-cta .button {
+  min-width: 320px;
 }
 
 .upload-dropzone input {

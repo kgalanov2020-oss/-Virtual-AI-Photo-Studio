@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { PRODUCT_IMAGES_PER_STUDIO } from "@/lib/generation";
 import { getStudioSession } from "@/lib/studios";
 
 type StudioPageProps = {
@@ -31,16 +30,18 @@ export default async function StudioPage({ params }: StudioPageProps) {
     <main className="page">
       <header className="topbar">
         <Link className="brand" href="/">
-          Виртуальная AI Фотостудия
+          Virtual AI Photo Studio
         </Link>
-        <div className="status">Интерьер: {studio.name}</div>
+        <nav className="topnav" aria-label="Навигация">
+          <Link href="/">Каталог</Link>
+          <Link href={`/upload?studio=${studio.slug}`}>Загрузить селфи</Link>
+        </nav>
       </header>
 
       <section className="studio-detail-hero">
         <div>
-          <p className="eyebrow">Выбранный интерьер</p>
+          <p className="eyebrow">Интерьер</p>
           <h1>{studio.name}</h1>
-          <p className="lead">{studio.description}</p>
           <div className="actions">
             <Link className="button button-primary" href={`/upload?studio=${studio.slug}`}>
               Выбрать этот интерьер
@@ -64,12 +65,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
         <div className="section-header">
           <div>
             <h2>Ракурсы интерьера</h2>
-            <p>
-              9 изображений самого пространства, чтобы перед загрузкой селфи
-              посмотреть атмосферу, свет, мебель и будущие зоны съёмки.
-            </p>
           </div>
-          <div className="count-pill">{galleryUrls.length} фото интерьера</div>
         </div>
 
         <div className="interior-gallery">
@@ -83,38 +79,10 @@ export default async function StudioPage({ params }: StudioPageProps) {
         </div>
       </section>
 
-      <section className="section">
-        <div className="section-header">
-          <div>
-            <h2>Фотосессия в этом пространстве</h2>
-            <p>
-              После загрузки селфи будет создано {PRODUCT_IMAGES_PER_STUDIO} фото:
-              10 разных позиций и 4 дистанции камеры для каждой позиции. Одежда
-              подбирается под интерьер.
-            </p>
-          </div>
-          <Link className="button button-primary" href={`/upload?studio=${studio.slug}`}>
-            Перейти к загрузке селфи
-          </Link>
-        </div>
-
-        <div className="shot-grid">
-          {shots.slice(0, 10).map((shot) => (
-            <article className="shot-card" key={shot.id}>
-              <h3>{shot.name}</h3>
-              <div className="meta-list">
-                <div className="meta-item">
-                  <span>Поза</span>
-                  {shot.pose}
-                </div>
-                <div className="meta-item">
-                  <span>Камера</span>
-                  {shot.camera_angle}
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+      <section className="section studio-upload-cta">
+        <Link className="button button-primary" href={`/upload?studio=${studio.slug}`}>
+          Перейти к загрузке селфи
+        </Link>
       </section>
     </main>
   );

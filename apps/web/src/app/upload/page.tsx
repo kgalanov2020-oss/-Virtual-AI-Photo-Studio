@@ -221,51 +221,23 @@ export default function UploadPage() {
     <main className="page">
       <header className="topbar">
         <Link className="brand" href="/">
-          Виртуальная AI Фотостудия
+          Virtual AI Photo Studio
         </Link>
-        <div className="status">Загрузка селфи для {selectedStudioSlug}</div>
+        <nav className="topnav" aria-label="Навигация">
+          <Link href="/">Каталог</Link>
+        </nav>
       </header>
 
       <section className="upload-layout">
         <div className="upload-copy">
           <p className="eyebrow">Шаг 1 из 3</p>
-          <h1>Загрузите фото для сохранения похожести</h1>
+          <h1>Загрузите фото</h1>
           <p className="lead">
             Нужны 8-10 обычных фото с телефона: анфас, полуобороты, профиль и
-            несколько вариантов освещения. Так итоговая серия лучше сохранит лицо.
+            несколько вариантов освещения.
           </p>
 
-          <div className="upload-status">
-            <strong>{readyCount}/10 фото</strong>
-            <span>{statusText}</span>
-          </div>
-
-          <div className="mode-panel">
-            <label className="mode-option">
-              <input
-                checked={generationMode === "child_safe"}
-                onChange={(event) =>
-                  setGenerationMode(event.target.checked ? "child_safe" : "standard")
-                }
-                type="checkbox"
-              />
-              <span>
-                <strong>Детский безопасный режим</strong>
-                <em>
-                  Для детских фото: полностью одетый ребёнок, школьный или детский
-                  портрет без взрослого делового образа и двусмысленных сцен.
-                </em>
-              </span>
-            </label>
-          </div>
         </div>
-
-        <label className="upload-dropzone">
-          <input accept={acceptedImageTypes} multiple onChange={handleFiles} type="file" />
-          <span>Выбрать фото</span>
-          <strong>Загрузите 8-10 селфи одним разом</strong>
-          <em>JPG, PNG, WEBP, HEIC, HEIF или AVIF</em>
-        </label>
       </section>
 
       <section className="section">
@@ -286,6 +258,34 @@ export default function UploadPage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="section child-mode-section">
+        <label className="mode-option">
+          <input
+            checked={generationMode === "child_safe"}
+            onChange={(event) =>
+              setGenerationMode(event.target.checked ? "child_safe" : "standard")
+            }
+            type="checkbox"
+          />
+          <span>
+            <strong>Детский безопасный режим</strong>
+            <em>
+              Для детских фото: полностью одетый ребёнок, школьный или детский
+              портрет без взрослого делового образа и двусмысленных сцен.
+            </em>
+          </span>
+        </label>
+      </section>
+
+      <section className="section upload-action-section">
+        <label className="upload-dropzone">
+          <input accept={acceptedImageTypes} multiple onChange={handleFiles} type="file" />
+          <span>Выбрать фото</span>
+          <strong>Загрузите 8-10 селфи одним разом</strong>
+          <em>JPG, PNG, WEBP, HEIC, HEIF или AVIF</em>
+        </label>
       </section>
 
       <section className="section">
