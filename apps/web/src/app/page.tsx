@@ -41,8 +41,7 @@ export default async function Home() {
     <main className="atelier-page">
       <header className="atelier-nav">
         <a className="atelier-brand" href="/">
-          <span>Atelier</span>
-          <em>Studio</em>
+          <span>Virtual AI Photo Studio</span>
         </a>
         <nav aria-label="Главная навигация">
           <a href="#studios">Интерьеры</a>
@@ -61,11 +60,10 @@ export default async function Home() {
             <span />
             Виртуальная фотостудия
           </p>
-          <h1>Фотосессия в интерьере, который выглядит как реальная локация</h1>
+          <h1>Профессиональная фотосессия в выбранном интерьере</h1>
           <p>
-            Выберите готовое пространство, загрузите несколько селфи и получите
-            серию профессиональных портретов, снятых так, будто вы действительно
-            были там.
+            Выберите готовое пространство, загрузите селфи и получите серию
+            портретов с подходящей одеждой, позами, светом и атмосферой.
           </p>
           <div className="atelier-actions">
             <a className="atelier-button atelier-button-light" href="#studios">
