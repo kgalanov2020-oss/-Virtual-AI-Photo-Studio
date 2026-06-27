@@ -3,6 +3,7 @@ import catalog from "@/lib/studio-catalog.json";
 import { generateBusinessPortrait } from "@/lib/comfy/client";
 import { getTargetShots, getTargetVariationCount, isTargetVariation } from "@/lib/generation";
 import { generateGeminiStudioPhoto } from "@/lib/gemini/client";
+import { PAYMENTS_ENABLED } from "@/lib/payments";
 import { createSupabaseAdminClient } from "@/lib/supabase";
 import type { GenerationMode, Job, StudioShot, UploadedSelfie } from "@/lib/types";
 
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Нет доступа к этому job." }, { status: 403 });
     }
 
-    if (job.payment_status !== "paid") {
+    if (PAYMENTS_ENABLED && job.payment_status !== "paid") {
       return NextResponse.json(
         { error: "Генерация доступна только после оплаты фотосессии." },
         { status: 402 },

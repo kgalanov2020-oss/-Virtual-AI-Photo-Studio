@@ -122,8 +122,8 @@ export default function QualityPage({ params }: QualityPageProps) {
           rejection_reason: null,
         })),
       );
-      setMessage("Фото приняты. Осталось оплатить пакет генерации.");
-      router.push(`/checkout/${jobId}`);
+      setMessage("Фото приняты. Переходим к генерации фотосессии.");
+      router.push(`/generation/${jobId}`);
     } catch (approveError) {
       setError(approveError instanceof Error ? approveError.message : "Неизвестная ошибка.");
     } finally {
@@ -169,7 +169,7 @@ export default function QualityPage({ params }: QualityPageProps) {
             onClick={approveAll}
             type="button"
           >
-            {isApproving ? "Принимаем..." : "Принять фото и перейти к оплате"}
+            {isApproving ? "Принимаем..." : "Принять фото и перейти к генерации"}
           </button>
         </div>
 

@@ -4,6 +4,7 @@ import {
   PHOTO_PACKAGE_AMOUNT_CENTS,
   PHOTO_PACKAGE_CODE,
 } from "@/lib/pricing";
+import { PAYMENTS_ENABLED } from "@/lib/payments";
 import { createSupabaseAdminClient } from "@/lib/supabase";
 
 export const runtime = "nodejs";
@@ -54,16 +55,18 @@ export async function POST(request: NextRequest, context: RouteContext) {
       throw new Error(selfiesError.message);
     }
 
+    const now = new Date().toISOString();
     const { data: updatedJob, error: updateError } = await supabase
       .from("jobs")
       .update({
-        status: "awaiting_payment",
-        payment_status: "unpaid",
+        status: PAYMENTS_ENABLED ? "awaiting_payment" : "queued",
+        payment_status: PAYMENTS_ENABLED ? "unpaid" : "paid",
+        paid_at: PAYMENTS_ENABLED ? null : now,
         amount_cents: PHOTO_PACKAGE_AMOUNT_CENTS,
         currency: PAYMENT_CURRENCY,
         product_code: PHOTO_PACKAGE_CODE,
-        progress: 0,
-        queued_at: null,
+        progress: PAYMENTS_ENABLED ? 0 : 5,
+        queued_at: PAYMENTS_ENABLED ? null : now,
         error_message: null,
       })
       .eq("id", jobId)

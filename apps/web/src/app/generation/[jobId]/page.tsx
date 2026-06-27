@@ -28,7 +28,7 @@ type GenerationResponse = {
 
 const statusLabels: Record<Job["status"], string> = {
   draft: "Черновик",
-  awaiting_payment: "Ожидает оплату",
+  awaiting_payment: "Ожидает запуска",
   queued: "В очереди",
   running: "Генерация",
   completed: "Готово",
@@ -283,7 +283,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
             <div style={{ width: `${job?.progress ?? 0}%` }} />
           </div>
           <p>{job?.progress ?? 0}% готово</p>
-          <p>{job?.payment_status === "paid" ? "Оплачено" : "Оплата не подтверждена"}</p>
+          <p>Тестовый режим без оплаты</p>
           <p>{generationMode === "child_safe" ? "Детский безопасный режим" : "Стандартный режим"}</p>
           <small>Job: {jobId || "загрузка..."}</small>
         </aside>
@@ -327,7 +327,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
           </button>
           <button
             className="button button-primary"
-            disabled={isLoading || isStartingGeneration || !job || job.payment_status !== "paid" || !["queued", "running"].includes(job.status)}
+            disabled={isLoading || isStartingGeneration || !job || !["queued", "running"].includes(job.status)}
             onClick={startGeneration}
             type="button"
           >
@@ -350,19 +350,12 @@ export default function GenerationPage({ params }: GenerationPageProps) {
             <div className="queue-panel">
               <strong>{totalGenerated}/{totalExpected} изображений готово</strong>
               <span>
-                {job?.payment_status !== "paid"
-                  ? "Для запуска генерации нужно оплатить пакет фотосессии."
-                  : job?.status === "completed"
+                {job?.status === "completed"
                   ? "Фотосессия готова. Можно скачать отдельные фото или весь архив."
                   : totalGenerated > 0
                     ? "Генерация идёт. Нажмите «Проверить статус», чтобы подтянуть новые варианты."
                     : "Нажмите «Запустить генерацию», чтобы создать фотосессию."}
               </span>
-              {job?.payment_status !== "paid" ? (
-                <Link className="button button-primary" href={`/checkout/${jobId}`}>
-                  Перейти к оплате
-                </Link>
-              ) : null}
             </div>
 
             <div className="generation-grid">
