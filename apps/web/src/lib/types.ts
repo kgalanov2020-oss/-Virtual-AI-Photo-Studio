@@ -44,13 +44,36 @@ export type Job = {
   user_id: string;
   studio_id: string;
   generation_mode: GenerationMode;
-  status: "draft" | "queued" | "running" | "completed" | "failed" | "cancelled";
+  status: "draft" | "awaiting_payment" | "queued" | "running" | "completed" | "failed" | "cancelled";
+  payment_status: "unpaid" | "pending" | "paid" | "refunded" | "failed";
+  paid_at: string | null;
+  amount_cents: number;
+  currency: string;
+  product_code: string;
   progress: number;
   error_message: string | null;
   created_at: string;
   queued_at: string | null;
   started_at: string | null;
   completed_at: string | null;
+};
+
+export type Order = {
+  id: string;
+  job_id: string;
+  user_id: string;
+  status: "pending" | "paid" | "cancelled" | "failed" | "refunded";
+  provider: string;
+  provider_session_id: string | null;
+  provider_payment_id: string | null;
+  checkout_url: string | null;
+  amount_cents: number;
+  currency: string;
+  product_code: string;
+  product_name: string;
+  created_at: string;
+  paid_at: string | null;
+  updated_at: string;
 };
 
 export type GeneratedImage = {
@@ -88,10 +111,15 @@ export type Database = {
       };
       jobs: {
         Row: Job;
-        Insert: Omit<Job, "id" | "generation_mode" | "status" | "progress" | "error_message" | "created_at" | "queued_at" | "started_at" | "completed_at"> & {
+        Insert: Omit<Job, "id" | "generation_mode" | "status" | "payment_status" | "paid_at" | "amount_cents" | "currency" | "product_code" | "progress" | "error_message" | "created_at" | "queued_at" | "started_at" | "completed_at"> & {
           id?: string;
           generation_mode?: GenerationMode;
           status?: Job["status"];
+          payment_status?: Job["payment_status"];
+          paid_at?: string | null;
+          amount_cents?: number;
+          currency?: string;
+          product_code?: string;
           progress?: number;
           error_message?: string | null;
           created_at?: string;
@@ -125,6 +153,23 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<GeneratedImage>;
+        Relationships: [];
+      };
+      orders: {
+        Row: Order;
+        Insert: Omit<
+          Order,
+          "id" | "provider_session_id" | "provider_payment_id" | "checkout_url" | "paid_at" | "created_at" | "updated_at"
+        > & {
+          id?: string;
+          provider_session_id?: string | null;
+          provider_payment_id?: string | null;
+          checkout_url?: string | null;
+          paid_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Order>;
         Relationships: [];
       };
     };

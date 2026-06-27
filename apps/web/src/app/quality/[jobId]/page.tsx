@@ -96,36 +96,23 @@ export default function QualityPage({ params }: QualityPageProps) {
 
     try {
       const supabase = createSupabaseBrowserClient();
-      const { error: updateError } = await supabase
-        .from("uploaded_selfies")
-        .update({
-          is_approved: true,
-          rejection_reason: null,
-        })
-        .eq("job_id", jobId)
-        .select("id");
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
 
-      if (updateError) {
-        throw new Error(updateError.message);
+      if (!token) {
+        throw new Error("Нет активной сессии Supabase. Обновите страницу и попробуйте снова.");
       }
 
-      const { data: updatedJob, error: jobError } = await supabase
-        .from("jobs")
-        .update({
-          status: "queued",
-          progress: 5,
-          queued_at: new Date().toISOString(),
-        })
-        .eq("id", jobId)
-        .select("id, status")
-        .single();
+      const response = await fetch(`/api/jobs/${jobId}/approve`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = (await response.json()) as { ok?: boolean; error?: string };
 
-      if (jobError) {
-        throw new Error(jobError.message);
-      }
-
-      if (updatedJob.status !== "queued") {
-        throw new Error("Supabase не перевёл job в очередь. Проверьте RLS-политики обновления.");
+      if (!response.ok || data.error) {
+        throw new Error(data.error ?? "Не удалось принять фото.");
       }
 
       setPhotos((current) =>
@@ -135,8 +122,8 @@ export default function QualityPage({ params }: QualityPageProps) {
           rejection_reason: null,
         })),
       );
-      setMessage("Фото приняты. Job переведён в очередь генерации.");
-      router.push(`/generation/${jobId}`);
+      setMessage("Фото приняты. Осталось оплатить пакет генерации.");
+      router.push(`/checkout/${jobId}`);
     } catch (approveError) {
       setError(approveError instanceof Error ? approveError.message : "Неизвестная ошибка.");
     } finally {
@@ -182,7 +169,7 @@ export default function QualityPage({ params }: QualityPageProps) {
             onClick={approveAll}
             type="button"
           >
-            {isApproving ? "Принимаем..." : "Принять фото и поставить в очередь"}
+            {isApproving ? "Принимаем..." : "Принять фото и перейти к оплате"}
           </button>
         </div>
 

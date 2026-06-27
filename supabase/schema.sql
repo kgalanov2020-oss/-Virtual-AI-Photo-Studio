@@ -36,13 +36,38 @@ create table if not exists public.jobs (
   generation_mode text not null default 'standard'
     check (generation_mode in ('standard', 'child_safe')),
   status text not null default 'draft'
-    check (status in ('draft', 'queued', 'running', 'completed', 'failed', 'cancelled')),
+    check (status in ('draft', 'awaiting_payment', 'queued', 'running', 'completed', 'failed', 'cancelled')),
+  payment_status text not null default 'unpaid'
+    check (payment_status in ('unpaid', 'pending', 'paid', 'refunded', 'failed')),
+  paid_at timestamptz,
+  amount_cents integer not null default 99000,
+  currency text not null default 'rub',
+  product_code text not null default 'studio_40',
   progress integer not null default 0 check (progress between 0 and 100),
   error_message text,
   created_at timestamptz not null default now(),
   queued_at timestamptz,
   started_at timestamptz,
   completed_at timestamptz
+);
+
+create table if not exists public.orders (
+  id uuid primary key default gen_random_uuid(),
+  job_id uuid not null references public.jobs(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  status text not null default 'pending'
+    check (status in ('pending', 'paid', 'cancelled', 'failed', 'refunded')),
+  provider text not null default 'stripe',
+  provider_session_id text unique,
+  provider_payment_id text,
+  checkout_url text,
+  amount_cents integer not null,
+  currency text not null default 'rub',
+  product_code text not null default 'studio_40',
+  product_name text not null default 'AI-фотосессия 40 фото',
+  created_at timestamptz not null default now(),
+  paid_at timestamptz,
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists public.uploaded_selfies (
@@ -74,6 +99,7 @@ alter table public.studio_shots enable row level security;
 alter table public.jobs enable row level security;
 alter table public.uploaded_selfies enable row level security;
 alter table public.generated_images enable row level security;
+alter table public.orders enable row level security;
 
 create policy "Anyone can read active studios"
 on public.studios
@@ -130,3 +156,9 @@ for update
 to authenticated
 using ((select auth.uid()) = user_id)
 with check ((select auth.uid()) = user_id);
+
+create policy "Users can read own orders"
+on public.orders
+for select
+to authenticated
+using ((select auth.uid()) = user_id);

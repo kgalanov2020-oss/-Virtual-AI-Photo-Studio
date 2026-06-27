@@ -42,7 +42,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const userId = userData.user.id;
     const { data: jobData, error: jobError } = await supabase
       .from("jobs")
-      .select("id, user_id, studio_id, generation_mode, status, progress, error_message, created_at, queued_at, started_at, completed_at")
+      .select("id, user_id, studio_id, generation_mode, status, payment_status, paid_at, amount_cents, currency, product_code, progress, error_message, created_at, queued_at, started_at, completed_at")
       .eq("id", jobId)
       .single();
 
@@ -54,6 +54,13 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     if (job.user_id !== userId) {
       return NextResponse.json({ error: "Нет доступа к этому job." }, { status: 403 });
+    }
+
+    if (job.payment_status !== "paid") {
+      return NextResponse.json(
+        { error: "Генерация доступна только после оплаты фотосессии." },
+        { status: 402 },
+      );
     }
 
     if (!["queued", "running", "failed"].includes(job.status)) {

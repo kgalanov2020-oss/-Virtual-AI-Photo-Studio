@@ -28,6 +28,7 @@ type GenerationResponse = {
 
 const statusLabels: Record<Job["status"], string> = {
   draft: "Черновик",
+  awaiting_payment: "Ожидает оплату",
   queued: "В очереди",
   running: "Генерация",
   completed: "Готово",
@@ -72,7 +73,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
       const supabase = createSupabaseBrowserClient();
       const { data: jobData, error: jobError } = await supabase
         .from("jobs")
-        .select("id, user_id, studio_id, generation_mode, status, progress, error_message, created_at, queued_at, started_at, completed_at")
+        .select("id, user_id, studio_id, generation_mode, status, payment_status, paid_at, amount_cents, currency, product_code, progress, error_message, created_at, queued_at, started_at, completed_at")
         .eq("id", resolvedJobId)
         .single();
 
@@ -282,6 +283,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
             <div style={{ width: `${job?.progress ?? 0}%` }} />
           </div>
           <p>{job?.progress ?? 0}% готово</p>
+          <p>{job?.payment_status === "paid" ? "Оплачено" : "Оплата не подтверждена"}</p>
           <p>{generationMode === "child_safe" ? "Детский безопасный режим" : "Стандартный режим"}</p>
           <small>Job: {jobId || "загрузка..."}</small>
         </aside>
@@ -325,7 +327,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
           </button>
           <button
             className="button button-primary"
-            disabled={isLoading || isStartingGeneration || !job || !["queued", "running"].includes(job.status)}
+            disabled={isLoading || isStartingGeneration || !job || job.payment_status !== "paid" || !["queued", "running"].includes(job.status)}
             onClick={startGeneration}
             type="button"
           >
@@ -348,12 +350,19 @@ export default function GenerationPage({ params }: GenerationPageProps) {
             <div className="queue-panel">
               <strong>{totalGenerated}/{totalExpected} изображений готово</strong>
               <span>
-                {job?.status === "completed"
+                {job?.payment_status !== "paid"
+                  ? "Для запуска генерации нужно оплатить пакет фотосессии."
+                  : job?.status === "completed"
                   ? "Фотосессия готова. Можно скачать отдельные фото или весь архив."
                   : totalGenerated > 0
                     ? "Генерация идёт. Нажмите «Проверить статус», чтобы подтянуть новые варианты."
                     : "Нажмите «Запустить генерацию», чтобы создать фотосессию."}
               </span>
+              {job?.payment_status !== "paid" ? (
+                <Link className="button button-primary" href={`/checkout/${jobId}`}>
+                  Перейти к оплате
+                </Link>
+              ) : null}
             </div>
 
             <div className="generation-grid">
