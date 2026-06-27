@@ -6,5 +6,5 @@
     "build:web": "pnpm --filter @ai-photo-studio/web build",
     "lint:web": "pnpm --filter @ai-photo-studio/web lint"
   },
-  "packageManager": "pnpm@11.7.0"
+  "packageManager": "pnpm@10.18.3"
 }

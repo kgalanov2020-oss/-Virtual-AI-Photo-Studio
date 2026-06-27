@@ -6,13 +6,13 @@ services:
     branch: main
     autoDeploy: true
     healthCheckPath: /
-    buildCommand: corepack enable && corepack prepare pnpm@11.7.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @ai-photo-studio/web build
-    startCommand: corepack enable && corepack prepare pnpm@11.7.0 --activate && pnpm --dir apps/web exec next start -H 0.0.0.0 -p $PORT
+    buildCommand: corepack enable && corepack prepare pnpm@10.18.3 --activate && pnpm install --frozen-lockfile && pnpm --filter @ai-photo-studio/web build
+    startCommand: corepack enable && corepack prepare pnpm@10.18.3 --activate && pnpm --dir apps/web exec next start -H 0.0.0.0 -p $PORT
     envVars:
       - key: NODE_VERSION
         value: 20.19.0
       - key: PNPM_VERSION
-        value: 11.7.0
+        value: 10.18.3
       - key: AI_IMAGE_PROVIDER
         value: gemini
       - key: GEMINI_IMAGE_MODEL
