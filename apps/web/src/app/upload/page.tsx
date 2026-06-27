@@ -17,43 +17,43 @@ type SelectedSelfie = {
 const selfieGuide = [
   {
     title: "Анфас с нейтральным выражением лица",
-    visual: "front-neutral",
+    image: "/selfie-guide/01-front-neutral.jpg",
   },
   {
     title: "Анфас с лёгкой улыбкой",
-    visual: "front-smile",
+    image: "/selfie-guide/02-front-smile.jpg",
   },
   {
     title: "Левый полуоборот",
-    visual: "left-three-quarter",
+    image: "/selfie-guide/03-left-three-quarter.jpg",
   },
   {
     title: "Правый полуоборот",
-    visual: "right-three-quarter",
+    image: "/selfie-guide/04-right-three-quarter.jpg",
   },
   {
     title: "Левый профиль",
-    visual: "left-profile",
+    image: "/selfie-guide/05-left-profile.jpg",
   },
   {
     title: "Правый профиль",
-    visual: "right-profile",
+    image: "/selfie-guide/06-right-profile.jpg",
   },
   {
     title: "Фото немного сверху",
-    visual: "from-above",
+    image: "/selfie-guide/07-from-above.jpg",
   },
   {
     title: "Фото немного снизу",
-    visual: "from-below",
+    image: "/selfie-guide/08-from-below.jpg",
   },
   {
     title: "Фото при дневном свете",
-    visual: "daylight",
+    image: "/selfie-guide/09-daylight.jpg",
   },
   {
     title: "Без солнцезащитных очков и сильных теней",
-    visual: "clean-face",
+    image: "/selfie-guide/10-clean-face.jpg",
   },
 ];
 
@@ -280,7 +280,7 @@ export default function UploadPage() {
         <div className="guide-grid">
           {selfieGuide.map((item, index) => (
             <article className="guide-card" key={item.title}>
-              <SelfieGuideVisual variant={item.visual} />
+              <img className="guide-photo" alt={item.title} src={item.image} />
               <span>{String(index + 1).padStart(2, "0")}</span>
               <strong>{item.title}</strong>
             </article>
@@ -390,26 +390,6 @@ export default function UploadPage() {
         {uploadResult ? <div className="upload-message success">{uploadResult}</div> : null}
       </section>
     </main>
-  );
-}
-
-function SelfieGuideVisual({ variant }: { variant: string }) {
-  return (
-    <div className={`guide-visual ${variant}`} aria-hidden="true">
-      <div className="guide-phone-frame">
-        <div className="guide-light" />
-        <div className="guide-person">
-          <div className="guide-head">
-            <i className="guide-eye guide-eye-left" />
-            <i className="guide-eye guide-eye-right" />
-            <i className="guide-nose" />
-            <i className="guide-mouth" />
-          </div>
-          <div className="guide-neck" />
-          <div className="guide-shoulders" />
-        </div>
-      </div>
-    </div>
   );
 }
 
