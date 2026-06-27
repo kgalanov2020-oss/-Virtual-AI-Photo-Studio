@@ -1253,10 +1253,11 @@ h1 {
 }
 
 .studio-upload-cta {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   justify-content: flex-end;
-  min-height: 220px;
+  min-height: 120px;
+  padding-bottom: 40px;
   padding-top: 0;
 }
 
