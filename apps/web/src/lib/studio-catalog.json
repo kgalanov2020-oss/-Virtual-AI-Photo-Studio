@@ -1,0 +1,194 @@
+{
+  "studios": [
+    {
+      "slug": "modern-office",
+      "name": "Modern Office",
+      "description": "Премиальная фотосессия в современном офисе: мягкий дневной свет, скульптурные стены, lounge-зона, рабочий стол и чистая архитектура для личного бренда.",
+      "preview_url": "/studios/modern-office/master-wide.png",
+      "base_prompt": "inside a premium modern office interior with cream sculptural walls, soft integrated wavy wall lighting, light oak herringbone floor, tall sheer curtains, rounded taupe lounge furniture, minimalist executive desk, potted greenery, calm high-end workspace atmosphere",
+      "wardrobe_prompt": "modern office wardrobe: tailored blazer, dress shirt, smart business casual or elegant suit, polished professional styling, no evening gown, no sportswear",
+      "gallery_urls": [
+        "/studios/modern-office/master-wide.png",
+        "/studios/modern-office/lounge-corner.png",
+        "/studios/modern-office/executive-desk.png",
+        "/studios/modern-office/window-zone.png",
+        "/studios/modern-office/presentation-corner.png",
+        "/studios/modern-office/corridor-walk.png",
+        "/studios/modern-office/dark-portrait-corner.png",
+        "/studios/modern-office/detail-shot.png",
+        "/studios/modern-office/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "premium-gym",
+      "name": "Premium Gym",
+      "description": "Премиальный спортзал для динамичной фотосессии: стильная фитнес-зона, зеркала, тренажёры, мягкий свет и уверенная спортивная атмосфера.",
+      "preview_url": "/studios/premium-gym/preview.png",
+      "base_prompt": "inside a premium modern gym interior with matte black equipment, warm wood wall panels, large mirrors, rubber training floor, linear ceiling lights, plants, open functional training zones, clean high-end fitness club atmosphere",
+      "wardrobe_prompt": "stylish premium athletic wardrobe: fashionable fitted sportswear, technical top, joggers, leggings or clean training shorts, modern sneakers, polished fully clothed fitness styling that matches a luxury gym",
+      "gallery_urls": [
+        "/studios/premium-gym/master-wide.png",
+        "/studios/premium-gym/cardio-zone.png",
+        "/studios/premium-gym/free-weights.png",
+        "/studios/premium-gym/mirror-zone.png",
+        "/studios/premium-gym/functional-zone.png",
+        "/studios/premium-gym/detail-shot.png",
+        "/studios/premium-gym/lounge-entry.png",
+        "/studios/premium-gym/dark-portrait-corner.png",
+        "/studios/premium-gym/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "boutique-hotel",
+      "name": "Boutique Hotel",
+      "description": "Элегантный интерьер boutique hotel: мрамор, мягкие кресла, латунные детали, бархат и дорогой приглушённый свет.",
+      "preview_url": "/studios/boutique-hotel/preview.png",
+      "base_prompt": "inside a refined boutique hotel lobby and suite interior with marble surfaces, warm brass details, velvet lounge chairs, tall curtains, curated art, soft cinematic hotel lighting, luxury hospitality atmosphere",
+      "wardrobe_prompt": "boutique hotel wardrobe: elegant evening or cocktail smart outfit, refined fabric, polished premium styling, suitable for upscale hotel lobby, not office formal",
+      "gallery_urls": [
+        "/studios/boutique-hotel/master-wide.png",
+        "/studios/boutique-hotel/angle-02.png",
+        "/studios/boutique-hotel/angle-03.png",
+        "/studios/boutique-hotel/angle-04.png",
+        "/studios/boutique-hotel/angle-05.png",
+        "/studios/boutique-hotel/angle-06.png",
+        "/studios/boutique-hotel/angle-07.png",
+        "/studios/boutique-hotel/detail-shot.png",
+        "/studios/boutique-hotel/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "castle-library",
+      "name": "Castle Library",
+      "description": "Атмосферная библиотека замка: камень, дерево, высокие окна, книжные стены и благородный классический свет.",
+      "preview_url": "/studios/castle-library/preview.png",
+      "base_prompt": "inside an elegant castle library with stone arches, dark carved wood shelves, tall leaded windows, antique reading tables, leather chairs, warm candle-like ambient light, cinematic heritage atmosphere",
+      "wardrobe_prompt": "castle library wardrobe: classic elegant outfit, tailored coat or refined dress shirt, heritage-inspired formal styling, muted rich fabrics",
+      "gallery_urls": [
+        "/studios/castle-library/master-wide.png",
+        "/studios/castle-library/angle-02.png",
+        "/studios/castle-library/angle-03.png",
+        "/studios/castle-library/angle-04.png",
+        "/studios/castle-library/angle-05.png",
+        "/studios/castle-library/angle-06.png",
+        "/studios/castle-library/angle-07.png",
+        "/studios/castle-library/detail-shot.png",
+        "/studios/castle-library/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "hi-tech-lab",
+      "name": "Hi-Tech Lab",
+      "description": "Футуристичный hi-tech интерьер: стекло, световые панели, чистые линии и технологичный premium look.",
+      "preview_url": "/studios/hi-tech-lab/preview.png",
+      "base_prompt": "inside a premium futuristic hi-tech lab and innovation office with glass walls, clean white panels, soft blue-white light strips, matte metal details, transparent screens without readable text, sleek technology atmosphere",
+      "wardrobe_prompt": "hi-tech wardrobe: sleek smart casual, modern jacket, clean technical fabrics, monochrome or cool neutral colors, innovation-leader styling",
+      "gallery_urls": [
+        "/studios/hi-tech-lab/master-wide.png",
+        "/studios/hi-tech-lab/angle-02.png",
+        "/studios/hi-tech-lab/angle-03.png",
+        "/studios/hi-tech-lab/angle-04.png",
+        "/studios/hi-tech-lab/angle-05.png",
+        "/studios/hi-tech-lab/angle-06.png",
+        "/studios/hi-tech-lab/angle-07.png",
+        "/studios/hi-tech-lab/detail-shot.png",
+        "/studios/hi-tech-lab/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "urban-loft",
+      "name": "Urban Loft",
+      "description": "Городской loft с кирпичом, бетоном, большими окнами и editorial-настроением для более смелых кадров.",
+      "preview_url": "/studios/urban-loft/preview.png",
+      "base_prompt": "inside a stylish urban loft studio with exposed brick, polished concrete, black steel window frames, warm industrial pendant lights, leather chair, large city windows, editorial creative atmosphere",
+      "wardrobe_prompt": "urban loft wardrobe: creative editorial smart casual, leather jacket or relaxed blazer, dark denim or structured casual pieces, stylish city look",
+      "gallery_urls": [
+        "/studios/urban-loft/master-wide.png",
+        "/studios/urban-loft/angle-02.png",
+        "/studios/urban-loft/angle-03.png",
+        "/studios/urban-loft/angle-04.png",
+        "/studios/urban-loft/angle-05.png",
+        "/studios/urban-loft/angle-06.png",
+        "/studios/urban-loft/angle-07.png",
+        "/studios/urban-loft/detail-shot.png",
+        "/studios/urban-loft/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "luxury-penthouse",
+      "name": "Luxury Penthouse",
+      "description": "Пентхаус с панорамным видом, дорогими материалами, мягкой мебелью и статусной спокойной эстетикой.",
+      "preview_url": "/studios/luxury-penthouse/preview.png",
+      "base_prompt": "inside a luxury penthouse with panoramic city windows, warm stone, designer furniture, low sculptural sofa, elegant side tables, soft daylight, high-end private residence atmosphere without bedroom feeling",
+      "wardrobe_prompt": "luxury penthouse wardrobe: elegant premium lifestyle outfit, refined evening-casual styling, soft luxury fabrics, upscale private-event look",
+      "gallery_urls": [
+        "/studios/luxury-penthouse/master-wide.png",
+        "/studios/luxury-penthouse/angle-02.png",
+        "/studios/luxury-penthouse/angle-03.png",
+        "/studios/luxury-penthouse/angle-04.png",
+        "/studios/luxury-penthouse/angle-05.png",
+        "/studios/luxury-penthouse/angle-06.png",
+        "/studios/luxury-penthouse/angle-07.png",
+        "/studios/luxury-penthouse/detail-shot.png",
+        "/studios/luxury-penthouse/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "art-gallery",
+      "name": "Art Gallery",
+      "description": "Современная галерея: белые стены, большие полотна, архитектурный свет и чистое пространство для editorial-портретов.",
+      "preview_url": "/studios/art-gallery/preview.png",
+      "base_prompt": "inside a contemporary art gallery with white walls, large abstract paintings without readable text, polished concrete floor, museum track lighting, open negative space, refined editorial atmosphere",
+      "wardrobe_prompt": "art gallery wardrobe: creative sophisticated outfit, minimal black or architectural clothing, gallery-opening style, refined but artistic",
+      "gallery_urls": [
+        "/studios/art-gallery/master-wide.png",
+        "/studios/art-gallery/angle-02.png",
+        "/studios/art-gallery/angle-03.png",
+        "/studios/art-gallery/angle-04.png",
+        "/studios/art-gallery/angle-05.png",
+        "/studios/art-gallery/angle-06.png",
+        "/studios/art-gallery/angle-07.png",
+        "/studios/art-gallery/detail-shot.png",
+        "/studios/art-gallery/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "wellness-spa",
+      "name": "Wellness Spa",
+      "description": "Спокойный wellness-интерьер: камень, дерево, мягкий свет, растения и clean premium lifestyle-настроение.",
+      "preview_url": "/studios/wellness-spa/preview.png",
+      "base_prompt": "inside a premium wellness spa lounge with natural stone, warm wood, soft linen textures, indoor plants, diffused daylight, calm minimalist luxury atmosphere, fully clothed lifestyle portrait setting",
+      "wardrobe_prompt": "wellness wardrobe: calm premium lifestyle outfit, soft knitwear or linen, fully clothed relaxed styling, natural neutral colors, elegant spa lounge look",
+      "gallery_urls": [
+        "/studios/wellness-spa/master-wide.png",
+        "/studios/wellness-spa/angle-02.png",
+        "/studios/wellness-spa/angle-03.png",
+        "/studios/wellness-spa/angle-04.png",
+        "/studios/wellness-spa/angle-05.png",
+        "/studios/wellness-spa/angle-06.png",
+        "/studios/wellness-spa/angle-07.png",
+        "/studios/wellness-spa/detail-shot.png",
+        "/studios/wellness-spa/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "executive-boardroom",
+      "name": "Executive Boardroom",
+      "description": "Современная переговорная и boardroom для строгих деловых портретов, презентаций и командного leadership-образа.",
+      "preview_url": "/studios/executive-boardroom/preview.png",
+      "base_prompt": "inside a premium executive boardroom with long matte conference table, leather chairs, large glass wall, warm wood panels, subtle city view, presentation screen with abstract unbranded graphics, polished corporate atmosphere",
+      "wardrobe_prompt": "executive boardroom wardrobe: formal business suit, crisp shirt, executive professional styling, polished corporate look",
+      "gallery_urls": [
+        "/studios/executive-boardroom/master-wide.png",
+        "/studios/executive-boardroom/angle-02.png",
+        "/studios/executive-boardroom/angle-03.png",
+        "/studios/executive-boardroom/angle-04.png",
+        "/studios/executive-boardroom/angle-05.png",
+        "/studios/executive-boardroom/angle-06.png",
+        "/studios/executive-boardroom/angle-07.png",
+        "/studios/executive-boardroom/detail-shot.png",
+        "/studios/executive-boardroom/alternate-wide.png"
+      ]
+    }
+  ]
+}

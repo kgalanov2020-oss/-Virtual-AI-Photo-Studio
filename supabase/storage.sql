@@ -14,7 +14,7 @@ values (
   'selfies',
   false,
   10485760,
-  array['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
+  array['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'image/avif']
 )
 on conflict (id) do update set
   public = excluded.public,

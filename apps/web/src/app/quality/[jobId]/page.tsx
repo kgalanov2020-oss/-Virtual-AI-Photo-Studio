@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
-import type { UploadedSelfie } from "@/lib/types";
+import type { GenerationMode, UploadedSelfie } from "@/lib/types";
 
 type QualityPhoto = UploadedSelfie & {
   signedUrl: string | null;
@@ -20,6 +20,7 @@ export default function QualityPage({ params }: QualityPageProps) {
   const router = useRouter();
   const [jobId, setJobId] = useState<string>("");
   const [photos, setPhotos] = useState<QualityPhoto[]>([]);
+  const [generationMode, setGenerationMode] = useState<GenerationMode>("standard");
   const [isLoading, setIsLoading] = useState(true);
   const [isApproving, setIsApproving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,17 +44,26 @@ export default function QualityPage({ params }: QualityPageProps) {
 
     try {
       const supabase = createSupabaseBrowserClient();
-      const { data, error: selfiesError } = await supabase
+      const [{ data: jobData }, { data, error: selfiesError }] = await Promise.all([
+        supabase
+          .from("jobs")
+          .select("generation_mode")
+          .eq("id", resolvedJobId)
+          .single(),
+        supabase
         .from("uploaded_selfies")
         .select(
           "id, job_id, user_id, file_url, quality_score, face_angle, is_approved, rejection_reason, created_at",
         )
-        .eq("job_id", resolvedJobId)
-        .order("created_at", { ascending: true });
+          .eq("job_id", resolvedJobId)
+          .order("created_at", { ascending: true }),
+      ]);
 
       if (selfiesError) {
         throw new Error(selfiesError.message);
       }
+
+      setGenerationMode((jobData?.generation_mode as GenerationMode | undefined) ?? "standard");
 
       const rows = (data ?? []) as UploadedSelfie[];
       const signedPhotos = await Promise.all(
@@ -155,6 +165,7 @@ export default function QualityPage({ params }: QualityPageProps) {
         </div>
         <div className="quality-summary">
           <strong>{approvedCount}/{photos.length} принято</strong>
+          <span>{generationMode === "child_safe" ? "Детский безопасный режим" : "Стандартный режим"}</span>
           <span>Job: {jobId || "загрузка..."}</span>
         </div>
       </section>

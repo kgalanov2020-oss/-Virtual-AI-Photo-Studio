@@ -1,91 +1,155 @@
-import { getStudioSession } from "@/lib/studios";
+import { PRODUCT_IMAGES_PER_STUDIO, TARGET_SHOTS_PER_STUDIO } from "@/lib/generation";
+import { getActiveStudios, getStudioSession } from "@/lib/studios";
 
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const result = await getStudioSession("modern-business-studio");
+  const studiosResult = await getActiveStudios();
 
-  if (result.status === "missing-env") {
+  if (studiosResult.status === "missing-env") {
     return <SetupPanel />;
   }
 
-  if (result.status === "error") {
-    return <ErrorPanel message={result.message} />;
+  if (studiosResult.status === "error") {
+    return <ErrorPanel message={studiosResult.message} />;
   }
 
-  const { studio, shots } = result;
-  const outputCount = shots.reduce((total, shot) => total + shot.variations, 0);
+  const studios = studiosResult.studios;
+  const featuredStudio = studios.find((studio) => studio.slug === "modern-office") ?? studios[0];
+  const featuredResult = featuredStudio
+    ? await getStudioSession(featuredStudio.slug)
+    : null;
+  const shots = featuredResult?.status === "ok" ? featuredResult.shots : [];
 
   return (
     <main className="page">
       <header className="topbar">
         <div className="brand">Виртуальная AI Фотостудия</div>
-        <div className="status">Каталог студий подключён к Supabase</div>
+        <div className="status">Каталог интерьеров подключён к Supabase</div>
       </header>
 
       <section className="hero">
         <div className="hero-copy">
-          <p className="eyebrow">Первая студийная сессия</p>
-          <h1>{studio.name}</h1>
-          <p className="lead">{studio.description}</p>
+          <p className="eyebrow">Выберите интерьер для фотосессии</p>
+          <h1>AI-фотосессия в выбранном пространстве</h1>
+          <p className="lead">
+            Пользователь выбирает интерьер: офис, студия, отель, замок, hi-tech и
+            другие пространства. Затем загружает селфи и получает полную серию из
+            {` ${PRODUCT_IMAGES_PER_STUDIO} `}фото в единой визуальной среде.
+          </p>
           <div className="actions">
-            <a className="button button-primary" href="/upload">
+            <a className="button button-primary" href={`/upload?studio=${featuredStudio?.slug ?? "modern-office"}`}>
               Загрузить селфи
             </a>
-            <a className="button button-secondary" href="#upload-guide">
-              Гайд по селфи
+            <a className="button button-secondary" href="#studios">
+              Все интерьеры
             </a>
           </div>
         </div>
 
-        <div className="studio-preview" aria-label="Превью современной офисной студии">
+        <div className="studio-preview" aria-label="Превью современного офисного интерьера">
           <div className="preview-card">
-            <strong>{outputCount} готовых фото</strong>
+            <strong>{PRODUCT_IMAGES_PER_STUDIO} фото в финальной серии</strong>
             <span>
-              {shots.length} постановочных сцен, 4 варианта на сцену, единая
-              бизнес-студия.
+              {TARGET_SHOTS_PER_STUDIO} разных кадров: 10 позиций и по 4 дистанции
+              для каждой позиции.
             </span>
           </div>
         </div>
       </section>
 
-      <section className="section" id="shots">
+      <section className="section" id="studios">
         <div className="section-header">
           <div>
-            <h2>План съёмки</h2>
-            <p>Сцены загружаются из таблицы Supabase `studio_shots`.</p>
+            <h2>Интерьеры</h2>
+            <p>Каждый интерьер хранит собственные 40 кадров для фотосессии.</p>
           </div>
-          <div className="count-pill">
-            {shots.length} сцен / {outputCount} фото
-          </div>
+          <div className="count-pill">{studios.length} студий</div>
         </div>
 
-        <div className="shot-grid">
-          {shots.map((shot) => (
-            <article className="shot-card" key={shot.id}>
-              <h3>{shot.name}</h3>
-              <div className="meta-list">
-                <div className="meta-item">
-                  <span>Поза</span>
-                  {shot.pose}
-                </div>
-                <div className="meta-item">
-                  <span>Камера</span>
-                  {shot.camera_angle}
-                </div>
-                <div className="meta-item">
-                  <span>Кадрирование</span>
-                  {shot.crop}
-                </div>
-                <div className="meta-item">
-                  <span>Результат</span>
-                  {shot.variations} варианта
-                </div>
+        <div className="studio-grid">
+          {studios.map((studio) => (
+            <article className="studio-card" key={studio.id}>
+              {studio.preview_url ? (
+                <img alt={studio.name} src={studio.preview_url} />
+              ) : (
+                <div className="studio-card-placeholder">{studio.name}</div>
+              )}
+              <div>
+                <h3>{studio.name}</h3>
+                <p>{studio.description}</p>
+                <a className="button button-secondary" href={`/studios/${studio.slug}`}>
+                  Смотреть интерьер
+                </a>
               </div>
             </article>
           ))}
         </div>
       </section>
+
+      <section className="section" id="modern-office-preview">
+        <div className="section-header">
+          <div>
+            <h2>Modern Office preview</h2>
+            <p>9 изображений офиса для лендинга и визуального направления студии.</p>
+          </div>
+        </div>
+        <div className="office-mosaic">
+          {[
+            "master-wide",
+            "lounge-corner",
+            "executive-desk",
+            "window-zone",
+            "presentation-corner",
+            "corridor-walk",
+            "dark-portrait-corner",
+            "detail-shot",
+            "alternate-wide",
+          ].map((name) => (
+            <img
+              alt={`Modern Office ${name}`}
+              key={name}
+              src={`/studios/modern-office/${name}.png`}
+            />
+          ))}
+        </div>
+      </section>
+
+      {shots.length > 0 ? (
+        <section className="section" id="shots">
+          <div className="section-header">
+            <div>
+              <h2>Сцены Modern Office</h2>
+              <p>
+                {PRODUCT_IMAGES_PER_STUDIO} кадров: 10 разных поз и 4 дистанции
+                камеры для каждой позы.
+              </p>
+            </div>
+          </div>
+
+          <div className="shot-grid">
+            {shots.slice(0, TARGET_SHOTS_PER_STUDIO).map((shot) => (
+              <article className="shot-card" key={shot.id}>
+                <h3>{shot.name}</h3>
+                <div className="meta-list">
+                  <div className="meta-item">
+                    <span>Поза</span>
+                    {shot.pose}
+                  </div>
+                  <div className="meta-item">
+                    <span>Камера</span>
+                    {shot.camera_angle}
+                  </div>
+                  <div className="meta-item">
+                    <span>Кадрирование</span>
+                    {shot.crop}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="section" id="upload-guide">
         <div className="section-header">

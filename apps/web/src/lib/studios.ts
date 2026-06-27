@@ -1,11 +1,49 @@
 import { createSupabaseBrowserClient, hasSupabaseEnv } from "./supabase";
+import catalog from "./studio-catalog.json";
 import type { Studio, StudioShot } from "./types";
 import { translateShot, translateStudio } from "./ru";
+
+type CatalogStudio = {
+  slug: string;
+  gallery_urls?: string[];
+  wardrobe_prompt?: string;
+};
+
+const catalogBySlug = new Map(
+  (catalog.studios as CatalogStudio[]).map((studio) => [studio.slug, studio]),
+);
 
 type StudioSessionResult =
   | { status: "ok"; studio: Studio; shots: StudioShot[] }
   | { status: "missing-env" }
   | { status: "error"; message: string };
+
+type StudiosResult =
+  | { status: "ok"; studios: Studio[] }
+  | { status: "missing-env" }
+  | { status: "error"; message: string };
+
+export async function getActiveStudios(): Promise<StudiosResult> {
+  if (!hasSupabaseEnv()) {
+    return { status: "missing-env" };
+  }
+
+  const supabase = createSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("studios")
+    .select("id, slug, name, description, preview_url, is_active, created_at")
+    .eq("is_active", true)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    return { status: "error", message: error.message };
+  }
+
+  return {
+    status: "ok",
+    studios: ((data ?? []) as Studio[]).map(withCatalogMetadata).map(translateStudio),
+  };
+}
 
 export async function getStudioSession(
   slug: string,
@@ -34,7 +72,7 @@ export async function getStudioSession(
     };
   }
 
-  const studio = studioData as Studio;
+  const studio = withCatalogMetadata(studioData as Studio);
 
   const { data: shotsData, error: shotsError } = await supabase
     .from("studio_shots")
@@ -52,5 +90,15 @@ export async function getStudioSession(
     status: "ok",
     studio: translateStudio(studio),
     shots: ((shotsData ?? []) as StudioShot[]).map(translateShot),
+  };
+}
+
+function withCatalogMetadata(studio: Studio): Studio {
+  const catalogStudio = catalogBySlug.get(studio.slug);
+
+  return {
+    ...studio,
+    gallery_urls: catalogStudio?.gallery_urls,
+    wardrobe_prompt: catalogStudio?.wardrobe_prompt,
   };
 }

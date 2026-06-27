@@ -14,6 +14,11 @@ type StudioPrompt = {
   prompt: string;
   negativePrompt: string;
   fileNamePrefix: string;
+  width?: number;
+  height?: number;
+  identityWeight?: number;
+  steps?: number;
+  cfg?: number;
 };
 
 export async function generateBusinessPortrait(inputImage: Blob, prompt: StudioPrompt) {
@@ -134,12 +139,21 @@ function buildWorkflow(inputName: string, prompt: StudioPrompt) {
     string,
     { inputs: Record<string, unknown> }
   >;
+  const width = prompt.width ?? 768;
+  const height = prompt.height ?? 1024;
 
   workflow["13"].inputs.image = inputName;
   workflow["2"].inputs.text = prompt.prompt;
   workflow["3"].inputs.text = prompt.negativePrompt;
   workflow["5"].inputs.seed = Math.floor(Date.now() / 1000);
+  workflow["5"].inputs.steps = prompt.steps ?? 24;
+  workflow["5"].inputs.cfg = prompt.cfg ?? 4.3;
   workflow["7"].inputs.filename_prefix = prompt.fileNamePrefix;
+  workflow["4"].inputs.width = width;
+  workflow["4"].inputs.height = height;
+  workflow["20"].inputs.weight = prompt.identityWeight ?? 0.75;
+  workflow["23"].inputs.target_width = width;
+  workflow["23"].inputs.target_height = height;
 
   return workflow;
 }

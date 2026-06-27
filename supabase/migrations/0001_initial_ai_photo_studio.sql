@@ -33,6 +33,8 @@ create table if not exists public.jobs (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
   studio_id uuid not null references public.studios(id),
+  generation_mode text not null default 'standard'
+    check (generation_mode in ('standard', 'child_safe')),
   status text not null default 'draft'
     check (status in ('draft', 'queued', 'running', 'completed', 'failed', 'cancelled')),
   progress integer not null default 0 check (progress between 0 and 100),

@@ -37,6 +37,9 @@ NEXT_PUBLIC_SUPABASE_URL=https://vplhgizzyonpwqjdzvwg.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 COMFY_URL=https://your-new-pod-8188.proxy.runpod.net
+AI_IMAGE_PROVIDER=runpod
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_IMAGE_MODEL=gemini-3.1-flash-image-preview
 ```
 
 Then run:
@@ -65,6 +68,14 @@ apps/web/src/lib/comfy/workflows/instantid_business_workflow_api.json
 ```
 
 The generation page calls `/api/jobs/[jobId]/runpod`, which uploads the first approved selfie to ComfyUI, runs one InstantID business portrait, saves the result to Supabase Storage, and records it in `generated_images`.
+
+To use Gemini / Nano Banana instead of RunPod, set:
+
+```bash
+AI_IMAGE_PROVIDER=gemini
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_IMAGE_MODEL=gemini-3.1-flash-image-preview
+```
 
 ## Next Implementation Steps
 

@@ -1,9 +1,13 @@
+export type GenerationMode = "standard" | "child_safe";
+
 export type Studio = {
   id: string;
   slug: string;
   name: string;
   description: string;
   preview_url: string | null;
+  gallery_urls?: string[];
+  wardrobe_prompt?: string;
   is_active: boolean;
   created_at: string;
 };
@@ -39,6 +43,7 @@ export type Job = {
   id: string;
   user_id: string;
   studio_id: string;
+  generation_mode: GenerationMode;
   status: "draft" | "queued" | "running" | "completed" | "failed" | "cancelled";
   progress: number;
   error_message: string | null;
@@ -83,8 +88,9 @@ export type Database = {
       };
       jobs: {
         Row: Job;
-        Insert: Omit<Job, "id" | "status" | "progress" | "error_message" | "created_at" | "queued_at" | "started_at" | "completed_at"> & {
+        Insert: Omit<Job, "id" | "generation_mode" | "status" | "progress" | "error_message" | "created_at" | "queued_at" | "started_at" | "completed_at"> & {
           id?: string;
+          generation_mode?: GenerationMode;
           status?: Job["status"];
           progress?: number;
           error_message?: string | null;

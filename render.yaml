@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: virtual-ai-photo-studio
+    runtime: node
+    plan: free
+    rootDir: .
+    buildCommand: corepack enable && corepack prepare pnpm@11.7.0 --activate && pnpm install --frozen-lockfile && pnpm --filter @ai-photo-studio/web build
+    startCommand: pnpm --filter @ai-photo-studio/web start -- -p $PORT
+    envVars:
+      - key: NODE_VERSION
+        value: 24.16.0
+      - key: PNPM_VERSION
+        value: 11.7.0
+      - key: AI_IMAGE_PROVIDER
+        value: gemini
+      - key: GEMINI_IMAGE_MODEL
+        value: gemini-3.1-flash-image-preview
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
