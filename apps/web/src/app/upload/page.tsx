@@ -63,6 +63,7 @@ export default function UploadPage() {
   const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("free_1");
   const [acceptedLegal, setAcceptedLegal] = useState(false);
   const [acceptedPhotoRights, setAcceptedPhotoRights] = useState(false);
+  const [isSavingConsents, setIsSavingConsents] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
 
@@ -168,6 +169,55 @@ export default function UploadPage() {
     }
   }, [profile, selectedPackageCode]);
 
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function saveAcceptedConsents() {
+      if (
+        !userId ||
+        !userEmail ||
+        !profile ||
+        hasAcceptedStoredConsents ||
+        !acceptedLegal ||
+        !acceptedPhotoRights
+      ) {
+        return;
+      }
+
+      setIsSavingConsents(true);
+      setAuthError(null);
+
+      try {
+        const nextProfile = await saveConsentsToProfile(userId, userEmail);
+        if (!isCancelled) {
+          setProfile(nextProfile);
+          setAuthMessage("Согласия сохранены в профиле.");
+        }
+      } catch (error) {
+        if (!isCancelled) {
+          setAuthError(error instanceof Error ? error.message : "Не удалось сохранить согласия.");
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsSavingConsents(false);
+        }
+      }
+    }
+
+    void saveAcceptedConsents();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [
+    acceptedLegal,
+    acceptedPhotoRights,
+    hasAcceptedStoredConsents,
+    profile?.user_id,
+    userEmail,
+    userId,
+  ]);
+
   function getAuthCredentials() {
     const email = authEmail.trim();
     const password = authPassword.trim();
@@ -188,6 +238,11 @@ export default function UploadPage() {
   async function registerWithEmailPassword() {
     const credentials = getAuthCredentials();
     if (!credentials || isAuthSubmitting) return;
+
+    if (!acceptedLegal || !acceptedPhotoRights) {
+      setAuthError("Перед регистрацией подтвердите пользовательское соглашение, политику конфиденциальности и право использовать загруженные фото.");
+      return;
+    }
 
     setIsAuthSubmitting(true);
     setUploadError(null);
@@ -302,6 +357,35 @@ export default function UploadPage() {
     setAcceptedPhotoRights(Boolean(nextProfile.photo_rights_accepted_at));
   }
 
+  async function saveConsentsToProfile(activeUserId: string, email: string) {
+    const supabase = createSupabaseBrowserClient();
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("user_profiles")
+      .upsert(
+        {
+          user_id: activeUserId,
+          email,
+          legal_terms_accepted_at: now,
+          privacy_accepted_at: now,
+          personal_data_accepted_at: now,
+          photo_rights_accepted_at: now,
+          updated_at: now,
+        },
+        { onConflict: "user_id" },
+      )
+      .select("*")
+      .single();
+
+    if (error || !data) {
+      throw new Error(error?.message ?? "Не удалось сохранить согласия.");
+    }
+
+    setAcceptedLegal(true);
+    setAcceptedPhotoRights(true);
+    return data as UserProfile;
+  }
+
   function handleFiles(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? [])
       .filter(isAcceptedImage)
@@ -360,24 +444,8 @@ export default function UploadPage() {
         throw new Error("Бесплатные фото закончились. Выберите платный пакет.");
       }
 
-      const now = new Date().toISOString();
-      const { error: profileError } = await supabase
-        .from("user_profiles")
-        .upsert(
-          {
-            user_id: activeUserId,
-            email: activeEmail,
-            legal_terms_accepted_at: now,
-            privacy_accepted_at: now,
-            personal_data_accepted_at: now,
-            photo_rights_accepted_at: now,
-            updated_at: now,
-          },
-          { onConflict: "user_id" },
-        );
-
-      if (profileError) {
-        throw new Error(profileError.message);
+      if (!hasAcceptedStoredConsents && acceptedLegal && acceptedPhotoRights) {
+        setProfile(await saveConsentsToProfile(activeUserId, activeEmail));
       }
 
       const { data: studio, error: studioError } = await supabase
@@ -527,6 +595,60 @@ export default function UploadPage() {
         )}
         {authMessage ? <div className="upload-message success">{authMessage}</div> : null}
         {authError ? <div className="upload-message error">{authError}</div> : null}
+
+        <div className="legal-consent-panel">
+          <p>
+            {hasAcceptedStoredConsents
+              ? "Согласия сохранены в профиле."
+              : "Подтвердите согласия один раз. Мы сохраним их в профиле после входа."}
+          </p>
+
+          <label className="consent-option">
+            <input
+              checked={acceptedLegal}
+              disabled={hasAcceptedStoredConsents || isSavingConsents}
+              onChange={(event) => setAcceptedLegal(event.target.checked)}
+              type="checkbox"
+            />
+            <span>
+              Я принимаю{" "}
+              <Link href="/oferta" target="_blank">
+                Пользовательское соглашение
+              </Link>
+              ,{" "}
+              <Link href="/privacy" target="_blank">
+                Политику конфиденциальности
+              </Link>{" "}
+              и даю{" "}
+              <Link href="/personal-data-consent" target="_blank">
+                согласие на обработку персональных данных
+              </Link>
+              .
+            </span>
+          </label>
+
+          <label className="consent-option">
+            <input
+              checked={acceptedPhotoRights}
+              disabled={hasAcceptedStoredConsents || isSavingConsents}
+              onChange={(event) => setAcceptedPhotoRights(event.target.checked)}
+              type="checkbox"
+            />
+            <span>
+              Я подтверждаю, что мне исполнилось 18 лет, я имею право использовать
+              загруженные изображения, не загружаю чужие фото без согласия и не создаю
+              незаконный или запрещённый контент. Если на фото ребёнок, я являюсь
+              родителем/законным представителем или имею согласие на использование
+              изображения.
+            </span>
+          </label>
+
+          <small>
+            Загруженные фото используются для создания AI-фотосессии и могут временно
+            храниться для генерации изображений, проверки качества, технической
+            поддержки и обеспечения работы сервиса.
+          </small>
+        </div>
       </section>
 
       <section className="section">
@@ -647,59 +769,6 @@ export default function UploadPage() {
           </div>
         )}
 
-        <div className="legal-consent-panel">
-          <p>{hasAcceptedStoredConsents ? "Согласия уже сохранены в профиле." : "Подтвердите согласия один раз. Мы сохраним их в профиле."}</p>
-          {!userId || !userEmail ? (
-            <p className="legal-consent-note">Сначала войдите по email, затем подтвердите юридические согласия.</p>
-          ) : null}
-
-          <label className="consent-option">
-            <input
-              checked={acceptedLegal}
-              disabled={!userId || !userEmail || hasAcceptedStoredConsents}
-              onChange={(event) => setAcceptedLegal(event.target.checked)}
-              type="checkbox"
-            />
-            <span>
-              Я принимаю{" "}
-              <Link href="/oferta" target="_blank">
-                Пользовательское соглашение
-              </Link>
-              ,{" "}
-              <Link href="/privacy" target="_blank">
-                Политику конфиденциальности
-              </Link>{" "}
-              и даю{" "}
-              <Link href="/personal-data-consent" target="_blank">
-                согласие на обработку персональных данных
-              </Link>
-              .
-            </span>
-          </label>
-
-          <label className="consent-option">
-            <input
-              checked={acceptedPhotoRights}
-              disabled={!userId || !userEmail || hasAcceptedStoredConsents}
-              onChange={(event) => setAcceptedPhotoRights(event.target.checked)}
-              type="checkbox"
-            />
-            <span>
-              Я подтверждаю, что мне исполнилось 18 лет, я имею право использовать
-              загруженные изображения, не загружаю чужие фото без согласия и не создаю
-              незаконный или запрещённый контент. Если на фото ребёнок, я являюсь
-              родителем/законным представителем или имею согласие на использование
-              изображения.
-            </span>
-          </label>
-
-          <small>
-            Загруженные фото используются для создания AI-фотосессии и могут временно
-            храниться для генерации изображений, проверки качества, технической
-            поддержки и обеспечения работы сервиса.
-          </small>
-        </div>
-
         <div className="upload-footer">
           <Link className="button button-secondary" href="/">
             Назад к студии
@@ -769,6 +838,20 @@ function formatAuthError(error: unknown, action: "login" | "register") {
     normalized.includes("rate limit") ||
     normalized.includes("too many") ||
     normalized.includes("email rate");
+  const isNetworkError =
+    authName === "typeerror" ||
+    normalized.includes("failed to fetch") ||
+    normalized.includes("fetch failed") ||
+    normalized.includes("networkerror") ||
+    normalized.includes("load failed");
+
+  if (isNetworkError) {
+    return {
+      isRateLimit: false,
+      message:
+        "Не удалось подключиться к Supabase Auth. Проверьте интернет, настройки SMTP и переменные Supabase на сайте.",
+    };
+  }
 
   if (
     authStatus >= 500 ||
