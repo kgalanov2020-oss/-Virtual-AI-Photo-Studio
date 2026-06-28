@@ -1501,6 +1501,26 @@ h1 {
   padding: 28px;
 }
 
+.account-state {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  padding: 22px 28px;
+}
+
+.account-state div {
+  display: grid;
+  gap: 6px;
+}
+
+.account-state span {
+  color: var(--muted);
+}
+
 .upload-footer {
   display: flex;
   flex-wrap: wrap;
@@ -1526,6 +1546,13 @@ h1 {
   background: #edf8f2;
   border: 1px solid #b7dfc9;
   color: var(--accent-dark);
+}
+
+.upload-message.muted {
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .legal-consent-panel {
@@ -2235,6 +2262,15 @@ h1 {
   }
 
   .auth-inline .button {
+    width: 100%;
+  }
+
+  .account-state {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .account-state .button {
     width: 100%;
   }
 

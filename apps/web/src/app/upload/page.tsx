@@ -6,6 +6,7 @@ import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { formatMoney, getPhotoPackage, PHOTO_PACKAGES, type PhotoPackageCode } from "@/lib/pricing";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { GenerationMode, UserProfile } from "@/lib/types";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
 
 type SelectedSelfie = {
   id: string;
@@ -75,10 +76,21 @@ export default function UploadPage() {
   );
   const hasConsents = hasAcceptedStoredConsents || (acceptedLegal && acceptedPhotoRights);
   const canContinue =
-    Boolean(userId) &&
+    Boolean(userId && userEmail && profile) &&
     isReady &&
     hasConsents &&
     (!selectedPackage.isFree || hasFreeCredits);
+  const continueHint = useMemo(() => {
+    if (!userId || !userEmail) return "Сначала войдите по email.";
+    if (!profile) return "Загружаем профиль пользователя.";
+    if (!isReady) return "Загрузите минимум 6 фото.";
+    if (!hasConsents) return "Подтвердите согласия.";
+    if (selectedPackage.isFree && !hasFreeCredits) {
+      return "Бесплатные фото закончились. Выберите платный пакет.";
+    }
+
+    return "";
+  }, [hasConsents, hasFreeCredits, isReady, profile, selectedPackage.isFree, userEmail, userId]);
   const statusText = useMemo(() => {
     if (readyCount === 0) return "Загрузите 6 селфи, чтобы начать.";
     if (readyCount < 6) return `Нужно ещё ${6 - readyCount} фото.`;
@@ -95,31 +107,52 @@ export default function UploadPage() {
     const supabase = createSupabaseBrowserClient();
 
     supabase.auth.getSession().then(({ data }) => {
-      const user = data.session?.user;
-      setUserId(user?.id ?? null);
-      setUserEmail(user?.email ?? "");
-      setAuthEmail(user?.email ?? "");
-
-      if (user?.id && user.email) {
-        loadOrCreateProfile(user.id, user.email);
-      }
+      syncUserSession(supabase, data.session?.user ?? null);
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      const user = session?.user;
-      setUserId(user?.id ?? null);
-      setUserEmail(user?.email ?? "");
-      setAuthEmail(user?.email ?? "");
-
-      if (user?.id && user.email) {
-        loadOrCreateProfile(user.id, user.email);
-      }
+      syncUserSession(supabase, session?.user ?? null);
     });
 
     return () => {
       listener.subscription.unsubscribe();
     };
   }, []);
+
+  async function syncUserSession(supabase: SupabaseClient, user: User | null) {
+    if (user?.is_anonymous || (user?.id && !user.email)) {
+      await supabase.auth.signOut();
+      clearUserSession();
+      setAuthMessage("Старая тестовая сессия сброшена. Войдите по email.");
+      return;
+    }
+
+    if (!user?.id || !user.email) {
+      clearUserSession();
+      return;
+    }
+
+    setUserId(user.id);
+    setUserEmail(user.email);
+    setAuthEmail(user.email);
+    await loadOrCreateProfile(user.id, user.email);
+  }
+
+  function clearUserSession() {
+    setUserId(null);
+    setUserEmail("");
+    setProfile(null);
+    setAcceptedLegal(false);
+    setAcceptedPhotoRights(false);
+  }
+
+  async function signOut() {
+    const supabase = createSupabaseBrowserClient();
+    await supabase.auth.signOut();
+    clearUserSession();
+    setAuthEmail("");
+    setAuthMessage("Вы вышли из аккаунта.");
+  }
 
   useEffect(() => {
     if (selectedPackageCode === "free_1" && profile && profile.free_images_remaining <= 0) {
@@ -223,7 +256,7 @@ export default function UploadPage() {
       return;
     }
 
-    if (!acceptedLegal || !acceptedPhotoRights) {
+    if (!hasConsents) {
       setUploadError("Подтвердите согласия перед продолжением.");
       return;
     }
@@ -365,10 +398,15 @@ export default function UploadPage() {
             </p>
           </div>
         </div>
-        {userId ? (
-          <div className="empty-state">
-            <strong>{userEmail}</strong>
-            <span>email подтверждён, можно продолжать загрузку</span>
+        {userId && userEmail ? (
+          <div className="account-state">
+            <div>
+              <strong>{userEmail}</strong>
+              <span>email подтверждён, можно продолжать загрузку</span>
+            </div>
+            <button className="button button-secondary" onClick={signOut} type="button">
+              Выйти
+            </button>
           </div>
         ) : (
           <div className="auth-inline">
@@ -573,6 +611,9 @@ export default function UploadPage() {
             {isUploading ? "Загружаем..." : "Продолжить к проверке качества"}
           </button>
         </div>
+        {!canContinue && continueHint ? (
+          <div className="upload-message muted">{continueHint}</div>
+        ) : null}
 
         {uploadError ? <div className="upload-message error">{uploadError}</div> : null}
         {uploadResult ? <div className="upload-message success">{uploadResult}</div> : null}
