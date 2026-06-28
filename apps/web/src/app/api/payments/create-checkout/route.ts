@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   formatMoney,
+  getPhotoPackage,
   PAYMENT_CURRENCY,
-  PHOTO_PACKAGE_AMOUNT_CENTS,
-  PHOTO_PACKAGE_CODE,
-  PHOTO_PACKAGE_DESCRIPTION,
-  PHOTO_PACKAGE_NAME,
 } from "@/lib/pricing";
 import { createSupabaseAdminClient } from "@/lib/supabase";
 
@@ -54,7 +51,7 @@ export async function POST(request: NextRequest) {
     const userId = userData.user.id;
     const { data: job, error: jobError } = await supabase
       .from("jobs")
-      .select("id, user_id, status, payment_status")
+      .select("id, user_id, status, payment_status, product_code, target_image_count")
       .eq("id", jobId)
       .single();
 
@@ -70,6 +67,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, paid: true, redirectUrl: `/generation/${jobId}` });
     }
 
+    const selectedPackage = getPhotoPackage(job.product_code);
+
+    if (selectedPackage.isFree) {
+      return NextResponse.json({ ok: true, paid: true, redirectUrl: `/generation/${jobId}` });
+    }
+
     const origin = request.headers.get("origin") ?? new URL(request.url).origin;
     const payment = await createYooKassaPayment({
       shopId: yookassaShopId,
@@ -78,6 +81,7 @@ export async function POST(request: NextRequest) {
       jobId,
       userId,
       email,
+      selectedPackage,
     });
     const checkoutUrl = payment.confirmation?.confirmation_url;
 
@@ -92,10 +96,11 @@ export async function POST(request: NextRequest) {
       provider: "yookassa",
       provider_session_id: payment.id,
       checkout_url: checkoutUrl,
-      amount_cents: PHOTO_PACKAGE_AMOUNT_CENTS,
+      amount_cents: selectedPackage.amountCents,
       currency: PAYMENT_CURRENCY,
-      product_code: PHOTO_PACKAGE_CODE,
-      product_name: PHOTO_PACKAGE_NAME,
+      product_code: selectedPackage.code,
+      product_name: selectedPackage.name,
+      target_image_count: selectedPackage.imageCount,
     });
 
     if (orderError) {
@@ -107,9 +112,10 @@ export async function POST(request: NextRequest) {
       .update({
         status: "awaiting_payment",
         payment_status: "pending",
-        amount_cents: PHOTO_PACKAGE_AMOUNT_CENTS,
+        amount_cents: selectedPackage.amountCents,
         currency: PAYMENT_CURRENCY,
-        product_code: PHOTO_PACKAGE_CODE,
+        product_code: selectedPackage.code,
+        target_image_count: selectedPackage.imageCount,
       })
       .eq("id", jobId);
 
@@ -120,7 +126,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       checkoutUrl,
-      label: formatMoney(),
+      label: formatMoney(selectedPackage.amountCents),
     });
   } catch (error) {
     return NextResponse.json(
@@ -137,6 +143,7 @@ async function createYooKassaPayment({
   jobId,
   userId,
   email,
+  selectedPackage,
 }: {
   shopId: string;
   secretKey: string;
@@ -144,8 +151,9 @@ async function createYooKassaPayment({
   jobId: string;
   userId: string;
   email: string;
+  selectedPackage: ReturnType<typeof getPhotoPackage>;
 }) {
-  const amountValue = (PHOTO_PACKAGE_AMOUNT_CENTS / 100).toFixed(2);
+  const amountValue = (selectedPackage.amountCents / 100).toFixed(2);
   const response = await fetch("https://api.yookassa.ru/v3/payments", {
     method: "POST",
     headers: {
@@ -163,11 +171,12 @@ async function createYooKassaPayment({
         type: "redirect",
         return_url: `${origin}/checkout/${jobId}?payment_return=1`,
       },
-      description: PHOTO_PACKAGE_NAME,
+      description: selectedPackage.name,
       metadata: {
         job_id: jobId,
         user_id: userId,
-        product_code: PHOTO_PACKAGE_CODE,
+        product_code: selectedPackage.code,
+        target_image_count: String(selectedPackage.imageCount),
         email,
       },
       receipt: {
@@ -176,7 +185,7 @@ async function createYooKassaPayment({
         },
         items: [
           {
-            description: PHOTO_PACKAGE_DESCRIPTION,
+            description: selectedPackage.description,
             quantity: "1.00",
             amount: {
               value: amountValue,

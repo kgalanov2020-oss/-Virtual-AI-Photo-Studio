@@ -55,14 +55,28 @@ export default function GenerationPage({ params }: GenerationPageProps) {
     });
   }, [params]);
 
-  const totalExpected = useMemo(
-    () => getTargetShots(shots).reduce((sum, shot) => sum + getTargetVariationCount(shot), 0),
-    [shots],
+  const visibleShotTargets = useMemo(
+    () => getVisibleShotTargets(shots, job?.target_image_count ?? 40),
+    [shots, job?.target_image_count],
   );
+  const targetCountByShotId = useMemo(() => {
+    const counts = new Map<string, number>();
+
+    visibleShotTargets.forEach(({ shot }) => {
+      counts.set(shot.id, (counts.get(shot.id) ?? 0) + 1);
+    });
+
+    return counts;
+  }, [visibleShotTargets]);
+
+  const totalExpected = visibleShotTargets.length;
 
   const totalGenerated = useMemo(
-    () => getTargetShots(shots).reduce((sum, shot) => sum + shot.generated.length, 0),
-    [shots],
+    () =>
+      visibleShotTargets.filter(({ shot, variationIndex }) =>
+        shot.generated.some((image) => image.variation_index === variationIndex),
+      ).length,
+    [visibleShotTargets],
   );
 
   async function loadGeneration(resolvedJobId: string) {
@@ -73,7 +87,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
       const supabase = createSupabaseBrowserClient();
       const { data: jobData, error: jobError } = await supabase
         .from("jobs")
-        .select("id, user_id, studio_id, generation_mode, status, payment_status, paid_at, amount_cents, currency, product_code, progress, error_message, created_at, queued_at, started_at, completed_at")
+        .select("id, user_id, studio_id, generation_mode, status, payment_status, paid_at, amount_cents, currency, product_code, target_image_count, progress, error_message, created_at, queued_at, started_at, completed_at")
         .eq("id", resolvedJobId)
         .single();
 
@@ -283,7 +297,6 @@ export default function GenerationPage({ params }: GenerationPageProps) {
             <div style={{ width: `${job?.progress ?? 0}%` }} />
           </div>
           <p>{job?.progress ?? 0}% готово</p>
-          <p>Тестовый режим без оплаты</p>
           <p>{generationMode === "child_safe" ? "Детский безопасный режим" : "Стандартный режим"}</p>
           <small>Job: {jobId || "загрузка..."}</small>
         </aside>
@@ -294,8 +307,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
           <div>
             <h2>План генерации</h2>
             <p>
-              Будет создано {totalExpected} фото: 10 разных позиций и 4 дистанции
-              камеры для каждой позиции.
+              Будет создано {totalExpected} фото в выбранном интерьере.
             </p>
           </div>
           <button
@@ -359,7 +371,9 @@ export default function GenerationPage({ params }: GenerationPageProps) {
             </div>
 
             <div className="generation-grid">
-              {getTargetShots(shots).map((shot, shotIndex) => (
+              {getTargetShots(shots)
+                .filter((shot) => (targetCountByShotId.get(shot.id) ?? 0) > 0)
+                .map((shot, shotIndex) => (
                 <article className="generation-card" key={shot.id}>
                   <div className="generation-card-top">
                     <span>{shotIndex + 1}</span>
@@ -367,7 +381,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
                   </div>
                   <p>{shot.pose}</p>
                   <div className="generation-slots">
-                    {Array.from({ length: getTargetVariationCount(shot) }).map((_, index) => {
+                    {Array.from({ length: targetCountByShotId.get(shot.id) ?? 0 }).map((_, index) => {
                       const generatedImage = shot.generated[index];
                       return generatedImage ? (
                         <div className="generated-thumb" key={generatedImage.id}>
@@ -397,6 +411,18 @@ export default function GenerationPage({ params }: GenerationPageProps) {
       </section>
     </main>
   );
+}
+
+function getVisibleShotTargets(shots: GenerationShot[], targetImageCount: number) {
+  const targets: Array<{ shot: GenerationShot; variationIndex: number }> = [];
+
+  for (const shot of getTargetShots(shots)) {
+    for (let variationIndex = 1; variationIndex <= getTargetVariationCount(shot); variationIndex += 1) {
+      targets.push({ shot, variationIndex });
+    }
+  }
+
+  return targets.slice(0, Math.max(1, Math.min(40, targetImageCount)));
 }
 
 function slugify(value: string) {

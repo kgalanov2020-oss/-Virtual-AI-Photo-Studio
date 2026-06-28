@@ -43,7 +43,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const userId = userData.user.id;
     const { data: jobData, error: jobError } = await supabase
       .from("jobs")
-      .select("id, user_id, studio_id, generation_mode, status, payment_status, paid_at, amount_cents, currency, product_code, progress, error_message, created_at, queued_at, started_at, completed_at")
+      .select("id, user_id, studio_id, generation_mode, status, payment_status, paid_at, amount_cents, currency, product_code, target_image_count, progress, error_message, created_at, queued_at, started_at, completed_at")
       .eq("id", jobId)
       .single();
 
@@ -132,15 +132,21 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const studioSlug = (studioData as { slug: string }).slug;
     const wardrobePrompt = wardrobeByStudioSlug.get(studioSlug);
     const targetShots = getTargetShots(shots);
+    const limitedTargets = getLimitedGenerationTargets(targetShots, job.target_image_count);
     const generated = generatedData ?? [];
     const targetGenerated = generated.filter((image) => isTargetVariation(image.variation_index));
-    const totalExpected = targetShots.reduce((sum, shot) => sum + getTargetVariationCount(shot), 0);
+    const targetKeys = new Set(
+      limitedTargets.map(({ shot, variationIndex }) => `${shot.id}:${variationIndex}`),
+    );
+    const totalExpected = limitedTargets.length;
     const completedBefore = new Set(
-      targetGenerated.map((image) => `${image.studio_shot_id}:${image.variation_index}`),
+      targetGenerated
+        .map((image) => `${image.studio_shot_id}:${image.variation_index}`)
+        .filter((key) => targetKeys.has(key)),
     ).size;
     lastKnownCompleted = completedBefore;
     lastKnownTotal = totalExpected;
-    const nextTarget = findNextTarget(targetShots, targetGenerated);
+    const nextTarget = findNextTarget(limitedTargets, targetGenerated);
 
     if (!nextTarget) {
       await supabase
@@ -287,19 +293,29 @@ function isGeminiPolicyBlock(error: unknown) {
   return /Input blocked|Prohibited Use policy|invalid_request/i.test(message);
 }
 
+function getLimitedGenerationTargets(shots: StudioShot[], targetImageCount: number) {
+  const targets: Array<{ shot: StudioShot; variationIndex: number }> = [];
+
+  for (const shot of shots) {
+    for (let variationIndex = 1; variationIndex <= getTargetVariationCount(shot); variationIndex += 1) {
+      targets.push({ shot, variationIndex });
+    }
+  }
+
+  return targets.slice(0, Math.max(1, Math.min(40, targetImageCount)));
+}
+
 function findNextTarget(
-  shots: StudioShot[],
+  targets: Array<{ shot: StudioShot; variationIndex: number }>,
   generated: Array<{ studio_shot_id: string; variation_index: number }>,
 ) {
   const completedKeys = new Set(
     generated.map((image) => `${image.studio_shot_id}:${image.variation_index}`),
   );
 
-  for (const shot of shots) {
-    for (let variationIndex = 1; variationIndex <= getTargetVariationCount(shot); variationIndex += 1) {
-      if (!completedKeys.has(`${shot.id}:${variationIndex}`)) {
-        return { shot, variationIndex };
-      }
+  for (const target of targets) {
+    if (!completedKeys.has(`${target.shot.id}:${target.variationIndex}`)) {
+      return target;
     }
   }
 

@@ -50,6 +50,7 @@ export type Job = {
   amount_cents: number;
   currency: string;
   product_code: string;
+  target_image_count: number;
   progress: number;
   error_message: string | null;
   created_at: string;
@@ -71,8 +72,21 @@ export type Order = {
   currency: string;
   product_code: string;
   product_name: string;
+  target_image_count: number;
   created_at: string;
   paid_at: string | null;
+  updated_at: string;
+};
+
+export type UserProfile = {
+  user_id: string;
+  email: string;
+  free_images_remaining: number;
+  legal_terms_accepted_at: string | null;
+  privacy_accepted_at: string | null;
+  personal_data_accepted_at: string | null;
+  photo_rights_accepted_at: string | null;
+  created_at: string;
   updated_at: string;
 };
 
@@ -111,7 +125,7 @@ export type Database = {
       };
       jobs: {
         Row: Job;
-        Insert: Omit<Job, "id" | "generation_mode" | "status" | "payment_status" | "paid_at" | "amount_cents" | "currency" | "product_code" | "progress" | "error_message" | "created_at" | "queued_at" | "started_at" | "completed_at"> & {
+        Insert: Omit<Job, "id" | "generation_mode" | "status" | "payment_status" | "paid_at" | "amount_cents" | "currency" | "product_code" | "target_image_count" | "progress" | "error_message" | "created_at" | "queued_at" | "started_at" | "completed_at"> & {
           id?: string;
           generation_mode?: GenerationMode;
           status?: Job["status"];
@@ -120,6 +134,7 @@ export type Database = {
           amount_cents?: number;
           currency?: string;
           product_code?: string;
+          target_image_count?: number;
           progress?: number;
           error_message?: string | null;
           created_at?: string;
@@ -170,6 +185,29 @@ export type Database = {
           updated_at?: string;
         };
         Update: Partial<Order>;
+        Relationships: [];
+      };
+      user_profiles: {
+        Row: UserProfile;
+        Insert: Omit<
+          UserProfile,
+          | "free_images_remaining"
+          | "legal_terms_accepted_at"
+          | "privacy_accepted_at"
+          | "personal_data_accepted_at"
+          | "photo_rights_accepted_at"
+          | "created_at"
+          | "updated_at"
+        > & {
+          free_images_remaining?: number;
+          legal_terms_accepted_at?: string | null;
+          privacy_accepted_at?: string | null;
+          personal_data_accepted_at?: string | null;
+          photo_rights_accepted_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<UserProfile>;
         Relationships: [];
       };
     };

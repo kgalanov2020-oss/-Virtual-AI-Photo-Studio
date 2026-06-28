@@ -43,6 +43,7 @@ create table if not exists public.jobs (
   amount_cents integer not null default 99000,
   currency text not null default 'rub',
   product_code text not null default 'studio_40',
+  target_image_count integer not null default 40 check (target_image_count between 1 and 40),
   progress integer not null default 0 check (progress between 0 and 100),
   error_message text,
   created_at timestamptz not null default now(),
@@ -65,6 +66,7 @@ create table if not exists public.orders (
   currency text not null default 'rub',
   product_code text not null default 'studio_40',
   product_name text not null default 'AI-фотосессия 40 фото',
+  target_image_count integer not null default 40 check (target_image_count between 1 and 40),
   created_at timestamptz not null default now(),
   paid_at timestamptz,
   updated_at timestamptz not null default now()
@@ -94,12 +96,27 @@ create table if not exists public.generated_images (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.user_profiles (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  email text not null,
+  free_images_remaining integer not null default 5 check (free_images_remaining >= 0),
+  legal_terms_accepted_at timestamptz,
+  privacy_accepted_at timestamptz,
+  personal_data_accepted_at timestamptz,
+  photo_rights_accepted_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 alter table public.studios enable row level security;
 alter table public.studio_shots enable row level security;
 alter table public.jobs enable row level security;
 alter table public.uploaded_selfies enable row level security;
 alter table public.generated_images enable row level security;
 alter table public.orders enable row level security;
+alter table public.user_profiles enable row level security;
+
+grant select, insert, update on public.user_profiles to authenticated;
 
 create policy "Anyone can read active studios"
 on public.studios
@@ -162,3 +179,22 @@ on public.orders
 for select
 to authenticated
 using ((select auth.uid()) = user_id);
+
+create policy "Users can read own profile"
+on public.user_profiles
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+create policy "Users can create own profile"
+on public.user_profiles
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can update own profile"
+on public.user_profiles
+for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);

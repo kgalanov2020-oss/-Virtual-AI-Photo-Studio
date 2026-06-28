@@ -5,9 +5,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import {
   formatMoney,
-  PHOTO_PACKAGE_AMOUNT_CENTS,
-  PHOTO_PACKAGE_DESCRIPTION,
-  PHOTO_PACKAGE_NAME,
+  getPhotoPackage,
 } from "@/lib/pricing";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { Job } from "@/lib/types";
@@ -34,9 +32,10 @@ export default function CheckoutPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const activePackage = useMemo(() => getPhotoPackage(job?.product_code), [job?.product_code]);
   const price = useMemo(
-    () => formatMoney(job?.amount_cents ?? PHOTO_PACKAGE_AMOUNT_CENTS, job?.currency),
-    [job?.amount_cents, job?.currency],
+    () => formatMoney(activePackage.amountCents, job?.currency),
+    [job?.currency, activePackage.amountCents],
   );
 
   useEffect(() => {
@@ -61,9 +60,11 @@ export default function CheckoutPage() {
 
     try {
       const supabase = createSupabaseBrowserClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const sessionEmail = sessionData.session?.user.email;
       const { data, error: jobError } = await supabase
         .from("jobs")
-        .select("id, user_id, studio_id, generation_mode, status, payment_status, paid_at, amount_cents, currency, product_code, progress, error_message, created_at, queued_at, started_at, completed_at")
+        .select("id, user_id, studio_id, generation_mode, status, payment_status, paid_at, amount_cents, currency, product_code, target_image_count, progress, error_message, created_at, queued_at, started_at, completed_at")
         .eq("id", jobId)
         .single();
 
@@ -72,6 +73,9 @@ export default function CheckoutPage() {
       }
 
       setJob(data as Job);
+      if (sessionEmail) {
+        setCustomerEmail(sessionEmail);
+      }
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : "Не удалось загрузить заказ.");
     } finally {
@@ -215,8 +219,8 @@ export default function CheckoutPage() {
 
         <aside className="checkout-card">
           <span>Пакет</span>
-          <strong>{PHOTO_PACKAGE_NAME}</strong>
-          <p>{PHOTO_PACKAGE_DESCRIPTION}</p>
+          <strong>{activePackage.name}</strong>
+          <p>{activePackage.description}</p>
           <div className="checkout-price">{price}</div>
           <label className="checkout-field">
             <span>Email для чека</span>

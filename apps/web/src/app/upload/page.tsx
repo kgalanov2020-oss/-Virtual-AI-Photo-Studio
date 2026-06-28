@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { formatMoney, getPhotoPackage, PHOTO_PACKAGES, type PhotoPackageCode } from "@/lib/pricing";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
-import type { GenerationMode } from "@/lib/types";
+import type { GenerationMode, UserProfile } from "@/lib/types";
 
 type SelectedSelfie = {
   id: string;
@@ -47,9 +48,16 @@ const acceptedImageExtensions = new Set(["jpg", "jpeg", "png", "webp", "heic", "
 export default function UploadPage() {
   const router = useRouter();
   const [selfies, setSelfies] = useState<SelectedSelfie[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState("");
+  const [authEmail, setAuthEmail] = useState("");
+  const [isSendingLink, setIsSendingLink] = useState(false);
+  const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [generationMode, setGenerationMode] = useState<GenerationMode>("standard");
   const [selectedStudioSlug, setSelectedStudioSlug] = useState("modern-office");
+  const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("free_1");
   const [acceptedLegal, setAcceptedLegal] = useState(false);
   const [acceptedPhotoRights, setAcceptedPhotoRights] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -57,7 +65,20 @@ export default function UploadPage() {
 
   const readyCount = selfies.length;
   const isReady = readyCount >= 6;
-  const canContinue = isReady && acceptedLegal && acceptedPhotoRights;
+  const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
+  const hasFreeCredits = (profile?.free_images_remaining ?? 0) > 0;
+  const hasAcceptedStoredConsents = Boolean(
+    profile?.legal_terms_accepted_at &&
+      profile.privacy_accepted_at &&
+      profile.personal_data_accepted_at &&
+      profile.photo_rights_accepted_at,
+  );
+  const hasConsents = hasAcceptedStoredConsents || (acceptedLegal && acceptedPhotoRights);
+  const canContinue =
+    Boolean(userId) &&
+    isReady &&
+    hasConsents &&
+    (!selectedPackage.isFree || hasFreeCredits);
   const statusText = useMemo(() => {
     if (readyCount === 0) return "Загрузите 6 селфи, чтобы начать.";
     if (readyCount < 6) return `Нужно ещё ${6 - readyCount} фото.`;
@@ -69,6 +90,103 @@ export default function UploadPage() {
       new URLSearchParams(window.location.search).get("studio") ?? "modern-office",
     );
   }, []);
+
+  useEffect(() => {
+    const supabase = createSupabaseBrowserClient();
+
+    supabase.auth.getSession().then(({ data }) => {
+      const user = data.session?.user;
+      setUserId(user?.id ?? null);
+      setUserEmail(user?.email ?? "");
+      setAuthEmail(user?.email ?? "");
+
+      if (user?.id && user.email) {
+        loadOrCreateProfile(user.id, user.email);
+      }
+    });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      const user = session?.user;
+      setUserId(user?.id ?? null);
+      setUserEmail(user?.email ?? "");
+      setAuthEmail(user?.email ?? "");
+
+      if (user?.id && user.email) {
+        loadOrCreateProfile(user.id, user.email);
+      }
+    });
+
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (selectedPackageCode === "free_1" && profile && profile.free_images_remaining <= 0) {
+      setSelectedPackageCode("studio_5");
+    }
+  }, [profile, selectedPackageCode]);
+
+  async function sendLoginLink() {
+    if (!authEmail.trim() || isSendingLink) return;
+
+    setIsSendingLink(true);
+    setUploadError(null);
+    setAuthMessage(null);
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { error } = await supabase.auth.signInWithOtp({
+        email: authEmail.trim(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/upload?studio=${selectedStudioSlug}`,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setAuthMessage("Отправили ссылку для входа. Откройте письмо и подтвердите email.");
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Не удалось отправить ссылку.");
+    } finally {
+      setIsSendingLink(false);
+    }
+  }
+
+  async function loadOrCreateProfile(activeUserId: string, email: string) {
+    const supabase = createSupabaseBrowserClient();
+    const now = new Date().toISOString();
+    const { data, error } = await supabase
+      .from("user_profiles")
+      .upsert(
+        {
+          user_id: activeUserId,
+          email,
+          updated_at: now,
+        },
+        { onConflict: "user_id" },
+      )
+      .select("*")
+      .single();
+
+    if (error) {
+      setUploadError(error.message);
+      return;
+    }
+
+    const nextProfile = data as UserProfile;
+    setProfile(nextProfile);
+    setAcceptedLegal(
+      Boolean(
+        nextProfile.legal_terms_accepted_at &&
+          nextProfile.privacy_accepted_at &&
+          nextProfile.personal_data_accepted_at,
+      ),
+    );
+    setAcceptedPhotoRights(Boolean(nextProfile.photo_rights_accepted_at));
+  }
 
   function handleFiles(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? [])
@@ -117,21 +235,35 @@ export default function UploadPage() {
     try {
       const supabase = createSupabaseBrowserClient();
       const { data: sessionData } = await supabase.auth.getSession();
-      let userId = sessionData.session?.user.id;
+      const activeUserId = sessionData.session?.user.id;
+      const activeEmail = sessionData.session?.user.email;
 
-      if (!userId) {
-        const { data: anonymousData, error: authError } =
-          await supabase.auth.signInAnonymously();
+      if (!activeUserId || !activeEmail) {
+        throw new Error("Сначала войдите по email.");
+      }
 
-        if (authError || !anonymousData.user) {
-          throw new Error(
-            authError?.message
-              ? `Не удалось создать анонимную сессию: ${authError.message}`
-              : "Не удалось создать анонимную сессию. Включите Anonymous sign-ins в Supabase Auth.",
-          );
-        }
+      if (selectedPackage.isFree && !hasFreeCredits) {
+        throw new Error("Бесплатные фото закончились. Выберите платный пакет.");
+      }
 
-        userId = anonymousData.user.id;
+      const now = new Date().toISOString();
+      const { error: profileError } = await supabase
+        .from("user_profiles")
+        .upsert(
+          {
+            user_id: activeUserId,
+            email: activeEmail,
+            legal_terms_accepted_at: now,
+            privacy_accepted_at: now,
+            personal_data_accepted_at: now,
+            photo_rights_accepted_at: now,
+            updated_at: now,
+          },
+          { onConflict: "user_id" },
+        );
+
+      if (profileError) {
+        throw new Error(profileError.message);
       }
 
       const { data: studio, error: studioError } = await supabase
@@ -147,10 +279,15 @@ export default function UploadPage() {
       const { data: job, error: jobError } = await supabase
         .from("jobs")
         .insert({
-          user_id: userId,
+          user_id: activeUserId,
           studio_id: studio.id,
           generation_mode: generationMode,
           status: "draft",
+          payment_status: selectedPackage.isFree ? "unpaid" : "unpaid",
+          amount_cents: selectedPackage.amountCents,
+          currency: "rub",
+          product_code: selectedPackage.code,
+          target_image_count: selectedPackage.imageCount,
           progress: 0,
         })
         .select("id")
@@ -163,7 +300,7 @@ export default function UploadPage() {
       const uploadedRows = [];
 
       for (const [index, selfie] of selfies.entries()) {
-        const filePath = `${userId}/${job.id}/${String(index + 1).padStart(2, "0")}-${sanitizeFileName(selfie.name)}`;
+        const filePath = `${activeUserId}/${job.id}/${String(index + 1).padStart(2, "0")}-${sanitizeFileName(selfie.name)}`;
         const { error: uploadError } = await supabase.storage
           .from("selfies")
           .upload(filePath, selfie.file, {
@@ -177,7 +314,7 @@ export default function UploadPage() {
 
         uploadedRows.push({
           job_id: job.id,
-          user_id: userId,
+          user_id: activeUserId,
           file_url: filePath,
           is_approved: false,
         });
@@ -218,6 +355,43 @@ export default function UploadPage() {
         </div>
       </section>
 
+      <section className="section auth-section">
+        <div className="section-header">
+          <div>
+            <h2>Email для аккаунта и чеков</h2>
+            <p>
+              Войдите по email. На этот адрес будут приходить чеки и доступ к
+              фотосессиям.
+            </p>
+          </div>
+        </div>
+        {userId ? (
+          <div className="empty-state">
+            <strong>{userEmail}</strong>
+            <span>email подтверждён, можно продолжать загрузку</span>
+          </div>
+        ) : (
+          <div className="auth-inline">
+            <input
+              autoComplete="email"
+              onChange={(event) => setAuthEmail(event.target.value)}
+              placeholder="email@example.com"
+              type="email"
+              value={authEmail}
+            />
+            <button
+              className="button button-primary"
+              disabled={isSendingLink || !authEmail.trim()}
+              onClick={sendLoginLink}
+              type="button"
+            >
+              {isSendingLink ? "Отправляем..." : "Получить ссылку для входа"}
+            </button>
+          </div>
+        )}
+        {authMessage ? <div className="upload-message success">{authMessage}</div> : null}
+      </section>
+
       <section className="section">
         <div className="section-header">
           <div>
@@ -238,6 +412,41 @@ export default function UploadPage() {
               <strong>{item.title}</strong>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="section child-mode-section">
+        <div className="section-header">
+          <div>
+            <h2>Пакет фотосессии</h2>
+            <p>
+              Бесплатно доступно {profile?.free_images_remaining ?? 0} фото. После
+              бесплатного теста можно выбрать платный пакет.
+            </p>
+          </div>
+        </div>
+        <div className="package-grid">
+          {PHOTO_PACKAGES.map((photoPackage) => {
+            const isDisabled = photoPackage.isFree && !hasFreeCredits;
+
+            return (
+              <label
+                className={`package-card ${selectedPackageCode === photoPackage.code ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
+                key={photoPackage.code}
+              >
+                <input
+                  checked={selectedPackageCode === photoPackage.code}
+                  disabled={isDisabled}
+                  name="photo-package"
+                  onChange={() => setSelectedPackageCode(photoPackage.code)}
+                  type="radio"
+                />
+                <strong>{photoPackage.imageCount} фото</strong>
+                <span>{formatMoney(photoPackage.amountCents)}</span>
+                <em>{photoPackage.description}</em>
+              </label>
+            );
+          })}
         </div>
       </section>
 
@@ -302,15 +511,12 @@ export default function UploadPage() {
         )}
 
         <div className="legal-consent-panel">
-          <p>
-            Используя сервис Virtual AI Photo Studio, вы соглашаетесь с обработкой
-            персональных данных, условиями Пользовательского соглашения и Политикой
-            конфиденциальности.
-          </p>
+          <p>{hasAcceptedStoredConsents ? "Согласия уже сохранены в профиле." : "Подтвердите согласия один раз. Мы сохраним их в профиле."}</p>
 
           <label className="consent-option">
             <input
               checked={acceptedLegal}
+              disabled={hasAcceptedStoredConsents}
               onChange={(event) => setAcceptedLegal(event.target.checked)}
               type="checkbox"
             />
@@ -334,6 +540,7 @@ export default function UploadPage() {
           <label className="consent-option">
             <input
               checked={acceptedPhotoRights}
+              disabled={hasAcceptedStoredConsents}
               onChange={(event) => setAcceptedPhotoRights(event.target.checked)}
               type="checkbox"
             />

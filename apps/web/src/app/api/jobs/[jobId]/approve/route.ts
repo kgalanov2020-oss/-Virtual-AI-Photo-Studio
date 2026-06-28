@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  getPhotoPackage,
   PAYMENT_CURRENCY,
-  PHOTO_PACKAGE_AMOUNT_CENTS,
-  PHOTO_PACKAGE_CODE,
 } from "@/lib/pricing";
 import { PAYMENTS_ENABLED } from "@/lib/payments";
 import { createSupabaseAdminClient } from "@/lib/supabase";
@@ -30,7 +29,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const userId = userData.user.id;
     const { data: job, error: jobError } = await supabase
       .from("jobs")
-      .select("id, user_id")
+      .select("id, user_id, status, payment_status, product_code, target_image_count")
       .eq("id", jobId)
       .single();
 
@@ -40,6 +39,47 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     if (job.user_id !== userId) {
       return NextResponse.json({ error: "Нет доступа к этому job." }, { status: 403 });
+    }
+
+    if (job.payment_status === "paid" || (job.status !== "draft" && job.status !== "failed")) {
+      return NextResponse.json({
+        ok: true,
+        job: {
+          id: job.id,
+          status: job.status,
+          payment_status: job.payment_status,
+        },
+      });
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("free_images_remaining, legal_terms_accepted_at, privacy_accepted_at, personal_data_accepted_at, photo_rights_accepted_at")
+      .eq("user_id", userId)
+      .single();
+
+    if (profileError || !profile) {
+      return NextResponse.json({ error: "Профиль пользователя не найден." }, { status: 400 });
+    }
+
+    const hasConsents =
+      profile.legal_terms_accepted_at &&
+      profile.privacy_accepted_at &&
+      profile.personal_data_accepted_at &&
+      profile.photo_rights_accepted_at;
+
+    if (!hasConsents) {
+      return NextResponse.json({ error: "Сначала подтвердите согласия." }, { status: 400 });
+    }
+
+    const selectedPackage = getPhotoPackage(job.product_code);
+    const isFreePackage = selectedPackage.isFree;
+
+    if (isFreePackage && profile.free_images_remaining < selectedPackage.imageCount) {
+      return NextResponse.json(
+        { error: "Бесплатные фото закончились. Выберите платный пакет." },
+        { status: 402 },
+      );
     }
 
     const { error: selfiesError } = await supabase
@@ -56,17 +96,34 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const now = new Date().toISOString();
+    const shouldPay = PAYMENTS_ENABLED && !isFreePackage;
+
+    if (isFreePackage) {
+      const { error: creditError } = await supabase
+        .from("user_profiles")
+        .update({
+          free_images_remaining: profile.free_images_remaining - selectedPackage.imageCount,
+          updated_at: now,
+        })
+        .eq("user_id", userId);
+
+      if (creditError) {
+        throw new Error(creditError.message);
+      }
+    }
+
     const { data: updatedJob, error: updateError } = await supabase
       .from("jobs")
       .update({
-        status: PAYMENTS_ENABLED ? "awaiting_payment" : "queued",
-        payment_status: PAYMENTS_ENABLED ? "unpaid" : "paid",
-        paid_at: PAYMENTS_ENABLED ? null : now,
-        amount_cents: PHOTO_PACKAGE_AMOUNT_CENTS,
+        status: shouldPay ? "awaiting_payment" : "queued",
+        payment_status: shouldPay ? "unpaid" : "paid",
+        paid_at: shouldPay ? null : now,
+        amount_cents: selectedPackage.amountCents,
         currency: PAYMENT_CURRENCY,
-        product_code: PHOTO_PACKAGE_CODE,
-        progress: PAYMENTS_ENABLED ? 0 : 5,
-        queued_at: PAYMENTS_ENABLED ? null : now,
+        product_code: selectedPackage.code,
+        target_image_count: selectedPackage.imageCount,
+        progress: shouldPay ? 0 : 5,
+        queued_at: shouldPay ? null : now,
         error_message: null,
       })
       .eq("id", jobId)

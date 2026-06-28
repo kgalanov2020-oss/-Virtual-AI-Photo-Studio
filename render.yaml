@@ -29,7 +29,7 @@ services:
       - key: GEMINI_API_KEY
         sync: false
       - key: PAYMENT_AMOUNT_CENTS
-        value: 99000
+        value: 99900
       - key: PAYMENT_CURRENCY
         value: rub
       - key: YOOKASSA_SHOP_ID
