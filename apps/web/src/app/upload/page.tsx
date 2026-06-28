@@ -52,9 +52,8 @@ export default function UploadPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState("");
   const [authEmail, setAuthEmail] = useState("");
-  const [isSendingLink, setIsSendingLink] = useState(false);
-  const [authCooldownUntil, setAuthCooldownUntil] = useState(0);
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  const [authPassword, setAuthPassword] = useState("");
+  const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -70,7 +69,6 @@ export default function UploadPage() {
   const readyCount = selfies.length;
   const isReady = readyCount >= 6;
   const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
-  const authCooldownSeconds = Math.max(0, Math.ceil((authCooldownUntil - currentTime) / 1000));
   const hasFreeCredits = (profile?.free_images_remaining ?? 0) > 0;
   const hasAcceptedStoredConsents = Boolean(
     profile?.legal_terms_accepted_at &&
@@ -106,18 +104,6 @@ export default function UploadPage() {
       new URLSearchParams(window.location.search).get("studio") ?? "modern-office",
     );
   }, []);
-
-  useEffect(() => {
-    if (authCooldownUntil <= Date.now()) return;
-
-    const timer = window.setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-
-    return () => {
-      window.clearInterval(timer);
-    };
-  }, [authCooldownUntil]);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -162,6 +148,7 @@ export default function UploadPage() {
     setProfile(null);
     setAcceptedLegal(false);
     setAcceptedPhotoRights(false);
+    setAuthPassword("");
   }
 
   async function signOut() {
@@ -179,18 +166,37 @@ export default function UploadPage() {
     }
   }, [profile, selectedPackageCode]);
 
-  async function sendLoginLink() {
-    if (!authEmail.trim() || isSendingLink || authCooldownSeconds > 0) return;
+  function getAuthCredentials() {
+    const email = authEmail.trim();
+    const password = authPassword.trim();
 
-    setIsSendingLink(true);
+    if (!email || !password) {
+      setAuthError("Введите email и пароль.");
+      return null;
+    }
+
+    if (password.length < 6) {
+      setAuthError("Пароль должен быть минимум 6 символов.");
+      return null;
+    }
+
+    return { email, password };
+  }
+
+  async function registerWithEmailPassword() {
+    const credentials = getAuthCredentials();
+    if (!credentials || isAuthSubmitting) return;
+
+    setIsAuthSubmitting(true);
     setUploadError(null);
     setAuthMessage(null);
     setAuthError(null);
 
     try {
       const supabase = createSupabaseBrowserClient();
-      const { error } = await supabase.auth.signInWithOtp({
-        email: authEmail.trim(),
+      const { data, error } = await supabase.auth.signUp({
+        email: credentials.email,
+        password: credentials.password,
         options: {
           emailRedirectTo: `${window.location.origin}/upload?studio=${selectedStudioSlug}`,
         },
@@ -200,18 +206,51 @@ export default function UploadPage() {
         throw error;
       }
 
-      setAuthCooldownUntil(Date.now() + 60_000);
-      setAuthMessage("Отправили ссылку для входа. Откройте письмо и подтвердите email.");
-    } catch (error) {
-      const formattedError = formatAuthError(error);
-
-      if (formattedError.isRateLimit) {
-        setAuthCooldownUntil(Date.now() + 5 * 60_000);
+      if (data.session?.user) {
+        await syncUserSession(supabase, data.session.user);
+        setAuthPassword("");
+        setAuthMessage("Аккаунт создан, вход выполнен.");
+        return;
       }
 
-      setAuthError(formattedError.message);
+      setAuthMessage("Регистрация отправлена. Проверьте email и подтвердите аккаунт, затем войдите.");
+    } catch (error) {
+      setAuthError(formatAuthError(error).message);
     } finally {
-      setIsSendingLink(false);
+      setIsAuthSubmitting(false);
+    }
+  }
+
+  async function loginWithEmailPassword() {
+    const credentials = getAuthCredentials();
+    if (!credentials || isAuthSubmitting) return;
+
+    setIsAuthSubmitting(true);
+    setUploadError(null);
+    setAuthMessage(null);
+    setAuthError(null);
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: credentials.email,
+        password: credentials.password,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        await syncUserSession(supabase, data.user);
+      }
+
+      setAuthPassword("");
+      setAuthMessage("Вы вошли в аккаунт.");
+    } catch (error) {
+      setAuthError(formatAuthError(error).message);
+    } finally {
+      setIsAuthSubmitting(false);
     }
   }
 
@@ -425,8 +464,8 @@ export default function UploadPage() {
           <div>
             <h2>Email для аккаунта и чеков</h2>
             <p>
-              Войдите по email. На этот адрес будут приходить чеки и доступ к
-              фотосессиям.
+              Зарегистрируйтесь или войдите по email и паролю. На этот адрес
+              будут приходить чеки и доступ к фотосессиям.
             </p>
           </div>
         </div>
@@ -449,18 +488,31 @@ export default function UploadPage() {
               type="email"
               value={authEmail}
             />
-            <button
-              className="button button-primary"
-              disabled={isSendingLink || authCooldownSeconds > 0 || !authEmail.trim()}
-              onClick={sendLoginLink}
-              type="button"
-            >
-              {isSendingLink
-                ? "Отправляем..."
-                : authCooldownSeconds > 0
-                  ? `Повтор через ${authCooldownSeconds} сек.`
-                  : "Получить ссылку для входа"}
-            </button>
+            <input
+              autoComplete="current-password"
+              onChange={(event) => setAuthPassword(event.target.value)}
+              placeholder="Пароль"
+              type="password"
+              value={authPassword}
+            />
+            <div className="auth-actions">
+              <button
+                className="button button-primary"
+                disabled={isAuthSubmitting || !authEmail.trim() || !authPassword.trim()}
+                onClick={registerWithEmailPassword}
+                type="button"
+              >
+                {isAuthSubmitting ? "Подождите..." : "Зарегистрироваться"}
+              </button>
+              <button
+                className="button button-secondary"
+                disabled={isAuthSubmitting || !authEmail.trim() || !authPassword.trim()}
+                onClick={loginWithEmailPassword}
+                type="button"
+              >
+                Войти
+              </button>
+            </div>
           </div>
         )}
         {authMessage ? <div className="upload-message success">{authMessage}</div> : null}
@@ -704,6 +756,41 @@ function formatAuthError(error: unknown) {
     };
   }
 
+  if (normalized.includes("email not confirmed") || normalized.includes("not confirmed")) {
+    return {
+      isRateLimit: false,
+      message: "Email ещё не подтверждён. Откройте письмо и подтвердите аккаунт, затем войдите.",
+    };
+  }
+
+  if (
+    normalized.includes("invalid login credentials") ||
+    normalized.includes("invalid credentials")
+  ) {
+    return {
+      isRateLimit: false,
+      message: "Неверный email или пароль.",
+    };
+  }
+
+  if (
+    normalized.includes("user already registered") ||
+    normalized.includes("already registered") ||
+    normalized.includes("already exists")
+  ) {
+    return {
+      isRateLimit: false,
+      message: "Аккаунт с таким email уже есть. Нажмите «Войти».",
+    };
+  }
+
+  if (normalized.includes("signup") && normalized.includes("disabled")) {
+    return {
+      isRateLimit: false,
+      message: "Регистрация временно отключена в настройках проекта.",
+    };
+  }
+
   return {
     isRateLimit: false,
     message,
@@ -733,5 +820,5 @@ function getAuthErrorMessage(error: unknown) {
     }
   }
 
-  return "Не удалось отправить письмо для входа. Проверьте SMTP-настройки почты и попробуйте снова.";
+  return "Не удалось выполнить вход или регистрацию. Проверьте настройки почты и попробуйте снова.";
 }
