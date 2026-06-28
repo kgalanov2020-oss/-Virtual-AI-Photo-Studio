@@ -53,6 +53,8 @@ export default function UploadPage() {
   const [userEmail, setUserEmail] = useState("");
   const [authEmail, setAuthEmail] = useState("");
   const [isSendingLink, setIsSendingLink] = useState(false);
+  const [authCooldownUntil, setAuthCooldownUntil] = useState(0);
+  const [currentTime, setCurrentTime] = useState(Date.now());
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -68,6 +70,7 @@ export default function UploadPage() {
   const readyCount = selfies.length;
   const isReady = readyCount >= 6;
   const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
+  const authCooldownSeconds = Math.max(0, Math.ceil((authCooldownUntil - currentTime) / 1000));
   const hasFreeCredits = (profile?.free_images_remaining ?? 0) > 0;
   const hasAcceptedStoredConsents = Boolean(
     profile?.legal_terms_accepted_at &&
@@ -103,6 +106,18 @@ export default function UploadPage() {
       new URLSearchParams(window.location.search).get("studio") ?? "modern-office",
     );
   }, []);
+
+  useEffect(() => {
+    if (authCooldownUntil <= Date.now()) return;
+
+    const timer = window.setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [authCooldownUntil]);
 
   useEffect(() => {
     const supabase = createSupabaseBrowserClient();
@@ -165,7 +180,7 @@ export default function UploadPage() {
   }, [profile, selectedPackageCode]);
 
   async function sendLoginLink() {
-    if (!authEmail.trim() || isSendingLink) return;
+    if (!authEmail.trim() || isSendingLink || authCooldownSeconds > 0) return;
 
     setIsSendingLink(true);
     setUploadError(null);
@@ -185,9 +200,16 @@ export default function UploadPage() {
         throw new Error(error.message);
       }
 
+      setAuthCooldownUntil(Date.now() + 60_000);
       setAuthMessage("Отправили ссылку для входа. Откройте письмо и подтвердите email.");
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : "Не удалось отправить ссылку.");
+      const formattedError = formatAuthError(error);
+
+      if (formattedError.isRateLimit) {
+        setAuthCooldownUntil(Date.now() + 5 * 60_000);
+      }
+
+      setAuthError(formattedError.message);
     } finally {
       setIsSendingLink(false);
     }
@@ -429,11 +451,15 @@ export default function UploadPage() {
             />
             <button
               className="button button-primary"
-              disabled={isSendingLink || !authEmail.trim()}
+              disabled={isSendingLink || authCooldownSeconds > 0 || !authEmail.trim()}
               onClick={sendLoginLink}
               type="button"
             >
-              {isSendingLink ? "Отправляем..." : "Получить ссылку для входа"}
+              {isSendingLink
+                ? "Отправляем..."
+                : authCooldownSeconds > 0
+                  ? `Повтор через ${authCooldownSeconds} сек.`
+                  : "Получить ссылку для входа"}
             </button>
           </div>
         )}
@@ -653,4 +679,33 @@ function isAcceptedImage(file: File) {
   if (file.type.startsWith("image/")) return true;
   const extension = file.name.split(".").pop()?.toLowerCase();
   return extension ? acceptedImageExtensions.has(extension) : false;
+}
+
+function formatAuthError(error: unknown) {
+  const message = error instanceof Error ? error.message : "Не удалось отправить ссылку.";
+  const normalized = message.toLowerCase();
+  const isRateLimit =
+    normalized.includes("rate limit") ||
+    normalized.includes("too many") ||
+    normalized.includes("email rate");
+
+  if (isRateLimit) {
+    return {
+      isRateLimit: true,
+      message:
+        "Supabase временно ограничил отправку писем. Подождите несколько минут и попробуйте снова. Для стабильной регистрации нужно подключить SMTP.",
+    };
+  }
+
+  if (normalized.includes("email") && normalized.includes("invalid")) {
+    return {
+      isRateLimit: false,
+      message: "Проверьте email: адрес выглядит некорректно.",
+    };
+  }
+
+  return {
+    isRateLimit: false,
+    message,
+  };
 }
