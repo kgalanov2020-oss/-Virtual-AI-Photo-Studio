@@ -54,6 +54,7 @@ export default function UploadPage() {
   const [authEmail, setAuthEmail] = useState("");
   const [isSendingLink, setIsSendingLink] = useState(false);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [generationMode, setGenerationMode] = useState<GenerationMode>("standard");
@@ -123,6 +124,7 @@ export default function UploadPage() {
     if (user?.is_anonymous || (user?.id && !user.email)) {
       await supabase.auth.signOut();
       clearUserSession();
+      setAuthError(null);
       setAuthMessage("Старая тестовая сессия сброшена. Войдите по email.");
       return;
     }
@@ -135,6 +137,7 @@ export default function UploadPage() {
     setUserId(user.id);
     setUserEmail(user.email);
     setAuthEmail(user.email);
+    setAuthError(null);
     await loadOrCreateProfile(user.id, user.email);
   }
 
@@ -151,6 +154,7 @@ export default function UploadPage() {
     await supabase.auth.signOut();
     clearUserSession();
     setAuthEmail("");
+    setAuthError(null);
     setAuthMessage("Вы вышли из аккаунта.");
   }
 
@@ -166,6 +170,7 @@ export default function UploadPage() {
     setIsSendingLink(true);
     setUploadError(null);
     setAuthMessage(null);
+    setAuthError(null);
 
     try {
       const supabase = createSupabaseBrowserClient();
@@ -182,7 +187,7 @@ export default function UploadPage() {
 
       setAuthMessage("Отправили ссылку для входа. Откройте письмо и подтвердите email.");
     } catch (error) {
-      setUploadError(error instanceof Error ? error.message : "Не удалось отправить ссылку.");
+      setAuthError(error instanceof Error ? error.message : "Не удалось отправить ссылку.");
     } finally {
       setIsSendingLink(false);
     }
@@ -205,11 +210,16 @@ export default function UploadPage() {
       .single();
 
     if (error) {
-      setUploadError(error.message);
+      setAuthError(
+        error.message.includes("user_profiles")
+          ? "Профиль не удалось загрузить. Проверьте, что SQL-миграция в Supabase выполнена."
+          : error.message,
+      );
       return;
     }
 
     const nextProfile = data as UserProfile;
+    setAuthError(null);
     setProfile(nextProfile);
     setAcceptedLegal(
       Boolean(
@@ -428,6 +438,7 @@ export default function UploadPage() {
           </div>
         )}
         {authMessage ? <div className="upload-message success">{authMessage}</div> : null}
+        {authError ? <div className="upload-message error">{authError}</div> : null}
       </section>
 
       <section className="section">
@@ -550,11 +561,14 @@ export default function UploadPage() {
 
         <div className="legal-consent-panel">
           <p>{hasAcceptedStoredConsents ? "Согласия уже сохранены в профиле." : "Подтвердите согласия один раз. Мы сохраним их в профиле."}</p>
+          {!userId || !userEmail ? (
+            <p className="legal-consent-note">Сначала войдите по email, затем подтвердите юридические согласия.</p>
+          ) : null}
 
           <label className="consent-option">
             <input
               checked={acceptedLegal}
-              disabled={hasAcceptedStoredConsents}
+              disabled={!userId || !userEmail || hasAcceptedStoredConsents}
               onChange={(event) => setAcceptedLegal(event.target.checked)}
               type="checkbox"
             />
@@ -578,7 +592,7 @@ export default function UploadPage() {
           <label className="consent-option">
             <input
               checked={acceptedPhotoRights}
-              disabled={hasAcceptedStoredConsents}
+              disabled={!userId || !userEmail || hasAcceptedStoredConsents}
               onChange={(event) => setAcceptedPhotoRights(event.target.checked)}
               type="checkbox"
             />
