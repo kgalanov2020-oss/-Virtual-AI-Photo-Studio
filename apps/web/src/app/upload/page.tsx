@@ -197,7 +197,7 @@ export default function UploadPage() {
       });
 
       if (error) {
-        throw new Error(error.message);
+        throw error;
       }
 
       setAuthCooldownUntil(Date.now() + 60_000);
@@ -682,7 +682,7 @@ function isAcceptedImage(file: File) {
 }
 
 function formatAuthError(error: unknown) {
-  const message = error instanceof Error ? error.message : "Не удалось отправить ссылку.";
+  const message = getAuthErrorMessage(error);
   const normalized = message.toLowerCase();
   const isRateLimit =
     normalized.includes("rate limit") ||
@@ -693,7 +693,7 @@ function formatAuthError(error: unknown) {
     return {
       isRateLimit: true,
       message:
-        "Supabase временно ограничил отправку писем. Подождите несколько минут и попробуйте снова. Для стабильной регистрации нужно подключить SMTP.",
+        "Отправка писем временно ограничена. Подождите несколько минут и попробуйте снова.",
     };
   }
 
@@ -708,4 +708,30 @@ function formatAuthError(error: unknown) {
     isRateLimit: false,
     message,
   };
+}
+
+function getAuthErrorMessage(error: unknown) {
+  if (error instanceof Error && error.message.trim() && error.message !== "{}") {
+    return error.message;
+  }
+
+  if (typeof error === "string" && error.trim() && error !== "{}") {
+    return error;
+  }
+
+  if (error && typeof error === "object") {
+    const errorRecord = error as Record<string, unknown>;
+    const candidate =
+      errorRecord.message ??
+      errorRecord.error_description ??
+      errorRecord.error ??
+      errorRecord.msg ??
+      errorRecord.name;
+
+    if (typeof candidate === "string" && candidate.trim() && candidate !== "{}") {
+      return candidate;
+    }
+  }
+
+  return "Не удалось отправить письмо для входа. Проверьте SMTP-настройки почты и попробуйте снова.";
 }
