@@ -6,6 +6,9 @@ services:
     branch: main
     autoDeploy: true
     healthCheckPath: /
+    domains:
+      - virtualphotostudio.ru
+      - www.virtualphotostudio.ru
     buildCommand: corepack enable && corepack prepare pnpm@10.18.3 --activate && pnpm install --frozen-lockfile && pnpm --filter @ai-photo-studio/web build
     startCommand: corepack enable && corepack prepare pnpm@10.18.3 --activate && pnpm --dir apps/web exec next start -H 0.0.0.0 -p $PORT
     envVars:
