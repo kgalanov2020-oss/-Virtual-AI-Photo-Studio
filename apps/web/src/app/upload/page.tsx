@@ -113,7 +113,9 @@ export default function UploadPage() {
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      syncUserSession(supabase, session?.user ?? null);
+      window.setTimeout(() => {
+        void syncUserSession(createSupabaseBrowserClient(), session?.user ?? null);
+      }, 0);
     });
 
     return () => {
@@ -194,13 +196,16 @@ export default function UploadPage() {
 
     try {
       const supabase = createSupabaseBrowserClient();
-      const { data, error } = await supabase.auth.signUp({
-        email: credentials.email,
-        password: credentials.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/upload?studio=${selectedStudioSlug}`,
-        },
-      });
+      const { data, error } = await withTimeout(
+        supabase.auth.signUp({
+          email: credentials.email,
+          password: credentials.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/upload?studio=${selectedStudioSlug}`,
+          },
+        }),
+        "Регистрация не получила ответ от Supabase. Попробуйте ещё раз.",
+      );
 
       if (error) {
         throw error;
@@ -215,7 +220,8 @@ export default function UploadPage() {
 
       setAuthMessage("Регистрация отправлена. Проверьте email и подтвердите аккаунт, затем войдите.");
     } catch (error) {
-      setAuthError(formatAuthError(error).message);
+      console.error("Registration failed", serializeAuthError(error));
+      setAuthError(formatAuthError(error, "register").message);
     } finally {
       setIsAuthSubmitting(false);
     }
@@ -232,10 +238,13 @@ export default function UploadPage() {
 
     try {
       const supabase = createSupabaseBrowserClient();
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
-      });
+      const { data, error } = await withTimeout(
+        supabase.auth.signInWithPassword({
+          email: credentials.email,
+          password: credentials.password,
+        }),
+        "Вход не получил ответ от Supabase. Попробуйте ещё раз.",
+      );
 
       if (error) {
         throw error;
@@ -248,7 +257,8 @@ export default function UploadPage() {
       setAuthPassword("");
       setAuthMessage("Вы вошли в аккаунт.");
     } catch (error) {
-      setAuthError(formatAuthError(error).message);
+      console.error("Login failed", serializeAuthError(error));
+      setAuthError(formatAuthError(error, "login").message);
     } finally {
       setIsAuthSubmitting(false);
     }
@@ -733,8 +743,25 @@ function isAcceptedImage(file: File) {
   return extension ? acceptedImageExtensions.has(extension) : false;
 }
 
-function formatAuthError(error: unknown) {
-  const message = getAuthErrorMessage(error);
+async function withTimeout<T>(promise: Promise<T>, message: string, timeoutMs = 20_000) {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<never>((_resolve, reject) => {
+        timer = setTimeout(() => reject(new Error(message)), timeoutMs);
+      }),
+    ]);
+  } finally {
+    if (timer) {
+      clearTimeout(timer);
+    }
+  }
+}
+
+function formatAuthError(error: unknown, action: "login" | "register") {
+  const message = getAuthErrorMessage(error, action);
   const normalized = message.toLowerCase();
   const isRateLimit =
     normalized.includes("rate limit") ||
@@ -791,13 +818,34 @@ function formatAuthError(error: unknown) {
     };
   }
 
+  if (
+    normalized.includes("smtp") ||
+    normalized.includes("email provider") ||
+    normalized.includes("confirmation email") ||
+    normalized.includes("sending")
+  ) {
+    return {
+      isRateLimit: false,
+      message:
+        "Не удалось отправить письмо подтверждения. Проверьте SMTP-настройки почты и попробуйте снова.",
+    };
+  }
+
+  if (normalized.includes("redirect")) {
+    return {
+      isRateLimit: false,
+      message:
+        "Адрес возврата после подтверждения email не разрешён в Supabase. Добавьте localhost и домен сайта в Auth URL Configuration.",
+    };
+  }
+
   return {
     isRateLimit: false,
     message,
   };
 }
 
-function getAuthErrorMessage(error: unknown) {
+function getAuthErrorMessage(error: unknown, action: "login" | "register") {
   if (error instanceof Error && error.message.trim() && error.message !== "{}") {
     return error.message;
   }
@@ -818,7 +866,29 @@ function getAuthErrorMessage(error: unknown) {
     if (typeof candidate === "string" && candidate.trim() && candidate !== "{}") {
       return candidate;
     }
+
+    const serialized = serializeAuthError(error);
+    if (serialized && serialized !== "{}") {
+      return serialized;
+    }
   }
 
-  return "Не удалось выполнить вход или регистрацию. Проверьте настройки почты и попробуйте снова.";
+  return action === "register"
+    ? "Не удалось отправить письмо подтверждения. Проверьте SMTP-настройки почты и попробуйте снова."
+    : "Не удалось войти. Проверьте email и пароль.";
+}
+
+function serializeAuthError(error: unknown) {
+  if (!error || typeof error !== "object") return "";
+
+  const details: Record<string, unknown> = {};
+  for (const key of Object.getOwnPropertyNames(error)) {
+    details[key] = (error as Record<string, unknown>)[key];
+  }
+
+  try {
+    return JSON.stringify(details);
+  } catch {
+    return "";
+  }
 }
