@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI Фотостудия",
-  description: "MVP виртуальной AI-фотостудии",
+  title: "Virtual AI Photo Studio",
+  description: "Виртуальная фотостудия с готовыми интерьерами",
 };
 
 export default function RootLayout({
