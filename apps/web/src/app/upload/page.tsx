@@ -763,10 +763,26 @@ async function withTimeout<T>(promise: Promise<T>, message: string, timeoutMs = 
 function formatAuthError(error: unknown, action: "login" | "register") {
   const message = getAuthErrorMessage(error, action);
   const normalized = message.toLowerCase();
+  const authStatus = getAuthErrorStatus(error);
+  const authName = getAuthErrorName(error).toLowerCase();
   const isRateLimit =
     normalized.includes("rate limit") ||
     normalized.includes("too many") ||
     normalized.includes("email rate");
+
+  if (
+    authStatus >= 500 ||
+    authName.includes("authretryablefetcherror") ||
+    normalized.includes("authretryablefetcherror")
+  ) {
+    return {
+      isRateLimit: false,
+      message:
+        action === "register"
+          ? "Регистрация сейчас не прошла: Supabase не смог отправить письмо подтверждения. Проверьте SMTP-настройки почты и попробуйте снова."
+          : "Вход сейчас не прошёл: Supabase временно вернул ошибку. Попробуйте ещё раз.",
+    };
+  }
 
   if (isRateLimit) {
     return {
@@ -867,15 +883,25 @@ function getAuthErrorMessage(error: unknown, action: "login" | "register") {
       return candidate;
     }
 
-    const serialized = serializeAuthError(error);
-    if (serialized && serialized !== "{}") {
-      return serialized;
-    }
+    const name = getAuthErrorName(error);
+    if (name && name !== "{}") return name;
   }
 
   return action === "register"
     ? "Не удалось отправить письмо подтверждения. Проверьте SMTP-настройки почты и попробуйте снова."
     : "Не удалось войти. Проверьте email и пароль.";
+}
+
+function getAuthErrorName(error: unknown) {
+  if (!error || typeof error !== "object") return "";
+  const name = (error as Record<string, unknown>).name;
+  return typeof name === "string" ? name : "";
+}
+
+function getAuthErrorStatus(error: unknown) {
+  if (!error || typeof error !== "object") return 0;
+  const status = (error as Record<string, unknown>).status;
+  return typeof status === "number" ? status : Number(status) || 0;
 }
 
 function serializeAuthError(error: unknown) {
