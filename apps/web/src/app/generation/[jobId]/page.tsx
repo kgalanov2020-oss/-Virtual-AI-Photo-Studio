@@ -28,7 +28,7 @@ type GenerationResponse = {
 
 const statusLabels: Record<Job["status"], string> = {
   draft: "Черновик",
-  awaiting_payment: "Ожидает запуска",
+  awaiting_payment: "Ожидает оплату",
   queued: "В очереди",
   running: "Генерация",
   completed: "Готово",

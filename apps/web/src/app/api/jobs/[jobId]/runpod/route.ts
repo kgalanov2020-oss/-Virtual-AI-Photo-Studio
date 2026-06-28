@@ -250,14 +250,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     });
   } catch (error) {
     const rawMessage = error instanceof Error ? error.message : "Неизвестная ошибка.";
-    const message =
-      activeGenerationMode === "child_safe" && isGeminiPolicyBlock(error)
-        ? [
-            "Gemini заблокировал исходное фото по правилам безопасности Google.",
-            "Детский безопасный режим уже использует безопасный возрастной промпт, но этот блок происходит до генерации, на проверке входного изображения.",
-            "Попробуйте другое обычное фото ребёнка: полностью одетый портрет, без пляжа/купальника/нижнего белья, без оголённого торса, без посторонних взрослых и без двусмысленной позы.",
-          ].join(" ")
-        : rawMessage;
+    const message = normalizeGenerationError(rawMessage, error, activeGenerationMode);
     const retryableError = isRetryableGenerationError(message);
 
     try {
@@ -319,9 +312,32 @@ function calculateProgress(completed: number, total: number) {
 }
 
 function isRetryableGenerationError(message: string) {
-  return /Gemini не вернул изображение|Gemini did not return an image|Deadline expired|UNAVAILABLE|503/i.test(
+  return /Gemini не вернул изображение|Gemini did not return an image|Deadline expired|UNAVAILABLE|503|429|quota|too_many_requests/i.test(
     message,
   );
+}
+
+function normalizeGenerationError(
+  rawMessage: string,
+  error: unknown,
+  generationMode: GenerationMode,
+) {
+  if (/429|quota|too_many_requests|not have enough quota/i.test(rawMessage)) {
+    return [
+      "Gemini временно не может создать фото: закончилась или превышена квота запросов.",
+      "Попробуйте позже или подключите новый ключ/платный лимит Gemini.",
+    ].join(" ");
+  }
+
+  if (generationMode === "child_safe" && isGeminiPolicyBlock(error)) {
+    return [
+      "Gemini заблокировал исходное фото по правилам безопасности Google.",
+      "Детский безопасный режим уже использует безопасный возрастной промпт, но этот блок происходит до генерации, на проверке входного изображения.",
+      "Попробуйте другое обычное фото ребёнка: полностью одетый портрет, без пляжа/купальника/нижнего белья, без оголённого торса, без посторонних взрослых и без двусмысленной позы.",
+    ].join(" ");
+  }
+
+  return rawMessage;
 }
 
 function readBearerToken(request: NextRequest) {

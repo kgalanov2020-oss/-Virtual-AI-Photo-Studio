@@ -109,7 +109,11 @@ export default function QualityPage({ params }: QualityPageProps) {
           Authorization: `Bearer ${token}`,
         },
       });
-      const data = (await response.json()) as { ok?: boolean; error?: string };
+      const data = (await response.json()) as {
+        ok?: boolean;
+        error?: string;
+        job?: { status?: string };
+      };
 
       if (!response.ok || data.error) {
         throw new Error(data.error ?? "Не удалось принять фото.");
@@ -122,6 +126,12 @@ export default function QualityPage({ params }: QualityPageProps) {
           rejection_reason: null,
         })),
       );
+      if (data.job?.status === "awaiting_payment") {
+        setMessage("Фото приняты. Переходим к оплате фотосессии.");
+        router.push(`/checkout/${jobId}`);
+        return;
+      }
+
       setMessage("Фото приняты. Переходим к генерации фотосессии.");
       router.push(`/generation/${jobId}`);
     } catch (approveError) {
@@ -144,11 +154,7 @@ export default function QualityPage({ params }: QualityPageProps) {
         <div>
           <p className="eyebrow">Шаг 2 из 3</p>
           <h1>Проверка качества</h1>
-          <p className="lead">
-            Сейчас это MVP-проверка: показываем загруженные фото и вручную принимаем
-            набор для генерации. Позже сюда подключим автоматическое определение лица,
-            размытия, освещения и дублей.
-          </p>
+          <p className="lead">Проверьте загруженные фото перед запуском фотосессии.</p>
         </div>
         <div className="quality-summary">
           <strong>{approvedCount}/{photos.length} принято</strong>
@@ -161,11 +167,11 @@ export default function QualityPage({ params }: QualityPageProps) {
         <div className="section-header">
           <div>
             <h2>Загруженные фото</h2>
-            <p>Для генерации нужно минимум 8 подходящих фото.</p>
+            <p>Для генерации нужно минимум 6 подходящих фото.</p>
           </div>
           <button
             className="button button-primary"
-            disabled={photos.length < 8 || isApproving}
+            disabled={photos.length < 6 || isApproving}
             onClick={approveAll}
             type="button"
           >

@@ -101,7 +101,7 @@ export default function UploadPage() {
     if (isUploading) return;
 
     if (!isReady) {
-      setUploadError("Загрузите минимум 8 фото.");
+      setUploadError("Загрузите минимум 6 фото.");
       return;
     }
 
