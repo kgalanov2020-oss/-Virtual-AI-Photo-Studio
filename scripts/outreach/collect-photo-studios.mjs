@@ -5,15 +5,16 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const outputDir = path.join(root, "tmp", "outreach");
 const outputPath = path.join(outputDir, "photo-studio-leads.csv");
+const defaultCitiesPath = path.join(root, "docs", "outreach", "russia-cities.txt");
 
 const apiKey = process.env.GOOGLE_PLACES_API_KEY;
-const cities = splitEnv("OUTREACH_CITIES", "Москва,Санкт-Петербург");
+const cities = readCities();
 const baseQueries = splitEnv(
   "OUTREACH_QUERIES",
   "фотостудия,аренда фотостудии,интерьерная фотостудия,photo studio",
 );
-const leadLimit = Number(process.env.OUTREACH_LIMIT ?? "100");
-const promoCode = process.env.OUTREACH_PROMO_CODE ?? "WELCOME";
+const leadLimit = Number(process.env.OUTREACH_LIMIT ?? "1000");
+const promoCode = process.env.OUTREACH_PROMO_CODE ?? "STUDIO";
 
 if (!apiKey) {
   throw new Error("Set GOOGLE_PLACES_API_KEY before running this script.");
@@ -23,6 +24,16 @@ fs.mkdirSync(outputDir, { recursive: true });
 
 const seenPlaceIds = new Set();
 const leads = [];
+const seenLeadKeys = new Set();
+
+if (fs.existsSync(outputPath) && process.env.OUTREACH_RESUME !== "false") {
+  for (const lead of parseCsv(fs.readFileSync(outputPath, "utf8"))) {
+    const key = lead.email || lead.website || `${lead.studio_name}:${lead.city}:${lead.phone}`;
+    if (!key || seenLeadKeys.has(key)) continue;
+    seenLeadKeys.add(key);
+    leads.push(lead);
+  }
+}
 
 for (const city of cities) {
   for (const baseQuery of baseQueries) {
@@ -38,6 +49,11 @@ for (const city of cities) {
       const details = await getPlaceDetails(place.place_id);
       const website = details.website ?? "";
       const emails = website ? await findEmailsOnWebsite(website) : [];
+      const leadKey =
+        emails[0] ?? website ?? `${details.name ?? place.name ?? ""}:${city}:${details.formatted_phone_number ?? ""}`;
+
+      if (!leadKey || seenLeadKeys.has(leadKey)) continue;
+      seenLeadKeys.add(leadKey);
 
       leads.push({
         studio_name: details.name ?? place.name ?? "",
@@ -50,6 +66,8 @@ for (const city of cities) {
         status: emails.length > 0 ? "new" : "needs_manual_email",
         last_contacted_at: "",
       });
+      fs.writeFileSync(outputPath, toCsv(leads), "utf8");
+      console.log(`${leads.length}/${leadLimit}: ${details.name ?? place.name ?? ""} (${city})`);
 
       await sleep(350);
     }
@@ -201,6 +219,63 @@ function splitEnv(name, fallback) {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function readCities() {
+  const citiesFile = process.env.OUTREACH_CITIES_FILE ?? defaultCitiesPath;
+  if (process.env.OUTREACH_CITIES) return splitEnv("OUTREACH_CITIES", "");
+  if (fs.existsSync(citiesFile)) {
+    return fs
+      .readFileSync(citiesFile, "utf8")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .filter((line) => !line.startsWith("#"));
+  }
+
+  return ["Москва", "Санкт-Петербург"];
+}
+
+function parseCsv(csv) {
+  const lines = csv.trim().split(/\r?\n/);
+  const headers = parseCsvLine(lines.shift() ?? "");
+  return lines.map((line) => {
+    const values = parseCsvLine(line);
+    return Object.fromEntries(headers.map((header, index) => [header, values[index] ?? ""]));
+  });
+}
+
+function parseCsvLine(line) {
+  const values = [];
+  let current = "";
+  let quoted = false;
+
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    const next = line[index + 1];
+
+    if (char === '"' && quoted && next === '"') {
+      current += '"';
+      index += 1;
+      continue;
+    }
+
+    if (char === '"') {
+      quoted = !quoted;
+      continue;
+    }
+
+    if (char === "," && !quoted) {
+      values.push(current);
+      current = "";
+      continue;
+    }
+
+    current += char;
+  }
+
+  values.push(current);
+  return values;
 }
 
 function sleep(ms) {

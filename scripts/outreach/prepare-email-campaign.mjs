@@ -23,7 +23,7 @@ const rows = leads
     const values = {
       studio_name: lead.studio_name || "коллеги",
       city: lead.city || "",
-      promo_code: lead.promo_code || "WELCOME",
+      promo_code: lead.promo_code || "STUDIO",
     };
     const text = renderTemplate(textTemplate, values);
     const html = renderTemplate(htmlTemplate, values);

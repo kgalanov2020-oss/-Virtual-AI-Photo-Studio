@@ -6,9 +6,8 @@
 
 ```powershell
 $env:GOOGLE_PLACES_API_KEY="ваш_google_places_key"
-$env:OUTREACH_CITIES="Москва,Санкт-Петербург,Екатеринбург"
-$env:OUTREACH_LIMIT="100"
-$env:OUTREACH_PROMO_CODE="WELCOME"
+$env:OUTREACH_LIMIT="1000"
+$env:OUTREACH_PROMO_CODE="STUDIO"
 node scripts/outreach/collect-photo-studios.mjs
 node scripts/outreach/prepare-email-campaign.mjs
 ```
@@ -55,6 +54,7 @@ tmp/outreach/photo-studio-leads.csv
 - Новый доменный ящик: `partners@virtualphotostudio.ru`
 - Лимит первого дня: 20 писем
 - Через 2-3 дня: 40-60 писем/день
+- Для базы 1000 студий отправлять волнами, не всем за один день
 - Не отправлять повторно на один домен чаще 1 раза в 14 дней
 - Все ответы с `стоп`, `unsubscribe`, `не пишите` переносить в stop-list
 
@@ -84,4 +84,3 @@ https://virtualphotostudio.ru/
 
 Если неактуально, ответьте "стоп".
 ```
-

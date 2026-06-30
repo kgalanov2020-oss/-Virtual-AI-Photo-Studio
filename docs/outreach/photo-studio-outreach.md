@@ -27,7 +27,7 @@
 
 ```csv
 studio_name,city,website,email,phone,source,promo_code,status
-Studio Name,Москва,https://example.com,info@example.com,+79990000000,google_places,WELCOME,new
+Studio Name,Москва,https://example.com,info@example.com,+79990000000,google_places,STUDIO,new
 ```
 
 ## Сегментация
@@ -50,10 +50,10 @@ Studio Name,Москва,https://example.com,info@example.com,+79990000000,googl
 
 Для тестовой рассылки можно использовать:
 
-- `WELCOME`: 2 промо-запуска по 20 фото.
+- `STUDIO`: 2 промо-запуска по 20 фото для фотостудий.
 - `FRIEND`: 3 промо-запуска по 20 фото.
 
-Если нужно отправлять 300+ писем, лучше сделать отдельный код `STUDIO`, чтобы потом видеть именно этот канал.
+Для рассылки по фотостудиям используем отдельный код `STUDIO`, чтобы видеть именно этот канал.
 
 ## Ссылка на до/после
 
@@ -66,4 +66,3 @@ https://virtualphotostudio.ru/#studios
 - https://virtualphotostudio.ru/selfie-guide/01-front-neutral.jpg
 - https://virtualphotostudio.ru/before-after/after-luxury-garage-01.jpg
 - https://virtualphotostudio.ru/before-after/after-luxury-garage-02.jpg
-

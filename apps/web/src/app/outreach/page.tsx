@@ -22,7 +22,7 @@ https://virtualphotostudio.ru
 export default function OutreachPage() {
   const [studioName, setStudioName] = useState("Название студии");
   const [city, setCity] = useState("Москва");
-  const [promoCode, setPromoCode] = useState("WELCOME");
+  const [promoCode, setPromoCode] = useState("STUDIO");
   const [subjectTemplate, setSubjectTemplate] = useState(
     "{{studio_name}}, AI-фотосессии для клиентов вашей студии",
   );
@@ -32,7 +32,7 @@ export default function OutreachPage() {
   const variables = useMemo(
     () => ({
       city,
-      promo_code: promoCode.trim().toUpperCase() || "WELCOME",
+      promo_code: promoCode.trim().toUpperCase() || "STUDIO",
       studio_name: studioName.trim() || "коллеги",
     }),
     [city, promoCode, studioName],
