@@ -1,5 +1,4 @@
 import fs from "node:fs";
-import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -16,7 +15,7 @@ const baseQueries = splitEnv(
 );
 const leadLimit = Number(process.env.OUTREACH_LIMIT ?? "1000");
 const promoCode = process.env.OUTREACH_PROMO_CODE ?? "STUDIO";
-const supabase = createSupabaseClient();
+const supabase = createSupabaseConfig();
 
 if (!apiKey) {
   throw new Error("Set GOOGLE_PLACES_API_KEY before running this script.");
@@ -89,7 +88,7 @@ fs.writeFileSync(outputPath, toCsv(leads), "utf8");
 console.log(`Saved ${leads.length} leads to ${outputPath}`);
 console.log(`With email: ${leads.filter((lead) => lead.email).length}`);
 
-function createSupabaseClient() {
+function createSupabaseConfig() {
   const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -98,28 +97,25 @@ function createSupabaseClient() {
     return null;
   }
 
-  const require = createRequire(path.join(root, "apps", "web", "package.json"));
-  const { createClient } = require("@supabase/supabase-js");
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      persistSession: false,
-    },
-  });
+  return {
+    restUrl: `${supabaseUrl.replace(/\/rest\/v1\/?$/, "").replace(/\/$/, "")}/rest/v1`,
+    serviceRoleKey,
+  };
 }
 
 async function preloadSupabaseKeys() {
   if (!supabase) return;
 
-  const { data, error } = await supabase
-    .from("outreach_leads")
-    .select("unique_key")
-    .limit(10000);
+  const response = await fetch(`${supabase.restUrl}/outreach_leads?select=unique_key&limit=10000`, {
+    headers: supabaseHeaders(),
+  });
 
-  if (error) {
-    console.warn(`Could not preload Supabase outreach keys: ${error.message}`);
+  if (!response.ok) {
+    console.warn(`Could not preload Supabase outreach keys: ${await response.text()}`);
     return;
   }
 
+  const data = await response.json();
   for (const lead of data ?? []) {
     if (lead.unique_key) seenLeadKeys.add(lead.unique_key);
   }
@@ -128,8 +124,14 @@ async function preloadSupabaseKeys() {
 async function upsertSupabaseLead(lead, uniqueKey) {
   if (!supabase) return;
 
-  const { error } = await supabase.from("outreach_leads").upsert(
-    {
+  const response = await fetch(`${supabase.restUrl}/outreach_leads?on_conflict=unique_key`, {
+    method: "POST",
+    headers: {
+      ...supabaseHeaders(),
+      "content-type": "application/json",
+      prefer: "resolution=merge-duplicates",
+    },
+    body: JSON.stringify({
       unique_key: uniqueKey,
       studio_name: lead.studio_name,
       city: lead.city || null,
@@ -141,13 +143,19 @@ async function upsertSupabaseLead(lead, uniqueKey) {
       status: lead.status,
       last_contacted_at: lead.last_contacted_at || null,
       raw: lead.raw ?? {},
-    },
-    { onConflict: "unique_key" },
-  );
+    }),
+  });
 
-  if (error) {
-    throw new Error(`Supabase outreach_leads upsert failed: ${error.message}`);
+  if (!response.ok) {
+    throw new Error(`Supabase outreach_leads upsert failed: ${await response.text()}`);
   }
+}
+
+function supabaseHeaders() {
+  return {
+    apikey: supabase.serviceRoleKey,
+    authorization: `Bearer ${supabase.serviceRoleKey}`,
+  };
 }
 
 async function searchPlaces(query, limit) {
