@@ -2188,27 +2188,35 @@ h1 {
 
 @media (max-width: 640px) {
   .atelier-nav {
-    padding: 18px 20px;
+    gap: 14px;
+    padding: 16px 18px;
   }
 
   .atelier-brand span {
-    font-size: 22px;
-    line-height: 1.15;
+    font-size: clamp(17px, 5.8vw, 22px);
+    letter-spacing: 0.06em;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
   }
 
   .atelier-hero {
     min-height: auto;
     overflow: hidden;
-    padding: 128px 20px 34px;
+    padding: 142px 18px 28px;
   }
 
   .atelier-hero h1 {
-    font-size: clamp(40px, 12vw, 54px);
+    font-size: clamp(30px, 8.7vw, 34px);
+    letter-spacing: 0;
+    line-height: 1.06;
     max-width: 100%;
+    overflow-wrap: normal;
+    word-break: normal;
   }
 
   .atelier-hero h1 small {
-    font-size: clamp(24px, 7vw, 34px);
+    font-size: clamp(22px, 6.7vw, 28px);
+    line-height: 1.08;
     white-space: normal;
   }
 
@@ -2218,8 +2226,8 @@ h1 {
   }
 
   .atelier-hero-copy > p:not(.atelier-kicker) {
-    font-size: 21px;
-    line-height: 1.35;
+    font-size: clamp(17px, 5.2vw, 20px);
+    line-height: 1.38;
     margin-left: 0;
     max-width: 100%;
     text-align: left;
@@ -2244,24 +2252,32 @@ h1 {
   .atelier-actions {
     justify-content: stretch;
     margin-left: 0;
+    margin-top: 24px;
     max-width: none;
     width: 100%;
   }
 
   .atelier-button {
+    font-size: 16px;
+    min-height: 54px;
+    padding: 0 18px;
     width: 100%;
   }
 
   .atelier-hero-stats {
     gap: 8px;
-    margin-top: 28px;
+    margin-top: 26px;
     width: 100%;
   }
 
   .atelier-hero-stats span {
     min-width: 0;
-    padding: 14px 16px;
+    padding: 12px 14px;
     width: 100%;
+  }
+
+  .atelier-hero-stats strong {
+    font-size: 30px;
   }
 
   .atelier-section {
