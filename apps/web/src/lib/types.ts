@@ -112,6 +112,32 @@ export type PromoRedemption = {
   created_at: string;
 };
 
+export type OutreachLead = {
+  id: string;
+  unique_key: string;
+  studio_name: string;
+  city: string | null;
+  website: string | null;
+  email: string | null;
+  phone: string | null;
+  source: string;
+  promo_code: string;
+  status:
+    | "new"
+    | "needs_manual_email"
+    | "needs_review"
+    | "approved"
+    | "sent"
+    | "replied"
+    | "stop"
+    | "bad_email"
+    | "duplicate";
+  last_contacted_at: string | null;
+  raw: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
+};
+
 export type GeneratedImage = {
   id: string;
   job_id: string;
@@ -249,6 +275,16 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<PromoRedemption>;
+        Relationships: [];
+      };
+      outreach_leads: {
+        Row: OutreachLead;
+        Insert: Omit<OutreachLead, "id" | "created_at" | "updated_at"> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<OutreachLead>;
         Relationships: [];
       };
     };

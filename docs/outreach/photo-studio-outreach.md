@@ -1,6 +1,6 @@
 # Outreach для фотостудий
 
-Цель: собрать 100-300 публичных контактов фотостудий и отправить аккуратное B2B-письмо с предложением Virtual AI Photo Studio, промокодом и ссылкой на блок "до/после".
+Цель: собрать до 1000 публичных контактов фотостудий по России и отправить аккуратное B2B-письмо с предложением Virtual AI Photo Studio, промокодом и ссылкой на блок "до/после".
 
 ## Рекомендуемый запуск
 
@@ -26,9 +26,11 @@
 Минимальный CSV:
 
 ```csv
-studio_name,city,website,email,phone,source,promo_code,status
-Studio Name,Москва,https://example.com,info@example.com,+79990000000,google_places,STUDIO,new
+unique_key,studio_name,city,website,email,phone,source,promo_code,status,last_contacted_at,raw
+email:info@example.com,Studio Name,Москва,https://example.com,info@example.com,+79990000000,google_places,STUDIO,new,,"{}"
 ```
+
+В продуктовой версии эти же данные сохраняются в Supabase-таблицу `outreach_leads`.
 
 ## Сегментация
 

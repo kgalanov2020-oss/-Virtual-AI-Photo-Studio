@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -15,6 +16,7 @@ const baseQueries = splitEnv(
 );
 const leadLimit = Number(process.env.OUTREACH_LIMIT ?? "1000");
 const promoCode = process.env.OUTREACH_PROMO_CODE ?? "STUDIO";
+const supabase = createSupabaseClient();
 
 if (!apiKey) {
   throw new Error("Set GOOGLE_PLACES_API_KEY before running this script.");
@@ -28,12 +30,14 @@ const seenLeadKeys = new Set();
 
 if (fs.existsSync(outputPath) && process.env.OUTREACH_RESUME !== "false") {
   for (const lead of parseCsv(fs.readFileSync(outputPath, "utf8"))) {
-    const key = lead.email || lead.website || `${lead.studio_name}:${lead.city}:${lead.phone}`;
+    const key = lead.unique_key || buildLeadKey(lead);
     if (!key || seenLeadKeys.has(key)) continue;
     seenLeadKeys.add(key);
     leads.push(lead);
   }
 }
+
+await preloadSupabaseKeys();
 
 for (const city of cities) {
   for (const baseQuery of baseQueries) {
@@ -49,13 +53,7 @@ for (const city of cities) {
       const details = await getPlaceDetails(place.place_id);
       const website = details.website ?? "";
       const emails = website ? await findEmailsOnWebsite(website) : [];
-      const leadKey =
-        emails[0] ?? website ?? `${details.name ?? place.name ?? ""}:${city}:${details.formatted_phone_number ?? ""}`;
-
-      if (!leadKey || seenLeadKeys.has(leadKey)) continue;
-      seenLeadKeys.add(leadKey);
-
-      leads.push({
+      const lead = {
         studio_name: details.name ?? place.name ?? "",
         city,
         website,
@@ -65,7 +63,20 @@ for (const city of cities) {
         promo_code: promoCode,
         status: emails.length > 0 ? "new" : "needs_manual_email",
         last_contacted_at: "",
-      });
+        raw: {
+          google_place_id: place.place_id,
+          google_query: query,
+          email_count: emails.length,
+        },
+      };
+      const leadKey = buildLeadKey(lead);
+
+      if (!leadKey || seenLeadKeys.has(leadKey)) continue;
+      seenLeadKeys.add(leadKey);
+
+      const csvLead = { ...lead, raw: JSON.stringify(lead.raw), unique_key: leadKey };
+      leads.push(csvLead);
+      await upsertSupabaseLead(lead, leadKey);
       fs.writeFileSync(outputPath, toCsv(leads), "utf8");
       console.log(`${leads.length}/${leadLimit}: ${details.name ?? place.name ?? ""} (${city})`);
 
@@ -77,6 +88,67 @@ for (const city of cities) {
 fs.writeFileSync(outputPath, toCsv(leads), "utf8");
 console.log(`Saved ${leads.length} leads to ${outputPath}`);
 console.log(`With email: ${leads.filter((lead) => lead.email).length}`);
+
+function createSupabaseClient() {
+  const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    console.warn("Supabase env is missing. Leads will be saved only to CSV.");
+    return null;
+  }
+
+  const require = createRequire(path.join(root, "apps", "web", "package.json"));
+  const { createClient } = require("@supabase/supabase-js");
+  return createClient(supabaseUrl, serviceRoleKey, {
+    auth: {
+      persistSession: false,
+    },
+  });
+}
+
+async function preloadSupabaseKeys() {
+  if (!supabase) return;
+
+  const { data, error } = await supabase
+    .from("outreach_leads")
+    .select("unique_key")
+    .limit(10000);
+
+  if (error) {
+    console.warn(`Could not preload Supabase outreach keys: ${error.message}`);
+    return;
+  }
+
+  for (const lead of data ?? []) {
+    if (lead.unique_key) seenLeadKeys.add(lead.unique_key);
+  }
+}
+
+async function upsertSupabaseLead(lead, uniqueKey) {
+  if (!supabase) return;
+
+  const { error } = await supabase.from("outreach_leads").upsert(
+    {
+      unique_key: uniqueKey,
+      studio_name: lead.studio_name,
+      city: lead.city || null,
+      website: lead.website || null,
+      email: lead.email || null,
+      phone: lead.phone || null,
+      source: lead.source,
+      promo_code: lead.promo_code,
+      status: lead.status,
+      last_contacted_at: lead.last_contacted_at || null,
+      raw: lead.raw ?? {},
+    },
+    { onConflict: "unique_key" },
+  );
+
+  if (error) {
+    throw new Error(`Supabase outreach_leads upsert failed: ${error.message}`);
+  }
+}
 
 async function searchPlaces(query, limit) {
   const places = [];
@@ -191,6 +263,7 @@ function extractEmails(html) {
 
 function toCsv(rows) {
   const headers = [
+    "unique_key",
     "studio_name",
     "city",
     "website",
@@ -200,12 +273,34 @@ function toCsv(rows) {
     "promo_code",
     "status",
     "last_contacted_at",
+    "raw",
   ];
 
   return [
     headers.join(","),
     ...rows.map((row) => headers.map((header) => csvCell(row[header] ?? "")).join(",")),
   ].join("\n");
+}
+
+function buildLeadKey(lead) {
+  const email = String(lead.email ?? "").trim().toLowerCase();
+  if (email) return `email:${email}`;
+
+  const website = String(lead.website ?? "").trim().toLowerCase();
+  if (website) {
+    try {
+      return `site:${new URL(website).hostname.replace(/^www\./, "")}`;
+    } catch {
+      return `site:${website}`;
+    }
+  }
+
+  const phone = String(lead.phone ?? "").replace(/\D/g, "");
+  if (phone) return `phone:${phone}`;
+
+  return `name:${String(lead.studio_name ?? "").trim().toLowerCase()}:${String(lead.city ?? "")
+    .trim()
+    .toLowerCase()}`;
 }
 
 function csvCell(value) {

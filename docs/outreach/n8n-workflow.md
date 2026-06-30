@@ -1,24 +1,51 @@
 # n8n workflow: фотостудии -> email
 
-## Вариант А: безопасный запуск через CSV
+## Вариант А: Render Cron + Supabase
 
-1. Собрать лиды локально:
+Основной вариант для продукта: сборщик запускается как Render Cron Job, берёт Google Places, ищет сайты и email, затем сохраняет лиды в Supabase `outreach_leads`.
+
+Переменные Render:
+
+```text
+GOOGLE_PLACES_API_KEY
+SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_SUPABASE_URL
+OUTREACH_LIMIT=1000
+OUTREACH_PROMO_CODE=STUDIO
+OUTREACH_ADMIN_TOKEN
+```
+
+Расписание в `render.yaml`: 1-е число месяца, 02:00 UTC. Для первого сбора 1000 студий лучше открыть Cron Job в Render и нажать `Trigger Run`.
+
+Лиды смотреть на сайте:
+
+```text
+https://virtualphotostudio.ru/outreach
+```
+
+Для просмотра нужен `OUTREACH_ADMIN_TOKEN`.
+
+## Вариант B: безопасный локальный запуск через CSV
+
+Собрать лиды локально:
 
 ```powershell
 $env:GOOGLE_PLACES_API_KEY="ваш_google_places_key"
+$env:NEXT_PUBLIC_SUPABASE_URL="ваш_supabase_url"
+$env:SUPABASE_SERVICE_ROLE_KEY="ваш_service_role_key"
 $env:OUTREACH_LIMIT="1000"
 $env:OUTREACH_PROMO_CODE="STUDIO"
 node scripts/outreach/collect-photo-studios.mjs
 node scripts/outreach/prepare-email-campaign.mjs
 ```
 
-2. Проверить файл:
+Проверить файл:
 
 ```text
 tmp/outreach/photo-studio-leads.csv
 ```
 
-3. В n8n создать workflow:
+В n8n создать workflow:
 
 - Manual Trigger
 - Read Binary File: `tmp/outreach/photo-studio-email-campaign.csv`
@@ -30,7 +57,7 @@ tmp/outreach/photo-studio-leads.csv
 - Send Email / SMTP: поля `email`, `subject`, `html`
 - Append/Update Google Sheet или CSV: статус `sent`, дата отправки
 
-## Вариант B: всё внутри n8n
+## Вариант C: всё внутри n8n
 
 Ноды:
 
@@ -62,7 +89,7 @@ tmp/outreach/photo-studio-leads.csv
 
 Варианты:
 
-- `{{studio_name}}, AI-фотосессии для клиентов вашей студии`
+- `{{studio_name}}, новый формат AI-фотосессий для ваших клиентов`
 - `Партнёрский тест AI-фотосессий для {{studio_name}}`
 - `Как превратить селфи клиента в фотосессию в интерьере`
 

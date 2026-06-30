@@ -1,17 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+type OutreachLead = {
+  id: string;
+  studio_name: string;
+  city: string | null;
+  website: string | null;
+  email: string | null;
+  phone: string | null;
+  source: string;
+  promo_code: string;
+  status: string;
+  created_at: string;
+};
 
 const defaultBody = `Здравствуйте, {{studio_name}}!
 
-Я представляю Virtual AI Photo Studio - сервис, который превращает обычные селфи клиента в готовую серию портретов в выбранном интерьере: с одеждой, светом, позами и атмосферой локации.
+Мы сделали Virtual AI Photo Studio - сервис, который превращает обычные селфи клиента в готовую серию портретов в интерьерной фотостудии: с подходящей одеждой, светом, позами и атмосферой локации.
 
-Это может быть полезно фотостудиям как дополнительный продукт: клиент выбирает интерьер, загружает 6-10 обычных фото, а получает AI-фотосессию без бронирования зала, визажиста и съёмочного дня.
+Фотостудия может использовать это как дополнительный продукт: показать клиенту пример "до/после", дать промокод и получать заявки от тех, кто пока не готов бронировать зал или хочет быстро протестировать образ.
 
-Для знакомства даём промокод {{promo_code}}: можно бесплатно протестировать результат на своих фото.
+Для знакомства даём промокод {{promo_code}}. По нему можно бесплатно проверить результат на своих фото.
 
-Если интересно, можем обсудить партнёрский формат: промокоды для ваших клиентов, отдельные подборки интерьеров или тестовую серию под вашу студию.
+Если вам интересно, можем подготовить отдельный промокод для клиентов вашей студии, подборку интерьеров под ваш стиль или тестовую серию с вашим залом.
 
 С уважением,
 Virtual AI Photo Studio
@@ -24,10 +37,14 @@ export default function OutreachPage() {
   const [city, setCity] = useState("Москва");
   const [promoCode, setPromoCode] = useState("STUDIO");
   const [subjectTemplate, setSubjectTemplate] = useState(
-    "{{studio_name}}, AI-фотосессии для клиентов вашей студии",
+    "{{studio_name}}, новый формат AI-фотосессий для ваших клиентов",
   );
   const [bodyTemplate, setBodyTemplate] = useState(defaultBody);
   const [copyMessage, setCopyMessage] = useState("");
+  const [adminToken, setAdminToken] = useState("");
+  const [leads, setLeads] = useState<OutreachLead[]>([]);
+  const [leadsMessage, setLeadsMessage] = useState("");
+  const [isLoadingLeads, setIsLoadingLeads] = useState(false);
 
   const variables = useMemo(
     () => ({
@@ -42,10 +59,46 @@ export default function OutreachPage() {
   const textBody = renderTemplate(bodyTemplate, variables);
   const htmlBody = buildHtmlEmail(textBody, variables.promo_code);
 
+  useEffect(() => {
+    setAdminToken(window.localStorage.getItem("outreach_admin_token") ?? "");
+  }, []);
+
   async function copyToClipboard(value: string, label: string) {
     await navigator.clipboard.writeText(value);
     setCopyMessage(`${label} скопирован.`);
     window.setTimeout(() => setCopyMessage(""), 1800);
+  }
+
+  async function loadLeads() {
+    const token = adminToken.trim();
+    if (!token) {
+      setLeadsMessage("Введите админ-токен для просмотра лидов.");
+      return;
+    }
+
+    setIsLoadingLeads(true);
+    setLeadsMessage("");
+    window.localStorage.setItem("outreach_admin_token", token);
+
+    try {
+      const response = await fetch("/api/outreach/leads?limit=1000", {
+        headers: {
+          "x-outreach-token": token,
+        },
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Не удалось загрузить лиды.");
+      }
+
+      setLeads(payload.leads ?? []);
+      setLeadsMessage(`Загружено студий: ${(payload.leads ?? []).length}.`);
+    } catch (error) {
+      setLeadsMessage(error instanceof Error ? error.message : "Не удалось загрузить лиды.");
+    } finally {
+      setIsLoadingLeads(false);
+    }
   }
 
   return (
@@ -164,6 +217,75 @@ export default function OutreachPage() {
           <div className="outreach-email-preview" dangerouslySetInnerHTML={{ __html: htmlBody }} />
         </div>
       </section>
+
+      <section className="section outreach-leads-section">
+        <div className="section-header">
+          <div>
+            <h2>Найденные студии</h2>
+            <p>Список появляется после запуска сборщика на Render Cron или локально.</p>
+          </div>
+        </div>
+
+        <div className="outreach-token-row">
+          <label>
+            <span>Админ-токен</span>
+            <input
+              onChange={(event) => setAdminToken(event.target.value)}
+              placeholder="OUTREACH_ADMIN_TOKEN"
+              type="password"
+              value={adminToken}
+            />
+          </label>
+          <button className="button button-primary" disabled={isLoadingLeads} onClick={loadLeads}>
+            {isLoadingLeads ? "Загрузка..." : "Показать студии"}
+          </button>
+        </div>
+
+        {leadsMessage ? <div className="upload-message">{leadsMessage}</div> : null}
+
+        <div className="outreach-leads-scroll">
+          <table className="outreach-leads-table">
+            <thead>
+              <tr>
+                <th>Студия</th>
+                <th>Город</th>
+                <th>Email</th>
+                <th>Телефон</th>
+                <th>Сайт</th>
+                <th>Статус</th>
+                <th>Промокод</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leads.length > 0 ? (
+                leads.map((lead) => (
+                  <tr key={lead.id}>
+                    <td>{lead.studio_name}</td>
+                    <td>{lead.city ?? "-"}</td>
+                    <td>{lead.email ?? "-"}</td>
+                    <td>{lead.phone ?? "-"}</td>
+                    <td>
+                      {lead.website ? (
+                        <a href={lead.website} rel="noreferrer" target="_blank">
+                          Открыть
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td>{lead.status}</td>
+                    <td>{lead.promo_code}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={7}>Пока нет загруженных лидов.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
     </main>
   );
 }
@@ -185,6 +307,11 @@ function buildHtmlEmail(textBody: string, promoCode: string) {
 
   return `
     <div class="outreach-email-shell">
+      <div class="outreach-email-hero">
+        <span>Virtual AI Photo Studio</span>
+        <h1>AI-фотосессия из обычных селфи клиента</h1>
+        <p>Готовый формат для фотостудий: до/после, промокод и быстрый тест без съёмочного дня.</p>
+      </div>
       ${paragraphs}
       <div class="outreach-email-comparison">
         <div>

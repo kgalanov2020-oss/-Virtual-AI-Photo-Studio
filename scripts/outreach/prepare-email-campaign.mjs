@@ -33,7 +33,7 @@ const rows = leads
       studio_name: lead.studio_name,
       city: lead.city,
       promo_code: values.promo_code,
-      subject: `${values.studio_name}, AI-фотосессии для клиентов вашей студии`,
+      subject: `${values.studio_name}, новый формат AI-фотосессий для ваших клиентов`,
       text,
       html,
     };
