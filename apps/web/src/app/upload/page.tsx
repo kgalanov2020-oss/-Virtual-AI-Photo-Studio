@@ -509,7 +509,7 @@ export default function UploadPage() {
                       void applyPromoCode();
                     }
                   }}
-                  placeholder="WELCOME"
+                  placeholder="Введите промокод"
                   type="text"
                   value={promoCode}
                 />

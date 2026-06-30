@@ -1441,6 +1441,13 @@ h1 {
   text-transform: uppercase;
 }
 
+.promo-code-form input::placeholder {
+  color: var(--muted);
+  font-weight: 600;
+  opacity: 0.7;
+  text-transform: none;
+}
+
 .mode-option {
   align-items: flex-start;
   background: var(--panel);
