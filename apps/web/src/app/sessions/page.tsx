@@ -45,10 +45,13 @@ export default function SessionsPage() {
     loadSessions();
   }, []);
 
-  const totalRemaining = useMemo(
+  const paidRemaining = useMemo(
     () =>
       rows.reduce(
-        (sum, row) => sum + Math.max(0, row.job.target_image_count - row.generatedCount),
+        (sum, row) =>
+          row.job.payment_status === "paid"
+            ? sum + Math.max(0, row.job.target_image_count - row.generatedCount)
+            : sum,
         0,
       ),
     [rows],
@@ -172,7 +175,7 @@ export default function SessionsPage() {
     if (isDeletingJobId) return;
 
     const confirmed = window.confirm(
-      "Удалить эту фотосессию из списка? Загруженные фото и черновик будут очищены.",
+      "Удалить эту фотосессию из истории? Загруженные и готовые фото будут удалены. Оплата не возвращается автоматически.",
     );
 
     if (!confirmed) return;
@@ -281,8 +284,8 @@ export default function SessionsPage() {
                 <span>бесплатных фото</span>
               </div>
               <div>
-                <strong>{totalRemaining}</strong>
-                <span>ожидает генерации</span>
+                <strong>{paidRemaining}</strong>
+                <span>оплаченных осталось</span>
               </div>
             </div>
 
@@ -334,7 +337,7 @@ export default function SessionsPage() {
                       onClick={() => deleteSession(row)}
                       type="button"
                     >
-                      {isDeletingJobId === row.job.id ? "Удаляем..." : "Удалить"}
+                      {isDeletingJobId === row.job.id ? "Удаляем..." : "Удалить из истории"}
                     </button>
                   </div>
                 </article>

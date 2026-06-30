@@ -263,8 +263,8 @@ export default function CheckoutPage() {
         <div className="empty-state">
           <strong>Что входит</strong>
           <span>
-            40 фото в выбранном интерьере: 10 профессионально поставленных сцен и 4
-            дистанции камеры для каждой сцены.
+            {activePackage.imageCount} фото в выбранном интерьере: профессионально
+            поставленные сцены и разные дистанции камеры.
           </span>
         </div>
         {error ? <div className="upload-message error">{error}</div> : null}

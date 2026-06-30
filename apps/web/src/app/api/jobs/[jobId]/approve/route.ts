@@ -98,20 +98,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const now = new Date().toISOString();
     const shouldPay = PAYMENTS_ENABLED && !isFreePackage;
 
-    if (isFreePackage) {
-      const { error: creditError } = await supabase
-        .from("user_profiles")
-        .update({
-          free_images_remaining: profile.free_images_remaining - selectedPackage.imageCount,
-          updated_at: now,
-        })
-        .eq("user_id", userId);
-
-      if (creditError) {
-        throw new Error(creditError.message);
-      }
-    }
-
     const { data: updatedJob, error: updateError } = await supabase
       .from("jobs")
       .update({

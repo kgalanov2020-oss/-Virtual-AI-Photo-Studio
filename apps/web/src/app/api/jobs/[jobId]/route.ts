@@ -36,13 +36,11 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       return NextResponse.json({ error: "Нет доступа к этой фотосессии." }, { status: 403 });
     }
 
-    const canDelete =
-      job.payment_status !== "paid" &&
-      ["draft", "awaiting_payment", "failed", "cancelled"].includes(job.status);
+    const canDelete = !["running"].includes(job.status);
 
     if (!canDelete) {
       return NextResponse.json(
-        { error: "Можно удалить только черновики, неоплаченные или ошибочные фотосессии." },
+        { error: "Фотосессию можно удалить после остановки текущей генерации." },
         { status: 409 },
       );
     }

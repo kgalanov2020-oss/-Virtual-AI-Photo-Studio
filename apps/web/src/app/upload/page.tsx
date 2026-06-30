@@ -52,9 +52,6 @@ export default function UploadPage() {
   const [selfies, setSelfies] = useState<SelectedSelfie[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState("");
-  const [authEmail, setAuthEmail] = useState("");
-  const [authPassword, setAuthPassword] = useState("");
-  const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
   const [authMessage, setAuthMessage] = useState<string | null>(null);
   const [authError, setAuthError] = useState<string | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -132,7 +129,6 @@ export default function UploadPage() {
 
     setUserId(user.id);
     setUserEmail(user.email);
-    setAuthEmail(user.email);
     setAuthError(null);
     await loadOrCreateProfile(user.id, user.email);
   }
@@ -141,7 +137,6 @@ export default function UploadPage() {
     setUserId(null);
     setUserEmail("");
     setProfile(null);
-    setAuthPassword("");
   }
 
   function redirectToLogin() {
@@ -149,116 +144,11 @@ export default function UploadPage() {
     window.location.replace(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
-  async function signOut() {
-    const supabase = createSupabaseBrowserClient();
-    await supabase.auth.signOut();
-    clearUserSession();
-    setAuthEmail("");
-    setAuthError(null);
-    setAuthMessage("Вы вышли из аккаунта.");
-  }
-
   useEffect(() => {
     if (selectedPackageCode === "free_1" && profile && profile.free_images_remaining <= 0) {
       setSelectedPackageCode("studio_5");
     }
   }, [profile, selectedPackageCode]);
-
-  function getAuthCredentials() {
-    const email = authEmail.trim();
-    const password = authPassword.trim();
-
-    if (!email || !password) {
-      setAuthError("Введите email и пароль.");
-      return null;
-    }
-
-    if (password.length < 6) {
-      setAuthError("Пароль должен быть минимум 6 символов.");
-      return null;
-    }
-
-    return { email, password };
-  }
-
-  async function registerWithEmailPassword() {
-    const credentials = getAuthCredentials();
-    if (!credentials || isAuthSubmitting) return;
-
-    setIsAuthSubmitting(true);
-    setUploadError(null);
-    setAuthMessage(null);
-    setAuthError(null);
-
-    try {
-      const supabase = createSupabaseBrowserClient();
-      const { data, error } = await withTimeout(
-        supabase.auth.signUp({
-          email: credentials.email,
-          password: credentials.password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/upload?studio=${selectedStudioSlug}`,
-          },
-        }),
-        "Регистрация не получила ответ от Supabase. Попробуйте ещё раз.",
-      );
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.session?.user) {
-        await syncUserSession(supabase, data.session.user);
-        setAuthPassword("");
-        setAuthMessage("Аккаунт создан, вход выполнен.");
-        return;
-      }
-
-      setAuthMessage("Регистрация отправлена. Проверьте email и подтвердите аккаунт, затем войдите.");
-    } catch (error) {
-      console.error("Registration failed", serializeAuthError(error));
-      setAuthError(formatAuthError(error, "register").message);
-    } finally {
-      setIsAuthSubmitting(false);
-    }
-  }
-
-  async function loginWithEmailPassword() {
-    const credentials = getAuthCredentials();
-    if (!credentials || isAuthSubmitting) return;
-
-    setIsAuthSubmitting(true);
-    setUploadError(null);
-    setAuthMessage(null);
-    setAuthError(null);
-
-    try {
-      const supabase = createSupabaseBrowserClient();
-      const { data, error } = await withTimeout(
-        supabase.auth.signInWithPassword({
-          email: credentials.email,
-          password: credentials.password,
-        }),
-        "Вход не получил ответ от Supabase. Попробуйте ещё раз.",
-      );
-
-      if (error) {
-        throw error;
-      }
-
-      if (data.user) {
-        await syncUserSession(supabase, data.user);
-      }
-
-      setAuthPassword("");
-      setAuthMessage("Вы вошли в аккаунт.");
-    } catch (error) {
-      console.error("Login failed", serializeAuthError(error));
-      setAuthError(formatAuthError(error, "login").message);
-    } finally {
-      setIsAuthSubmitting(false);
-    }
-  }
 
   async function loadOrCreateProfile(activeUserId: string, email: string) {
     const supabase = createSupabaseBrowserClient();
@@ -617,194 +507,4 @@ function isAcceptedImage(file: File) {
   if (file.type.startsWith("image/")) return true;
   const extension = file.name.split(".").pop()?.toLowerCase();
   return extension ? acceptedImageExtensions.has(extension) : false;
-}
-
-async function withTimeout<T>(promise: Promise<T>, message: string, timeoutMs = 20_000) {
-  let timer: ReturnType<typeof setTimeout> | null = null;
-
-  try {
-    return await Promise.race([
-      promise,
-      new Promise<never>((_resolve, reject) => {
-        timer = setTimeout(() => reject(new Error(message)), timeoutMs);
-      }),
-    ]);
-  } finally {
-    if (timer) {
-      clearTimeout(timer);
-    }
-  }
-}
-
-function formatAuthError(error: unknown, action: "login" | "register") {
-  const message = getAuthErrorMessage(error, action);
-  const normalized = message.toLowerCase();
-  const authStatus = getAuthErrorStatus(error);
-  const authName = getAuthErrorName(error).toLowerCase();
-  const isRateLimit =
-    normalized.includes("rate limit") ||
-    normalized.includes("too many") ||
-    normalized.includes("email rate");
-  const isNetworkError =
-    authName === "typeerror" ||
-    normalized.includes("failed to fetch") ||
-    normalized.includes("fetch failed") ||
-    normalized.includes("networkerror") ||
-    normalized.includes("load failed");
-
-  if (isNetworkError) {
-    return {
-      isRateLimit: false,
-      message:
-        "Не удалось подключиться к Supabase Auth. Проверьте интернет, настройки SMTP и переменные Supabase на сайте.",
-    };
-  }
-
-  if (
-    authStatus >= 500 ||
-    authName.includes("authretryablefetcherror") ||
-    normalized.includes("authretryablefetcherror")
-  ) {
-    return {
-      isRateLimit: false,
-      message:
-        action === "register"
-          ? "Регистрация сейчас не прошла: Supabase не смог отправить письмо подтверждения. Проверьте SMTP-настройки почты и попробуйте снова."
-          : "Вход сейчас не прошёл: Supabase временно вернул ошибку. Попробуйте ещё раз.",
-    };
-  }
-
-  if (isRateLimit) {
-    return {
-      isRateLimit: true,
-      message:
-        "Отправка писем временно ограничена. Подождите несколько минут и попробуйте снова.",
-    };
-  }
-
-  if (normalized.includes("email") && normalized.includes("invalid")) {
-    return {
-      isRateLimit: false,
-      message: "Проверьте email: адрес выглядит некорректно.",
-    };
-  }
-
-  if (normalized.includes("email not confirmed") || normalized.includes("not confirmed")) {
-    return {
-      isRateLimit: false,
-      message: "Email ещё не подтверждён. Откройте письмо и подтвердите аккаунт, затем войдите.",
-    };
-  }
-
-  if (
-    normalized.includes("invalid login credentials") ||
-    normalized.includes("invalid credentials")
-  ) {
-    return {
-      isRateLimit: false,
-      message: "Неверный email или пароль.",
-    };
-  }
-
-  if (
-    normalized.includes("user already registered") ||
-    normalized.includes("already registered") ||
-    normalized.includes("already exists")
-  ) {
-    return {
-      isRateLimit: false,
-      message: "Аккаунт с таким email уже есть. Нажмите «Войти».",
-    };
-  }
-
-  if (normalized.includes("signup") && normalized.includes("disabled")) {
-    return {
-      isRateLimit: false,
-      message: "Регистрация временно отключена в настройках проекта.",
-    };
-  }
-
-  if (
-    normalized.includes("smtp") ||
-    normalized.includes("email provider") ||
-    normalized.includes("confirmation email") ||
-    normalized.includes("sending")
-  ) {
-    return {
-      isRateLimit: false,
-      message:
-        "Не удалось отправить письмо подтверждения. Проверьте SMTP-настройки почты и попробуйте снова.",
-    };
-  }
-
-  if (normalized.includes("redirect")) {
-    return {
-      isRateLimit: false,
-      message:
-        "Адрес возврата после подтверждения email не разрешён в Supabase. Добавьте localhost и домен сайта в Auth URL Configuration.",
-    };
-  }
-
-  return {
-    isRateLimit: false,
-    message,
-  };
-}
-
-function getAuthErrorMessage(error: unknown, action: "login" | "register") {
-  if (error instanceof Error && error.message.trim() && error.message !== "{}") {
-    return error.message;
-  }
-
-  if (typeof error === "string" && error.trim() && error !== "{}") {
-    return error;
-  }
-
-  if (error && typeof error === "object") {
-    const errorRecord = error as Record<string, unknown>;
-    const candidate =
-      errorRecord.message ??
-      errorRecord.error_description ??
-      errorRecord.error ??
-      errorRecord.msg ??
-      errorRecord.name;
-
-    if (typeof candidate === "string" && candidate.trim() && candidate !== "{}") {
-      return candidate;
-    }
-
-    const name = getAuthErrorName(error);
-    if (name && name !== "{}") return name;
-  }
-
-  return action === "register"
-    ? "Не удалось отправить письмо подтверждения. Проверьте SMTP-настройки почты и попробуйте снова."
-    : "Не удалось войти. Проверьте email и пароль.";
-}
-
-function getAuthErrorName(error: unknown) {
-  if (!error || typeof error !== "object") return "";
-  const name = (error as Record<string, unknown>).name;
-  return typeof name === "string" ? name : "";
-}
-
-function getAuthErrorStatus(error: unknown) {
-  if (!error || typeof error !== "object") return 0;
-  const status = (error as Record<string, unknown>).status;
-  return typeof status === "number" ? status : Number(status) || 0;
-}
-
-function serializeAuthError(error: unknown) {
-  if (!error || typeof error !== "object") return "";
-
-  const details: Record<string, unknown> = {};
-  for (const key of Object.getOwnPropertyNames(error)) {
-    details[key] = (error as Record<string, unknown>)[key];
-  }
-
-  try {
-    return JSON.stringify(details);
-  } catch {
-    return "";
-  }
 }

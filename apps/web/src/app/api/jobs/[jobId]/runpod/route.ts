@@ -4,6 +4,7 @@ import { generateBusinessPortrait } from "@/lib/comfy/client";
 import { getTargetShots, getTargetVariationCount, isTargetVariation } from "@/lib/generation";
 import { generateGeminiStudioPhoto } from "@/lib/gemini/client";
 import { PAYMENTS_ENABLED } from "@/lib/payments";
+import { getPhotoPackage } from "@/lib/pricing";
 import { createSupabaseAdminClient } from "@/lib/supabase";
 import type { GenerationMode, Job, StudioShot, UploadedSelfie } from "@/lib/types";
 
@@ -63,6 +64,8 @@ export async function POST(request: NextRequest, context: RouteContext) {
         { status: 402 },
       );
     }
+
+    const selectedPackage = getPhotoPackage(job.product_code);
 
     if (!["queued", "running", "failed"].includes(job.status)) {
       return NextResponse.json(
@@ -166,6 +169,28 @@ export async function POST(request: NextRequest, context: RouteContext) {
       });
     }
 
+    if (selectedPackage.isFree && completedBefore < totalExpected) {
+      const { data: profile, error: profileError } = await supabase
+        .from("user_profiles")
+        .select("free_images_remaining")
+        .eq("user_id", userId)
+        .single();
+
+      if (profileError || !profile) {
+        return NextResponse.json(
+          { error: "Профиль пользователя не найден." },
+          { status: 400 },
+        );
+      }
+
+      if (profile.free_images_remaining < 1) {
+        return NextResponse.json(
+          { error: "Бесплатные фото закончились. Выберите платный пакет." },
+          { status: 402 },
+        );
+      }
+    }
+
     const { shot, variationIndex } = nextTarget;
     const generationMode = job.generation_mode ?? "standard";
     activeGenerationMode = generationMode;
@@ -244,6 +269,24 @@ export async function POST(request: NextRequest, context: RouteContext) {
         completed_at: isDone ? new Date().toISOString() : null,
       })
       .eq("id", jobId);
+
+    if (selectedPackage.isFree) {
+      const { data: profile } = await supabase
+        .from("user_profiles")
+        .select("free_images_remaining")
+        .eq("user_id", userId)
+        .single();
+
+      const freeImagesRemaining = Math.max(0, (profile?.free_images_remaining ?? 0) - 1);
+
+      await supabase
+        .from("user_profiles")
+        .update({
+          free_images_remaining: freeImagesRemaining,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", userId);
+    }
 
     return NextResponse.json({
       ok: true,
