@@ -33,7 +33,7 @@ services:
       - key: PAYMENT_CURRENCY
         value: rub
       - key: NEXT_PUBLIC_PAYMENTS_ENABLED
-        value: false
+        value: true
       - key: YOOKASSA_SHOP_ID
         sync: false
       - key: YOOKASSA_SECRET_KEY

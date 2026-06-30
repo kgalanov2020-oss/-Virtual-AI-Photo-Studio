@@ -1010,6 +1010,19 @@ const privateCinemaPoseTemplates = [
   { slug: "cinema-hero", name: "Главный cinema кадр", camera: "лучший cinematic-ракурс, объектив 70 мм", pose: "финальная уверенная поза в приватном кинозале", prompt: "signature private cinema editorial portrait, premium dark lounge atmosphere, polished final image" },
 ];
 
+const blackPhotoStudioPoseTemplates = [
+  { slug: "seamless-cyclorama", name: "На чёрной циклораме", camera: "объектив 85 мм, направленный студийный свет", pose: "стоит на чёрной циклораме, корпус слегка повернут, руки видны", prompt: "standing on black seamless cyclorama, slight torso turn, hands visible, dramatic clean fashion light" },
+  { slug: "softbox-edge", name: "У большого softbox", camera: "объектив 70 мм, боковой softbox-свет", pose: "стоит рядом с большим softbox, лицо в мягком боковом свете", prompt: "near large softbox edge, clean side light on face, black studio equipment visible" },
+  { slug: "posing-cube", name: "С posing cube", camera: "объектив 50 мм, низкий editorial-ракурс", pose: "сидит или опирается на чёрный куб, руки естественно расположены", prompt: "seated or leaning on black posing cube, elegant hands, minimal fashion editorial set" },
+  { slug: "spotlight-center", name: "В пятне света", camera: "объектив 85 мм, контрастный spotlight", pose: "стоит в центре пятна света, уверенная спокойная поза", prompt: "standing in centered spotlight on dark cyclorama, strong controlled shadows, high-fashion mood" },
+  { slug: "floor-reflection", name: "У отражающего пола", camera: "объектив 70 мм, низкий ракурс", pose: "стоит или сидит низко, видны отражения на тёмном полу", prompt: "near subtle glossy dark floor reflection, full styling visible, minimal black studio portrait" },
+  { slug: "light-stand", name: "Backstage fashion", camera: "объектив 50 мм, backstage editorial", pose: "стоит рядом со стойками света, не перекрывая лицо", prompt: "standing near light stands and studio cart, backstage fashion editorial mood, no logos" },
+  { slug: "profile-shadow", name: "Профиль и тень", camera: "объектив 85 мм, резкий боковой свет", pose: "профиль или полуоборот, выразительная тень на фоне", prompt: "side profile or half-turn with sharp shadow on black cyclorama, sculpted facial contour" },
+  { slug: "wide-studio", name: "Широкий кадр студии", camera: "широкий объектив 35 мм", pose: "стоит внутри всей чёрной студии, оборудование и фон видны", prompt: "wide environmental black photo studio shot, person smaller in frame, cyclorama and lights dominate" },
+  { slug: "equipment-detail", name: "Через студийные детали", camera: "объектив 85 мм, размытый передний план", pose: "портрет через размытые стойки или световое оборудование", prompt: "portrait framed through blurred studio equipment, black cyclorama, premium fashion lighting depth" },
+  { slug: "black-studio-hero", name: "Главный black studio кадр", camera: "лучший fashion-ракурс, объектив 70 мм", pose: "финальная сильная fashion-поза в чёрной студии", prompt: "signature black minimal photo studio fashion portrait, strong light, clean uncluttered final image" },
+];
+
 const fashionBoutiquePoseTemplates = [
   { slug: "clothing-rail", name: "У fashion-рейла", camera: "объектив 70 мм, витринный свет", pose: "стоит у рейла с одеждой, рука естественно рядом", prompt: "standing by sculptural clothing rail, garments without logos, polished boutique editorial styling" },
   { slug: "mirror-boutique", name: "У зеркала", camera: "объектив 85 мм, мягкая глубина", pose: "полуоборот у большого зеркала, уверенный спокойный взгляд", prompt: "half-turn portrait near large boutique mirror, warm display lighting, premium retail architecture" },
@@ -1021,6 +1034,19 @@ const fashionBoutiquePoseTemplates = [
   { slug: "front-display", name: "У центральной витрины", camera: "объектив 70 мм, витринный свет", pose: "стоит у центральной display-зоны", prompt: "standing near central boutique display, warm gallery-like light, elegant fashion editorial styling" },
   { slug: "wide-boutique", name: "Широкий boutique кадр", camera: "широкий объектив 35 мм", pose: "стоит внутри всего пространства бутика", prompt: "wide environmental concept store shot, person smaller in frame, rails, mirrors and display architecture dominate" },
   { slug: "boutique-hero", name: "Главный boutique кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная fashion-поза в премиальном бутике", prompt: "signature fashion boutique editorial portrait, quiet luxury retail interior, polished final image" },
+];
+
+const moroccanRiadPoseTemplates = [
+  { slug: "courtyard-arch", name: "У арки riad", camera: "объектив 70 мм, тёплый боковой свет", pose: "стоит у резной арки, корпус слегка повернут", prompt: "standing near ornate Moroccan riad arch, carved plaster, warm golden side light, luxury travel portrait" },
+  { slug: "fountain-lounge", name: "У фонтана", camera: "объектив 50 мм, courtyard-ракурс", pose: "сидит или стоит у фонтана, руки видны", prompt: "near riad courtyard fountain, zellige tile and lounge cushions visible, relaxed resort editorial pose" },
+  { slug: "tile-corner", name: "У плитки zellige", camera: "объектив 85 мм, мягкая глубина", pose: "полуоборот у стены с плиткой, спокойный взгляд", prompt: "half-turn portrait by Moroccan zellige tile wall, ornate texture, warm lantern highlights" },
+  { slug: "lantern-corridor", name: "В коридоре с фонарями", camera: "объектив 70 мм, перспективный ракурс", pose: "идёт по арочному коридору, естественный шаг", prompt: "walking through arched riad corridor with lanterns, natural motion, warm luxury travel atmosphere" },
+  { slug: "palm-courtyard", name: "В тени пальм", camera: "объектив 85 мм, пятнистый солнечный свет", pose: "стоит в мягкой тени пальм во внутреннем дворике", prompt: "portrait in palm shadows inside riad courtyard, carved arches and plants around, warm sun patches" },
+  { slug: "carved-doorway", name: "У резной двери", camera: "объектив 70 мм, архитектурный свет", pose: "стоит у деревянной резной двери, руки расслаблены", prompt: "standing by carved Moroccan wooden doorway, ornate arch, refined resort styling, hands visible" },
+  { slug: "low-table", name: "У низкого lounge-стола", camera: "объектив 50 мм, lifestyle-ракурс", pose: "сидит или стоит у низкого стола с фонарями", prompt: "near low riad lounge table with lanterns and cushions, relaxed luxury travel editorial moment" },
+  { slug: "rooftop-terrace", name: "На террасе riad", camera: "объектив 70 мм, закатный свет", pose: "стоит на террасе с арками или городским фоном", prompt: "on Moroccan riad rooftop terrace at golden hour, arches and desert-resort atmosphere, elegant stance" },
+  { slug: "wide-riad", name: "Широкий кадр riad", camera: "широкий объектив 35 мм", pose: "стоит в центре двора, архитектура доминирует", prompt: "wide environmental Moroccan riad courtyard shot, person smaller in frame, fountain, arches, tile and palms dominate" },
+  { slug: "riad-hero", name: "Главный riad кадр", camera: "лучший travel editorial-ракурс, объектив 70 мм", pose: "финальная уверенная поза в тёплом riad-интерьере", prompt: "signature Moroccan riad luxury travel editorial portrait, warm golden light, polished final resort image" },
 ];
 
 const wineCellarPoseTemplates = [
@@ -1077,6 +1103,9 @@ const studioPoseTemplates = {
   "new-york-editorial-street": newYorkStreetPoseTemplates,
   "music-recording-studio": musicRecordingStudioPoseTemplates,
   "cyprus-villa": cyprusVillaPoseTemplates,
+  "black-photo-studio": blackPhotoStudioPoseTemplates,
+  "fashion-boutique": fashionBoutiquePoseTemplates,
+  "moroccan-riad": moroccanRiadPoseTemplates,
 };
 
 const distanceVariants = [

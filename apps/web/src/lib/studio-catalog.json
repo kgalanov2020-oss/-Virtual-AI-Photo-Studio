@@ -512,6 +512,63 @@
         "/studios/cyprus-villa/detail-shot.png",
         "/studios/cyprus-villa/alternate-wide.png"
       ]
+    },
+    {
+      "slug": "black-photo-studio",
+      "name": "Black Photo Studio",
+      "description": "Чёрная циклорама и минималистичная fashion-студия: сильный направленный свет, чистый фон, студийное оборудование и лаконичный editorial-образ.",
+      "preview_url": "/studios/black-photo-studio/preview.png",
+      "base_prompt": "inside a black minimal fashion photo studio with seamless black cyclorama, matte dark floor, professional softboxes, spotlights, light stands, posing cube, clean uncluttered editorial portrait set, dramatic controlled studio lighting",
+      "wardrobe_prompt": "black photo studio wardrobe: minimal fashion editorial outfit, monochrome black or white styling, structured blazer, fitted trousers, leather or satin accents, no logos, fully clothed high-fashion look",
+      "gallery_urls": [
+        "/studios/black-photo-studio/master-wide.png",
+        "/studios/black-photo-studio/angle-02.png",
+        "/studios/black-photo-studio/angle-03.png",
+        "/studios/black-photo-studio/angle-04.png",
+        "/studios/black-photo-studio/angle-05.png",
+        "/studios/black-photo-studio/angle-06.png",
+        "/studios/black-photo-studio/angle-07.png",
+        "/studios/black-photo-studio/detail-shot.png",
+        "/studios/black-photo-studio/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "fashion-boutique",
+      "name": "Fashion Boutique",
+      "description": "Премиальный бутик и concept store: рейлы с одеждой, зеркала, сумки, тёплый витринный свет и чистая fashion/editorial-атмосфера.",
+      "preview_url": "/studios/fashion-boutique/preview.png",
+      "base_prompt": "inside a premium fashion boutique concept store with elegant clothing racks, curated outfits, full-length mirrors, marble display tables, handbags, warm display lighting, soft beige plaster walls, refined editorial retail atmosphere",
+      "wardrobe_prompt": "fashion boutique wardrobe: polished editorial fashion outfit, tailored coat, blazer, designer-inspired accessories without logos, elegant shoes, layered premium styling, fully clothed concept store look",
+      "gallery_urls": [
+        "/studios/fashion-boutique/master-wide.png",
+        "/studios/fashion-boutique/angle-02.png",
+        "/studios/fashion-boutique/angle-03.png",
+        "/studios/fashion-boutique/angle-04.png",
+        "/studios/fashion-boutique/angle-05.png",
+        "/studios/fashion-boutique/angle-06.png",
+        "/studios/fashion-boutique/angle-07.png",
+        "/studios/fashion-boutique/detail-shot.png",
+        "/studios/fashion-boutique/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "moroccan-riad",
+      "name": "Марокканский riad",
+      "description": "Desert resort / марокканский riad: арки, плитка, внутренний дворик, фонтан, пальмы, фонари и тёплый luxury travel-свет.",
+      "preview_url": "/studios/moroccan-riad/preview.png",
+      "base_prompt": "inside a luxury Moroccan riad desert resort courtyard with ornate arches, zellige tile, carved plaster, fountain pool, palm trees, lanterns, warm golden sunlight, lounge cushions, luxury travel editorial atmosphere",
+      "wardrobe_prompt": "Moroccan riad wardrobe: elegant resort fashion outfit, linen layers, silk scarf, light tailored separates or flowing dress, warm neutral tones, luxury travel styling, fully clothed",
+      "gallery_urls": [
+        "/studios/moroccan-riad/master-wide.png",
+        "/studios/moroccan-riad/angle-02.png",
+        "/studios/moroccan-riad/angle-03.png",
+        "/studios/moroccan-riad/angle-04.png",
+        "/studios/moroccan-riad/angle-05.png",
+        "/studios/moroccan-riad/angle-06.png",
+        "/studios/moroccan-riad/angle-07.png",
+        "/studios/moroccan-riad/detail-shot.png",
+        "/studios/moroccan-riad/alternate-wide.png"
+      ]
     }
   ]
 }

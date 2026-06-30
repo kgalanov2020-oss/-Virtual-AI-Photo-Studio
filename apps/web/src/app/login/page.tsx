@@ -306,29 +306,8 @@ export default function LoginPage() {
               type="password"
               value={password}
             />
-            <div className="auth-actions">
-              <button
-                className="button button-primary"
-                disabled={isSubmitting || !email.trim() || password.length < 6 || !consentsAccepted}
-                onClick={register}
-                type="button"
-              >
-                {isSubmitting ? "Подождите..." : "Зарегистрироваться"}
-              </button>
-              <button
-                className="button button-secondary"
-                disabled={isSubmitting || !email.trim() || !password.trim()}
-                onClick={login}
-                type="button"
-              >
-                Войти
-              </button>
-            </div>
           </div>
         )}
-
-        {message ? <div className="upload-message success">{message}</div> : null}
-        {error ? <div className="upload-message error">{error}</div> : null}
 
         {shouldShowConsents ? (
           <div className="legal-consent-panel">
@@ -385,6 +364,30 @@ export default function LoginPage() {
             </small>
           </div>
         ) : null}
+
+        {!user ? (
+          <div className="auth-actions auth-actions-after-consent">
+            <button
+              className="button button-primary"
+              disabled={isSubmitting || !email.trim() || password.length < 6 || !consentsAccepted}
+              onClick={register}
+              type="button"
+            >
+              {isSubmitting ? "Подождите..." : "Зарегистрироваться"}
+            </button>
+            <button
+              className="button button-secondary"
+              disabled={isSubmitting || !email.trim() || !password.trim()}
+              onClick={login}
+              type="button"
+            >
+              Войти
+            </button>
+          </div>
+        ) : null}
+
+        {message ? <div className="upload-message success">{message}</div> : null}
+        {error ? <div className="upload-message error">{error}</div> : null}
       </section>
     </main>
   );

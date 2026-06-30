@@ -136,6 +136,21 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
     description:
       "Солнечная вилла на Кипре: белый камень, террасы, бассейн, пальмы, море и тёплый средиземноморский свет для лёгкой lifestyle-съёмки.",
   },
+  "black-photo-studio": {
+    name: "Black Photo Studio",
+    description:
+      "Чёрная циклорама и минималистичная fashion-студия: сильный направленный свет, чистый фон, студийное оборудование и лаконичный editorial-образ.",
+  },
+  "fashion-boutique": {
+    name: "Fashion Boutique",
+    description:
+      "Премиальный бутик и concept store: рейлы с одеждой, зеркала, сумки, тёплый витринный свет и чистая fashion/editorial-атмосфера.",
+  },
+  "moroccan-riad": {
+    name: "Марокканский riad",
+    description:
+      "Desert resort / марокканский riad: арки, плитка, внутренний дворик, фонтан, пальмы, фонари и тёплый luxury travel-свет.",
+  },
 };
 
 const shotTranslations: Record<

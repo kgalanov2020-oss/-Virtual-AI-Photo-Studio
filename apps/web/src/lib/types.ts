@@ -90,6 +90,28 @@ export type UserProfile = {
   updated_at: string;
 };
 
+export type PromoCode = {
+  id: string;
+  code: string;
+  credit_amount: number;
+  description: string | null;
+  is_active: boolean;
+  starts_at: string | null;
+  expires_at: string | null;
+  max_redemptions: number | null;
+  redeemed_count: number;
+  created_at: string;
+};
+
+export type PromoRedemption = {
+  id: string;
+  promo_code_id: string;
+  user_id: string;
+  email: string;
+  credits_granted: number;
+  created_at: string;
+};
+
 export type GeneratedImage = {
   id: string;
   job_id: string;
@@ -208,6 +230,25 @@ export type Database = {
           updated_at?: string;
         };
         Update: Partial<UserProfile>;
+        Relationships: [];
+      };
+      promo_codes: {
+        Row: PromoCode;
+        Insert: Omit<PromoCode, "id" | "redeemed_count" | "created_at"> & {
+          id?: string;
+          redeemed_count?: number;
+          created_at?: string;
+        };
+        Update: Partial<PromoCode>;
+        Relationships: [];
+      };
+      promo_redemptions: {
+        Row: PromoRedemption;
+        Insert: Omit<PromoRedemption, "id" | "created_at"> & {
+          id?: string;
+          created_at?: string;
+        };
+        Update: Partial<PromoRedemption>;
         Relationships: [];
       };
     };

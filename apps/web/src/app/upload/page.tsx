@@ -61,6 +61,10 @@ export default function UploadPage() {
   const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("free_1");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
+  const [promoCode, setPromoCode] = useState("");
+  const [promoError, setPromoError] = useState<string | null>(null);
+  const [promoMessage, setPromoMessage] = useState<string | null>(null);
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
 
   const readyCount = selfies.length;
   const isReady = readyCount >= 6;
@@ -178,6 +182,70 @@ export default function UploadPage() {
     const nextProfile = data as UserProfile;
     setAuthError(null);
     setProfile(nextProfile);
+  }
+
+  async function applyPromoCode() {
+    if (isApplyingPromo) return;
+
+    const normalizedCode = promoCode.trim().replace(/\s+/g, "").toUpperCase();
+    if (!normalizedCode) {
+      setPromoError("Введите промокод.");
+      setPromoMessage(null);
+      return;
+    }
+
+    setIsApplyingPromo(true);
+    setPromoError(null);
+    setPromoMessage(null);
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      if (!token) {
+        throw new Error("Сначала войдите в аккаунт.");
+      }
+
+      const response = await fetch("/api/promo-codes/redeem", {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ code: normalizedCode }),
+      });
+      const payload = (await response.json()) as {
+        error?: string;
+        creditsGranted?: number;
+        freeImagesRemaining?: number;
+      };
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Не удалось применить промокод.");
+      }
+
+      setProfile((currentProfile) =>
+        currentProfile
+          ? {
+              ...currentProfile,
+              free_images_remaining:
+                payload.freeImagesRemaining ?? currentProfile.free_images_remaining,
+            }
+          : currentProfile,
+      );
+      setSelectedPackageCode("free_1");
+      setPromoCode("");
+      setPromoMessage(
+        `Промокод применён: +${payload.creditsGranted ?? 0} фото. Баланс: ${
+          payload.freeImagesRemaining ?? 0
+        }.`,
+      );
+    } catch (error) {
+      setPromoError(error instanceof Error ? error.message : "Неизвестная ошибка.");
+    } finally {
+      setIsApplyingPromo(false);
+    }
   }
 
   function handleFiles(event: ChangeEvent<HTMLInputElement>) {
@@ -401,6 +469,41 @@ export default function UploadPage() {
                   </label>
                 );
               })}
+            </div>
+            <div className="promo-code-panel">
+              <div>
+                <strong>Есть промокод?</strong>
+                <span>Введите код, чтобы пополнить бесплатный баланс фото.</span>
+              </div>
+              <div className="promo-code-form">
+                <input
+                  autoComplete="off"
+                  onChange={(event) => {
+                    setPromoCode(event.target.value);
+                    setPromoError(null);
+                    setPromoMessage(null);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") {
+                      event.preventDefault();
+                      void applyPromoCode();
+                    }
+                  }}
+                  placeholder="WELCOME5"
+                  type="text"
+                  value={promoCode}
+                />
+                <button
+                  className="button button-secondary"
+                  disabled={isApplyingPromo}
+                  onClick={applyPromoCode}
+                  type="button"
+                >
+                  {isApplyingPromo ? "Проверяем..." : "Применить"}
+                </button>
+              </div>
+              {promoError ? <div className="upload-message error">{promoError}</div> : null}
+              {promoMessage ? <div className="upload-message success">{promoMessage}</div> : null}
             </div>
           </section>
 
