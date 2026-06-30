@@ -13,6 +13,10 @@ export async function POST(request: NextRequest) {
     const { code } = (await request.json()) as RedeemPromoBody;
     const normalizedCode = normalizePromoCode(code);
 
+    if (!token) {
+      return NextResponse.json({ error: "Сначала войдите в аккаунт." }, { status: 401 });
+    }
+
     if (!normalizedCode) {
       return NextResponse.json({ error: "Введите промокод." }, { status: 400 });
     }
@@ -134,7 +138,7 @@ function readBearerToken(request: NextRequest) {
   const [scheme, token] = authorization.split(" ");
 
   if (scheme.toLowerCase() !== "bearer" || !token) {
-    throw new Error("Не передан токен пользователя.");
+    return null;
   }
 
   return token;
