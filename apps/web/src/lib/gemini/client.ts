@@ -289,24 +289,24 @@ function getString(value: unknown) {
 function buildImagePrompt(prompt: GeminiStudioPrompt, attempt: number) {
   const framing =
     prompt.width && prompt.height && prompt.width > prompt.height
-      ? "Use a horizontal business-photo frame. Show the environment and body language clearly."
-      : "Use a natural business-photo frame. Avoid a passport-style crop.";
+      ? "Use a horizontal editorial lifestyle photo frame. Show the environment and body language clearly."
+      : "Use a natural editorial lifestyle photo frame. Avoid a passport-style crop.";
   const retryGuidance =
     attempt === 1
       ? "Return exactly one generated image. Do not respond with text only."
       : attempt === 2
-        ? "If exact likeness is difficult, prioritize creating a realistic business photo with strong visual resemblance. Return an image, not text."
-        : "Create the safest possible photorealistic business photo inspired by the reference person's appearance and the scene. Return one image only.";
+        ? "If exact likeness is difficult, prioritize creating a realistic editorial lifestyle photo with strong visual resemblance. Return an image, not text."
+        : "Create the safest possible photorealistic editorial lifestyle photo inspired by the reference person's appearance and the scene. Return one image only.";
 
   return [
     "Use the attached selfie only as a visual reference for face shape, hair, age range and general appearance.",
-    "Create a new photorealistic business photo, like a real DSLR editorial/corporate photo.",
+    "Create a new photorealistic editorial lifestyle photo, like a real DSLR magazine photoshoot.",
     "Do not create a cartoon, CGI render, waxy AI portrait, painted image, avatar, over-sharpened image or plastic skin.",
     "Keep natural skin texture, believable eyes, normal face, realistic hands and realistic body proportions.",
     retryGuidance,
     framing,
     "Follow the requested scene literally. If the scene mentions a desk, laptop, coffee, chair, presentation screen, hands, legs, walking or gesture, those objects and body parts must be visible.",
-    "Make the image feel alive: candid work moment, natural off-camera gaze, conversation, movement or active pose when appropriate.",
+    "Make the image feel alive: natural off-camera gaze, conversation, movement or active pose when appropriate.",
     `Scene request: ${prompt.prompt}`,
     `Avoid: ${prompt.negativePrompt}`,
   ].join("\n");

@@ -215,7 +215,7 @@
       "description": "Beach club у моря: светлый песок, шезлонги, зонты, мягкий дневной свет и расслабленная курортная эстетика.",
       "preview_url": "/studios/beach-club/preview.png",
       "base_prompt": "at an elegant beach club with pale sand, cream umbrellas, designer sunbeds, cabanas, ocean horizon, warm daylight, natural coastal textures, upscale summer lifestyle atmosphere",
-      "wardrobe_prompt": "beach club wardrobe: elegant fully clothed resort look, linen set, light dress, summer shirt, sandals or loafers, stylish relaxed beach club outfit, no swimsuit, no revealing clothes",
+      "wardrobe_prompt": "beach club wardrobe: location-appropriate beachwear and resortwear only: linen beach shirt, relaxed resort shorts or linen trousers, light sundress, kaftan, pareo cover-up, sandals, straw hat or sunglasses. No blazer, no suit, no formal jacket, no office shirt, no business shoes, no corporate look. Keep it tasteful, non-revealing, beach-appropriate and fully styled for a premium beach club.",
       "gallery_urls": [
         "/studios/beach-club/master-wide.png",
         "/studios/beach-club/angle-02.png",

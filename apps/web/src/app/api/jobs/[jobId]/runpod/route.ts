@@ -446,7 +446,7 @@ function buildPositivePrompt(
 function buildNegativePrompt(shot: StudioShot, generationMode: GenerationMode) {
   const baseNegative = [
     "nsfw, nude, naked, porn, erotic",
-    "sexualized child, seductive pose, adult romantic context, revealing clothes, underwear, swimsuit, bare torso, exposed chest, exposed belly",
+    "sexualized child, seductive pose, adult romantic context, revealing clothes, underwear, bare torso, exposed chest, exposed belly",
     "wrong gender, different person, deformed face, bad anatomy, bad eyes, cross eye",
     "red spots on face, colored stains, paint marks, skin blemish artifacts, dirt on face, face noise, random colored marks",
     "jpeg artifacts, digital noise, oversharpened, harsh HDR, crunchy contrast, blown highlights, crushed shadows, unreal contrast, orange skin, oily skin",
@@ -462,7 +462,7 @@ function buildNegativePrompt(shot: StudioShot, generationMode: GenerationMode) {
     return [
       ...baseNegative,
       "adult business executive, mature professional, corporate leader, CEO, founder, office romance, nightlife, glamour, makeup-heavy look",
-      "formal suit that makes the child look adult, high heels, luxury adult styling, provocative expression",
+      "formal suit that makes the child look adult, high heels, luxury adult styling, provocative expression, swimsuit",
     ].join(", ");
   }
 
