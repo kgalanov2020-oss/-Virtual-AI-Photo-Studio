@@ -69,7 +69,9 @@ export default function UploadPage() {
   const readyCount = selfies.length;
   const isReady = readyCount >= 6;
   const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
-  const hasFreeCredits = (profile?.free_images_remaining ?? 0) > 0;
+  const hasFreeCredits =
+    !selectedPackage.isFree ||
+    (profile?.free_images_remaining ?? 0) >= selectedPackage.imageCount;
   const isAuthenticated = Boolean(userId && userEmail && profile);
   const canContinue =
     Boolean(userId && userEmail && profile) &&
@@ -80,11 +82,19 @@ export default function UploadPage() {
     if (!profile) return "Загружаем профиль пользователя.";
     if (!isReady) return "Загрузите минимум 6 фото.";
     if (selectedPackage.isFree && !hasFreeCredits) {
-      return "Бесплатные фото закончились. Выберите платный пакет.";
+      return `Для бесплатной генерации нужно ${selectedPackage.imageCount} фото на балансе. Введите промокод или выберите платный пакет.`;
     }
 
     return "";
-  }, [hasFreeCredits, isReady, profile, selectedPackage.isFree, userEmail, userId]);
+  }, [
+    hasFreeCredits,
+    isReady,
+    profile,
+    selectedPackage.imageCount,
+    selectedPackage.isFree,
+    userEmail,
+    userId,
+  ]);
   const statusText = useMemo(() => {
     if (readyCount === 0) return "Загрузите 6 селфи, чтобы начать.";
     if (readyCount < 6) return `Нужно ещё ${6 - readyCount} фото.`;
@@ -149,7 +159,12 @@ export default function UploadPage() {
   }
 
   useEffect(() => {
-    if (selectedPackageCode === "free_1" && profile && profile.free_images_remaining <= 0) {
+    const freePackage = getPhotoPackage("free_1");
+    if (
+      selectedPackageCode === "free_1" &&
+      profile &&
+      profile.free_images_remaining < freePackage.imageCount
+    ) {
       setSelectedPackageCode("studio_5");
     }
   }, [profile, selectedPackageCode]);
@@ -234,7 +249,10 @@ export default function UploadPage() {
             }
           : currentProfile,
       );
-      setSelectedPackageCode("free_1");
+      const freePackage = getPhotoPackage("free_1");
+      if ((payload.freeImagesRemaining ?? 0) >= freePackage.imageCount) {
+        setSelectedPackageCode("free_1");
+      }
       setPromoCode("");
       setPromoMessage(
         `Промокод применён: +${payload.creditsGranted ?? 0} фото. Баланс: ${
@@ -298,7 +316,9 @@ export default function UploadPage() {
       }
 
       if (selectedPackage.isFree && !hasFreeCredits) {
-        throw new Error("Бесплатные фото закончились. Выберите платный пакет.");
+        throw new Error(
+          `Для бесплатной генерации нужно ${selectedPackage.imageCount} фото на балансе.`,
+        );
       }
 
       const { data: studio, error: studioError } = await supabase
@@ -442,8 +462,8 @@ export default function UploadPage() {
               <div>
                 <h2>Пакет фотосессии</h2>
                 <p>
-                  Бесплатно доступно {profile?.free_images_remaining ?? 0} фото. После
-                  бесплатного теста можно выбрать платный пакет.
+                  Бесплатно доступно {profile?.free_images_remaining ?? 0} фото. Один
+                  промо-запуск использует 20 фото.
                 </p>
               </div>
             </div>
@@ -489,7 +509,7 @@ export default function UploadPage() {
                       void applyPromoCode();
                     }
                   }}
-                  placeholder="WELCOME5"
+                  placeholder="WELCOME"
                   type="text"
                   value={promoCode}
                 />

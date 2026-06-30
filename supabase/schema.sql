@@ -111,7 +111,7 @@ create table if not exists public.user_profiles (
 create table if not exists public.promo_codes (
   id uuid primary key default gen_random_uuid(),
   code text not null unique check (code = upper(code)),
-  credit_amount integer not null check (credit_amount between 1 and 40),
+  credit_amount integer not null check (credit_amount between 1 and 120),
   description text,
   is_active boolean not null default true,
   starts_at timestamptz,

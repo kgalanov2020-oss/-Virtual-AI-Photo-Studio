@@ -1,7 +1,7 @@
 create table if not exists public.promo_codes (
   id uuid primary key default gen_random_uuid(),
   code text not null unique check (code = upper(code)),
-  credit_amount integer not null check (credit_amount between 1 and 40),
+  credit_amount integer not null check (credit_amount between 1 and 120),
   description text,
   is_active boolean not null default true,
   starts_at timestamptz,
@@ -35,7 +35,7 @@ using ((select auth.uid()) = user_id);
 
 insert into public.promo_codes (code, credit_amount, description, max_redemptions)
 values
-  ('START3', 3, 'Промокод на 3 бесплатных фото', 100),
-  ('WELCOME5', 5, 'Промокод на 5 бесплатных фото', 100),
-  ('FRIEND5', 5, 'Приведи друга: 5 бесплатных фото', null)
+  ('START', 20, 'Одна промо-генерация на 20 бесплатных фото', 100),
+  ('WELCOME', 40, 'Две промо-генерации по 20 бесплатных фото', 100),
+  ('FRIEND', 60, 'Приведи друга: три промо-генерации по 20 бесплатных фото', null)
 on conflict (code) do nothing;
