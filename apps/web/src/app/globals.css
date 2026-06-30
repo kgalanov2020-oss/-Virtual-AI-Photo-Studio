@@ -327,6 +327,7 @@ a {
 .before-after-section {
   background: #ecefec;
   border-block: 1px solid #d7ddd8;
+  padding-top: clamp(30px, 4vw, 52px);
 }
 
 .before-after-grid {
