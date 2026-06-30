@@ -96,13 +96,6 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="atelier-section atelier-intro">
-        <div>
-          <h2>Каталог виртуальных студий</h2>
-        </div>
-        <p>Готовые пространства с продуманным светом, одеждой и позами</p>
-      </section>
-
       <section className="atelier-section before-after-section">
         <div className="before-after-grid" aria-label="Пример до и после">
           <div className="before-after-column">
@@ -124,6 +117,13 @@ export default async function Home() {
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="atelier-section atelier-intro">
+        <div>
+          <h2>Каталог виртуальных студий</h2>
+        </div>
+        <p>Готовые пространства с продуманным светом, одеждой и позами</p>
       </section>
 
       <section className="atelier-section" id="studios">
