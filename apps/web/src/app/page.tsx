@@ -63,7 +63,7 @@ export default async function Home() {
         </nav>
       </header>
 
-      <section className="atelier-hero">
+      <section className="atelier-hero" id="top">
         <div className="atelier-hero-media" aria-hidden="true" />
         <div className="atelier-hero-copy">
           <h1>
@@ -104,16 +104,6 @@ export default async function Home() {
       </section>
 
       <section className="atelier-section before-after-section">
-        <div className="atelier-section-head">
-          <div>
-            <h2>Из обычных селфи в готовую фотосессию</h2>
-          </div>
-          <p>
-            Загружаете несколько простых фото с телефона, выбираете интерьер, а сервис
-            собирает серию портретов с одеждой, светом и позами под выбранную локацию
-          </p>
-        </div>
-
         <div className="before-after-grid" aria-label="Пример до и после">
           <div className="before-after-column">
             <span>До</span>
@@ -164,7 +154,9 @@ export default async function Home() {
       </section>
 
       <footer className="atelier-footer">
-        <span>Virtual AI Photo Studio</span>
+        <a className="atelier-footer-brand" href="#top">
+          Virtual AI Photo Studio
+        </a>
         <nav aria-label="Юридическая информация">
           <a href="/oferta">Пользовательское соглашение</a>
           <a href="/privacy">Политика конфиденциальности</a>
