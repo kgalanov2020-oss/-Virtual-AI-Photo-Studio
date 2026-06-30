@@ -476,25 +476,6 @@
       ]
     },
     {
-      "slug": "modern-editorial-studio",
-      "name": "Модерн студия",
-      "description": "Современная editorial-студия: мягкий фон, циклорама, дизайнерский стул, тканевые фактуры и чистый профессиональный свет.",
-      "preview_url": "/studios/modern-editorial-studio/preview.png",
-      "base_prompt": "in a modern editorial photo studio with a soft seamless cyclorama, sculptural chair, neutral fabric backdrop, large softbox light, minimal premium set design, clean contemporary photography atmosphere",
-      "wardrobe_prompt": "modern editorial studio wardrobe: clean fashion basics, oversized blazer, monochrome suit, silk shirt, minimalist premium styling, refined studio portrait look",
-      "gallery_urls": [
-        "/studios/modern-editorial-studio/master-wide.png",
-        "/studios/modern-editorial-studio/angle-02.png",
-        "/studios/modern-editorial-studio/angle-03.png",
-        "/studios/modern-editorial-studio/angle-04.png",
-        "/studios/modern-editorial-studio/angle-05.png",
-        "/studios/modern-editorial-studio/angle-06.png",
-        "/studios/modern-editorial-studio/angle-07.png",
-        "/studios/modern-editorial-studio/detail-shot.png",
-        "/studios/modern-editorial-studio/alternate-wide.png"
-      ]
-    },
-    {
       "slug": "music-recording-studio",
       "name": "Музыкальная студия",
       "description": "Атмосферная студия звукозаписи: акустические панели, микшерный пульт, микрофон, тёплый свет и creative portrait mood.",
@@ -514,60 +495,22 @@
       ]
     },
     {
-      "slug": "private-cinema",
-      "name": "Кинозал / private cinema",
-      "description": "Приватный кинозал: мягкие lounge-кресла, тёмные акустические панели, тёплая подсветка ступеней и cinematic premium mood.",
-      "preview_url": "/studios/private-cinema/preview.png",
-      "base_prompt": "inside a luxury private cinema screening room with deep lounge chairs, dark acoustic wall panels, subtle aisle lighting, large projection screen glow, premium hospitality details, cinematic private club atmosphere",
-      "wardrobe_prompt": "private cinema wardrobe: elegant evening smart casual, dark blazer, refined knitwear, silk blouse or quiet luxury outfit, polished lounge styling",
+      "slug": "cyprus-villa",
+      "name": "Вилла Кипр",
+      "description": "Солнечная вилла на Кипре: белый камень, террасы, бассейн, пальмы, море и тёплый средиземноморский свет для лёгкой lifestyle-съёмки.",
+      "preview_url": "/studios/cyprus-villa/preview.png",
+      "base_prompt": "at a sunny Cyprus Mediterranean villa with white limestone walls, open terraces, infinity pool, palm trees, linen curtains, stone floors, sea horizon, warm bright daylight, luxury resort villa atmosphere",
+      "wardrobe_prompt": "Cyprus villa wardrobe: elegant Mediterranean resort outfit, linen shirt, light trousers, summer dress, silk scarf, sandals or loafers, fully clothed sunny premium vacation styling",
       "gallery_urls": [
-        "/studios/private-cinema/master-wide.png",
-        "/studios/private-cinema/angle-02.png",
-        "/studios/private-cinema/angle-03.png",
-        "/studios/private-cinema/angle-04.png",
-        "/studios/private-cinema/angle-05.png",
-        "/studios/private-cinema/angle-06.png",
-        "/studios/private-cinema/angle-07.png",
-        "/studios/private-cinema/detail-shot.png",
-        "/studios/private-cinema/alternate-wide.png"
-      ]
-    },
-    {
-      "slug": "fashion-boutique",
-      "name": "Концепт-стор / fashion boutique",
-      "description": "Премиальный fashion boutique: скульптурные рейлы, зеркала, светлые ткани, сумки без логотипов и чистая retail-архитектура.",
-      "preview_url": "/studios/fashion-boutique/preview.png",
-      "base_prompt": "inside a high-end fashion boutique and concept store with sculptural clothing rails, neutral stone floor, warm display lighting, mirrors, curated handbags and garments without logos, architectural luxury retail design",
-      "wardrobe_prompt": "fashion boutique wardrobe: refined fashion editorial outfit, elegant coat, monochrome suit, silk blouse, premium accessories without logos, polished retail styling",
-      "gallery_urls": [
-        "/studios/fashion-boutique/master-wide.png",
-        "/studios/fashion-boutique/angle-02.png",
-        "/studios/fashion-boutique/angle-03.png",
-        "/studios/fashion-boutique/angle-04.png",
-        "/studios/fashion-boutique/angle-05.png",
-        "/studios/fashion-boutique/angle-06.png",
-        "/studios/fashion-boutique/angle-07.png",
-        "/studios/fashion-boutique/detail-shot.png",
-        "/studios/fashion-boutique/alternate-wide.png"
-      ]
-    },
-    {
-      "slug": "wine-cellar",
-      "name": "Винная комната / wine cellar",
-      "description": "Винная комната private club: каменные арки, деревянные стеллажи, tasting table, кожаные кресла и тёплый камерный свет.",
-      "preview_url": "/studios/wine-cellar/preview.png",
-      "base_prompt": "inside a refined wine cellar and tasting room with arched stone walls, wooden wine racks, tasting table, leather chairs, soft amber pendant lighting, premium private club atmosphere, no readable wine labels",
-      "wardrobe_prompt": "wine cellar wardrobe: elegant private club outfit, dark suit, velvet jacket, refined dress or quiet luxury evening styling, polished but relaxed",
-      "gallery_urls": [
-        "/studios/wine-cellar/master-wide.png",
-        "/studios/wine-cellar/angle-02.png",
-        "/studios/wine-cellar/angle-03.png",
-        "/studios/wine-cellar/angle-04.png",
-        "/studios/wine-cellar/angle-05.png",
-        "/studios/wine-cellar/angle-06.png",
-        "/studios/wine-cellar/angle-07.png",
-        "/studios/wine-cellar/detail-shot.png",
-        "/studios/wine-cellar/alternate-wide.png"
+        "/studios/cyprus-villa/master-wide.png",
+        "/studios/cyprus-villa/angle-02.png",
+        "/studios/cyprus-villa/angle-03.png",
+        "/studios/cyprus-villa/angle-04.png",
+        "/studios/cyprus-villa/angle-05.png",
+        "/studios/cyprus-villa/angle-06.png",
+        "/studios/cyprus-villa/angle-07.png",
+        "/studios/cyprus-villa/detail-shot.png",
+        "/studios/cyprus-villa/alternate-wide.png"
       ]
     }
   ]

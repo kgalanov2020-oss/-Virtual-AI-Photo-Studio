@@ -956,6 +956,12 @@ h1 {
   color: var(--text);
 }
 
+.button-danger {
+  background: rgba(122, 47, 37, 0.08);
+  border: 1px solid rgba(122, 47, 37, 0.28);
+  color: #7a2f25;
+}
+
 .studio-preview {
   aspect-ratio: 4 / 5;
   background:

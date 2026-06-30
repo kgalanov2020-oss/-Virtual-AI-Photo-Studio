@@ -126,15 +126,15 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
     description:
       "New York street editorial: лестницы, кирпич, такси-цвет, плотная городская перспектива и fashion-ритм.",
   },
-  "modern-editorial-studio": {
-    name: "Модерн студия",
-    description:
-      "Современная editorial-студия: мягкий фон, циклорама, дизайнерский стул, тканевые фактуры и чистый профессиональный свет.",
-  },
   "music-recording-studio": {
     name: "Музыкальная студия",
     description:
       "Атмосферная студия звукозаписи: акустические панели, микшерный пульт, микрофон, тёплый свет и creative portrait mood.",
+  },
+  "cyprus-villa": {
+    name: "Вилла Кипр",
+    description:
+      "Солнечная вилла на Кипре: белый камень, террасы, бассейн, пальмы, море и тёплый средиземноморский свет для лёгкой lifestyle-съёмки.",
   },
 };
 

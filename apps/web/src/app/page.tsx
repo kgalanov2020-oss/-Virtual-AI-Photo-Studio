@@ -30,11 +30,8 @@ const studioLabels: Record<string, string> = {
   "paris-street": "Paris editorial",
   "tokyo-neon-night": "Neon night",
   "new-york-editorial-street": "NY street",
-  "modern-editorial-studio": "Studio editorial",
   "music-recording-studio": "Creative portrait",
-  "private-cinema": "Cinema lounge",
-  "fashion-boutique": "Fashion retail",
-  "wine-cellar": "Private club",
+  "cyprus-villa": "Sunny villa",
 };
 
 export default async function Home() {

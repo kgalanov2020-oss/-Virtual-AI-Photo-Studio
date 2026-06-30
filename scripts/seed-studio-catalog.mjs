@@ -1036,6 +1036,19 @@ const wineCellarPoseTemplates = [
   { slug: "cellar-hero", name: "Главный wine cellar кадр", camera: "лучший cinematic-ракурс, объектив 70 мм", pose: "финальная уверенная поза в винной комнате", prompt: "signature wine cellar editorial portrait, warm refined tasting room atmosphere, polished final image" },
 ];
 
+const cyprusVillaPoseTemplates = [
+  { slug: "pool-terrace", name: "У бассейна", camera: "объектив 70 мм, солнечный боковой свет", pose: "стоит у бассейна на террасе, корпус слегка повернут", prompt: "standing on sunny Cyprus villa pool terrace, infinity pool and sea horizon visible, bright Mediterranean lifestyle portrait" },
+  { slug: "white-arches", name: "У белых арок", camera: "объектив 85 мм, мягкая глубина", pose: "полуоборот у белых каменных арок виллы", prompt: "half-turn portrait near white limestone arches, bougainvillea and sea light, elegant resort villa mood" },
+  { slug: "linen-lounge", name: "В lounge-зоне", camera: "объектив 70 мм, ракурс три четверти", pose: "сидит или стоит у светлой lounge-зоны, руки видны", prompt: "near cream outdoor lounge sofa with linen curtains, hands visible, sunny premium villa terrace" },
+  { slug: "garden-path", name: "По садовой дорожке", camera: "репортажный объектив 50 мм", pose: "идёт по каменной дорожке виллы, естественный шаг", prompt: "walking along stone garden path at Cyprus villa, palms and white walls around, natural sunny movement" },
+  { slug: "sea-balcony", name: "На балконе с морем", camera: "объектив 70 мм, уровень глаз", pose: "стоит у балюстрады или стеклянного ограждения с видом на море", prompt: "standing on villa balcony with sea horizon and bright sky, relaxed Mediterranean resort styling" },
+  { slug: "breakfast-terrace", name: "На завтрачной террасе", camera: "объектив 50 мм, lifestyle-ракурс", pose: "сидит или стоит у небольшого стола на террасе", prompt: "near breakfast table on sunny villa terrace, ceramic dishes and linen details, refined vacation lifestyle" },
+  { slug: "palm-shadow", name: "В тени пальм", camera: "объектив 85 мм, пятнистый солнечный свет", pose: "стоит в мягкой тени пальм, расслабленная поза", prompt: "portrait in palm shadows near white villa wall, warm sun patches, elegant natural expression" },
+  { slug: "villa-steps", name: "На ступенях виллы", camera: "объектив 70 мм, нижний спокойный ракурс", pose: "стоит или сидит на светлых каменных ступенях", prompt: "on white stone villa steps, sea and terrace plants visible, sunny upscale Mediterranean pose" },
+  { slug: "wide-villa", name: "Широкий кадр виллы", camera: "широкий объектив 35 мм", pose: "стоит внутри пространства виллы, архитектура и море доминируют", prompt: "wide environmental Cyprus villa shot, person smaller in frame, white architecture, pool, palms and sea dominate" },
+  { slug: "villa-hero", name: "Главный Cyprus кадр", camera: "лучший resort editorial-ракурс, объектив 70 мм", pose: "финальная уверенная поза на солнечной вилле", prompt: "signature sunny Cyprus villa editorial portrait, bright Mediterranean light, polished final resort lifestyle image" },
+];
+
 const studioPoseTemplates = {
   "modern-office": officePoseTemplates,
   "executive-boardroom": boardroomPoseTemplates,
@@ -1062,11 +1075,8 @@ const studioPoseTemplates = {
   "paris-street": parisStreetPoseTemplates,
   "tokyo-neon-night": tokyoNeonPoseTemplates,
   "new-york-editorial-street": newYorkStreetPoseTemplates,
-  "modern-editorial-studio": modernEditorialStudioPoseTemplates,
   "music-recording-studio": musicRecordingStudioPoseTemplates,
-  "private-cinema": privateCinemaPoseTemplates,
-  "fashion-boutique": fashionBoutiquePoseTemplates,
-  "wine-cellar": wineCellarPoseTemplates,
+  "cyprus-villa": cyprusVillaPoseTemplates,
 };
 
 const distanceVariants = [

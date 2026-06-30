@@ -38,6 +38,7 @@ export default function SessionsPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloadingJobId, setIsDownloadingJobId] = useState<string | null>(null);
+  const [isDeletingJobId, setIsDeletingJobId] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -167,6 +168,51 @@ export default function SessionsPage() {
     }
   }
 
+  async function deleteSession(row: SessionRow) {
+    if (isDeletingJobId) return;
+
+    const confirmed = window.confirm(
+      "Удалить эту фотосессию из списка? Загруженные фото и черновик будут очищены.",
+    );
+
+    if (!confirmed) return;
+
+    setIsDeletingJobId(row.job.id);
+    setError("");
+
+    try {
+      const supabase = createSupabaseBrowserClient();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+
+      if (!token) {
+        throw new Error("Нет активной сессии Supabase. Обновите страницу и попробуйте снова.");
+      }
+
+      const response = await fetch(`/api/jobs/${row.job.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = (await response.json()) as { ok?: boolean; error?: string };
+
+      if (!response.ok || data.error) {
+        throw new Error(data.error ?? "Не удалось удалить фотосессию.");
+      }
+
+      setRows((currentRows) => currentRows.filter((currentRow) => currentRow.job.id !== row.job.id));
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Не удалось удалить фотосессию.",
+      );
+    } finally {
+      setIsDeletingJobId(null);
+    }
+  }
+
   return (
     <main className="page">
       <header className="topbar">
@@ -282,6 +328,14 @@ export default function SessionsPage() {
                     >
                       Повторить
                     </Link>
+                    <button
+                      className="button button-danger"
+                      disabled={isDeletingJobId === row.job.id}
+                      onClick={() => deleteSession(row)}
+                      type="button"
+                    >
+                      {isDeletingJobId === row.job.id ? "Удаляем..." : "Удалить"}
+                    </button>
                   </div>
                 </article>
               ))}

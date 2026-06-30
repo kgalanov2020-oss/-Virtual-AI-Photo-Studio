@@ -32,6 +32,8 @@ services:
         value: 99900
       - key: PAYMENT_CURRENCY
         value: rub
+      - key: NEXT_PUBLIC_PAYMENTS_ENABLED
+        value: false
       - key: YOOKASSA_SHOP_ID
         sync: false
       - key: YOOKASSA_SECRET_KEY

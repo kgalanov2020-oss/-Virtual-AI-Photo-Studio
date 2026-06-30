@@ -3,7 +3,6 @@ export type PhotoPackageCode =
   | "studio_5"
   | "studio_10"
   | "studio_20"
-  | "studio_30"
   | "studio_40";
 
 export type PhotoPackage = {
@@ -48,13 +47,6 @@ export const PHOTO_PACKAGES: PhotoPackage[] = [
     description: "20 изображений в выбранном интерьере",
     imageCount: 20,
     amountCents: 79900,
-  },
-  {
-    code: "studio_30",
-    name: "AI-фотосессия 30 фото",
-    description: "30 изображений в выбранном интерьере",
-    imageCount: 30,
-    amountCents: 89900,
   },
   {
     code: "studio_40",
