@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
       sessionId?: string;
     };
 
-    if (!jobId || !sessionId) {
-      return NextResponse.json({ error: "Не переданы jobId или sessionId." }, { status: 400 });
+    if (!jobId) {
+      return NextResponse.json({ error: "Не передан jobId." }, { status: 400 });
     }
 
     const yookassaShopId = process.env.YOOKASSA_SHOP_ID;
@@ -38,16 +38,77 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = userData.user.id;
-    const session = await retrieveYooKassaPayment(yookassaShopId, yookassaSecretKey, sessionId);
-    const sessionJobId = session.metadata?.job_id;
+    const { data: job, error: jobLookupError } = await supabase
+      .from("jobs")
+      .select("id, user_id, payment_status")
+      .eq("id", jobId)
+      .single();
 
-    if (sessionJobId !== jobId || session.metadata?.user_id !== userId) {
-      return NextResponse.json({ error: "Оплата не относится к этому заказу." }, { status: 403 });
+    if (jobLookupError || !job) {
+      return NextResponse.json({ error: jobLookupError?.message ?? "Job не найден." }, { status: 404 });
     }
 
-    if (session.status !== "succeeded") {
+    if (job.user_id !== userId) {
+      return NextResponse.json({ error: "Нет доступа к этому job." }, { status: 403 });
+    }
+
+    if (job.payment_status === "paid") {
+      return NextResponse.json({ ok: true, redirectUrl: `/generation/${jobId}` });
+    }
+
+    const sessionIdsToCheck: string[] = [];
+    if (sessionId) {
+      sessionIdsToCheck.push(sessionId);
+    }
+
+    const { data: pendingOrders, error: orderLookupError } = await supabase
+        .from("orders")
+        .select("provider_session_id")
+        .eq("job_id", jobId)
+        .eq("user_id", userId)
+        .eq("status", "pending")
+        .order("created_at", { ascending: false })
+        .limit(10);
+
+    if (orderLookupError) {
+      throw new Error(orderLookupError.message);
+    }
+
+    for (const order of pendingOrders ?? []) {
+      if (order.provider_session_id && !sessionIdsToCheck.includes(order.provider_session_id)) {
+        sessionIdsToCheck.push(order.provider_session_id);
+      }
+    }
+
+    if (sessionIdsToCheck.length === 0) {
+      return NextResponse.json({ error: "Не найден ожидающий платёж для этого заказа." }, { status: 404 });
+    }
+
+    let paidSession: YooKassaPayment | null = null;
+    let lastCheckedSession: YooKassaPayment | null = null;
+
+    for (const activeSessionId of sessionIdsToCheck) {
+      const session = await retrieveYooKassaPayment(yookassaShopId, yookassaSecretKey, activeSessionId);
+      lastCheckedSession = session;
+
+      if (session.metadata?.job_id !== jobId || session.metadata?.user_id !== userId) {
+        continue;
+      }
+
+      if (session.status === "succeeded") {
+        paidSession = session;
+        break;
+      }
+    }
+
+    if (!paidSession) {
       return NextResponse.json(
-        { error: "Платёж ещё не подтверждён платёжной системой." },
+        {
+          error:
+            lastCheckedSession?.metadata?.job_id === jobId
+              ? "Платёж ещё не подтверждён платёжной системой."
+              : "Оплата не относится к этому заказу.",
+        },
         { status: 409 },
       );
     }
@@ -57,11 +118,11 @@ export async function POST(request: NextRequest) {
       .from("orders")
       .update({
         status: "paid",
-        provider_payment_id: session.id,
+        provider_payment_id: paidSession.id,
         paid_at: paidAt,
         updated_at: paidAt,
       })
-      .eq("provider_session_id", sessionId)
+      .eq("provider_session_id", paidSession.id)
       .eq("job_id", jobId)
       .eq("user_id", userId);
 
@@ -69,7 +130,7 @@ export async function POST(request: NextRequest) {
       throw new Error(orderError.message);
     }
 
-    const { error: jobError } = await supabase
+    const { error: jobUpdateError } = await supabase
       .from("jobs")
       .update({
         status: "queued",
@@ -82,8 +143,8 @@ export async function POST(request: NextRequest) {
       .eq("id", jobId)
       .eq("user_id", userId);
 
-    if (jobError) {
-      throw new Error(jobError.message);
+    if (jobUpdateError) {
+      throw new Error(jobUpdateError.message);
     }
 
     return NextResponse.json({ ok: true, redirectUrl: `/generation/${jobId}` });

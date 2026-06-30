@@ -1,10 +1,12 @@
 import type { MetadataRoute } from "next";
 import catalog from "@/lib/studio-catalog.json";
 
-const siteUrl = "https://virtual-ai-photo-studio.onrender.com";
+const siteUrl = "https://virtualphotostudio.ru";
 
 const staticRoutes = [
   "",
+  "/login",
+  "/sessions",
   "/upload",
   "/oferta",
   "/privacy",

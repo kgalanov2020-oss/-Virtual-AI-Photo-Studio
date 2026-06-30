@@ -73,10 +73,24 @@ a {
   gap: clamp(20px, 3vw, 42px);
 }
 
-.atelier-nav nav a {
+.atelier-nav nav a,
+.atelier-nav nav button {
   color: var(--muted);
   font-size: 15px;
   font-weight: 700;
+}
+
+.nav-auth-button,
+.nav-auth-link {
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 0;
+  text-align: left;
 }
 
 .topnav {
@@ -85,7 +99,9 @@ a {
   gap: 22px;
 }
 
-.topnav a {
+.topnav a,
+.topnav .nav-auth-button,
+.topnav .nav-auth-link {
   color: var(--text);
   font-size: 14px;
   font-weight: 800;
@@ -560,6 +576,38 @@ a {
 .status {
   color: var(--muted);
   font-size: 14px;
+}
+
+.topnav {
+  align-items: center;
+  display: flex;
+  gap: 18px;
+}
+
+.topnav a,
+.topnav button {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.auth-nav-actions {
+  align-items: center;
+  display: inline-flex;
+  gap: 18px;
+}
+
+.nav-auth-button {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
+}
+
+.nav-auth-link,
+.nav-auth-button {
+  white-space: nowrap;
 }
 
 .landing-topbar {
@@ -1635,6 +1683,78 @@ h1 {
   padding-left: 22px;
 }
 
+.sessions-section {
+  padding-top: 0;
+}
+
+.sessions-summary {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 22px;
+}
+
+.sessions-summary div {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 4px;
+  padding: 18px;
+}
+
+.sessions-summary strong {
+  color: var(--ink);
+  font-size: 32px;
+  line-height: 1;
+}
+
+.sessions-summary span,
+.session-card span {
+  color: var(--muted);
+}
+
+.sessions-list {
+  display: grid;
+  gap: 14px;
+}
+
+.session-card {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(220px, 1.35fr) repeat(3, minmax(120px, 0.7fr)) minmax(320px, 1.25fr);
+  padding: 18px;
+}
+
+.session-card > div {
+  display: grid;
+  gap: 5px;
+}
+
+.session-card span {
+  font-size: 14px;
+}
+
+.session-card strong {
+  color: var(--ink);
+}
+
+.session-actions {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.session-actions .button {
+  min-width: 0;
+  padding: 0 18px;
+}
+
 .checkout-layout {
   align-items: end;
   display: grid;
@@ -1967,9 +2087,10 @@ h1 {
     position: absolute;
   }
 
-  .atelier-nav nav,
-  .atelier-nav-cta {
-    display: none;
+  .atelier-nav nav {
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    justify-content: flex-start;
   }
 
   .atelier-intro,
@@ -2211,6 +2332,12 @@ h1 {
     gap: 10px;
   }
 
+  .auth-nav-actions,
+  .topnav {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
   .landing-hero {
     min-height: 680px;
     padding-bottom: 38px;
@@ -2268,8 +2395,14 @@ h1 {
   }
 
   .auth-inline,
-  .package-grid {
+  .package-grid,
+  .sessions-summary,
+  .session-card {
     grid-template-columns: 1fr;
+  }
+
+  .session-actions {
+    justify-content: flex-start;
   }
 
   .auth-inline .button {

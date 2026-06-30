@@ -2,10 +2,10 @@ services:
   - type: web
     name: virtual-ai-photo-studio
     runtime: node
-    plan: free
+    plan: starter
     branch: main
     autoDeploy: true
-    healthCheckPath: /
+    healthCheckPath: /api/health
     domains:
       - virtualphotostudio.ru
       - www.virtualphotostudio.ru

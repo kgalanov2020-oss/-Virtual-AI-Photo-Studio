@@ -17,7 +17,8 @@ export default function PrivacyPage() {
         <p>
           Настоящая Политика конфиденциальности определяет порядок сбора, хранения,
           использования, передачи и защиты персональных данных пользователей сервиса
-          Virtual AI Photo Studio.
+          Virtual AI Photo Studio, расположенного по адресу{" "}
+          <a href="https://virtualphotostudio.ru">https://virtualphotostudio.ru</a>.
         </p>
 
         <h2>1. Оператор персональных данных</h2>

@@ -1,4 +1,10 @@
-export type PhotoPackageCode = "free_1" | "studio_5" | "studio_10" | "studio_20" | "studio_40";
+export type PhotoPackageCode =
+  | "free_1"
+  | "studio_5"
+  | "studio_10"
+  | "studio_20"
+  | "studio_30"
+  | "studio_40";
 
 export type PhotoPackage = {
   code: PhotoPackageCode;
@@ -34,14 +40,21 @@ export const PHOTO_PACKAGES: PhotoPackage[] = [
     name: "AI-фотосессия 10 фото",
     description: "10 изображений в выбранном интерьере",
     imageCount: 10,
-    amountCents: 44900,
+    amountCents: 49900,
   },
   {
     code: "studio_20",
     name: "AI-фотосессия 20 фото",
     description: "20 изображений в выбранном интерьере",
     imageCount: 20,
-    amountCents: 69900,
+    amountCents: 79900,
+  },
+  {
+    code: "studio_30",
+    name: "AI-фотосессия 30 фото",
+    description: "30 изображений в выбранном интерьере",
+    imageCount: 30,
+    amountCents: 89900,
   },
   {
     code: "studio_40",

@@ -971,6 +971,71 @@ const newYorkStreetPoseTemplates = [
   { slug: "ny-hero", name: "Главный NY editorial кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная fashion-поза на улице Нью-Йорка", prompt: "signature New York editorial street pose, bold city fashion and urban rhythm" },
 ];
 
+const modernEditorialStudioPoseTemplates = [
+  { slug: "seamless-chair", name: "У дизайнерского стула", camera: "объектив 85 мм, мягкий студийный свет", pose: "сидит или стоит рядом с дизайнерским стулом, руки расслаблены", prompt: "near sculptural designer chair on seamless cyclorama, clean studio composition, relaxed confident editorial pose" },
+  { slug: "fabric-backdrop", name: "У тканевого фона", camera: "объектив 70 мм, ракурс три четверти", pose: "полуоборот у мягкого тканевого backdrop, плечи расслаблены", prompt: "half-turn near neutral fabric backdrop, soft folds visible, minimalist premium fashion portrait" },
+  { slug: "softbox-edge", name: "У softbox-света", camera: "объектив 50 мм, уровень глаз", pose: "стоит у края большого softbox, красивый боковой свет", prompt: "standing near large softbox edge, clean side light on face, professional studio set visible" },
+  { slug: "floor-seated", name: "Расслабленная посадка", camera: "объектив 70 мм, низкий спокойный ракурс", pose: "сидит на полу или низком кубе, естественная fashion-поза", prompt: "relaxed seated pose on low cube or studio floor, elegant hands, premium editorial body language" },
+  { slug: "cyclorama-walk", name: "Движение по циклораме", camera: "репортажный объектив 50 мм", pose: "идёт по циклораме, лёгкое движение одежды", prompt: "walking across seamless cyclorama, subtle outfit movement, clean editorial studio motion shot" },
+  { slug: "standing-minimal", name: "Минималистичный портрет", camera: "объектив 85 мм, мягкая глубина", pose: "стоит спокойно, руки видны, лёгкий поворот корпуса", prompt: "minimal standing studio portrait, hands visible, slight torso turn, clean premium neutral background" },
+  { slug: "mirrorless-set", name: "У съёмочного сета", camera: "объектив 50 мм, backstage editorial", pose: "стоит рядом со студийным оборудованием без логотипов", prompt: "near studio equipment without logos, backstage editorial mood, softbox stands blurred in background" },
+  { slug: "profile-studio", name: "Профиль в студии", camera: "объектив 85 мм, боковой свет", pose: "профиль или полуоборот, мягкая линия лица", prompt: "side profile studio portrait, soft side light, clean modern set, elegant facial contour" },
+  { slug: "wide-studio-set", name: "Широкий студийный кадр", camera: "широкий объектив 35 мм", pose: "стоит внутри всей студийной постановки, интерьер доминирует", prompt: "wide full studio set shot, person smaller in frame, cyclorama, chair, fabric backdrop and lights visible" },
+  { slug: "studio-hero", name: "Главный studio кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная fashion-поза в современной студии", prompt: "signature modern editorial studio portrait, refined fashion styling, high-end magazine photoshoot atmosphere" },
+];
+
+const musicRecordingStudioPoseTemplates = [
+  { slug: "mixing-console", name: "У микшерного пульта", camera: "объектив 70 мм, тёплый студийный свет", pose: "сидит или стоит у микшерного пульта, руки естественно видны", prompt: "near large mixing console, hands visible, warm recording studio lights, creative producer portrait" },
+  { slug: "studio-mic", name: "У студийного микрофона", camera: "объектив 85 мм, мягкая глубина", pose: "стоит у микрофона, не поёт, спокойный уверенный взгляд", prompt: "standing by studio microphone, not singing, calm confident expression, acoustic panels behind" },
+  { slug: "vocal-booth", name: "В vocal booth", camera: "объектив 70 мм, стекло и отражения", pose: "полуоборот в вокальной кабине, руки расслаблены", prompt: "inside glass vocal booth, subtle reflections, relaxed half-turn, premium music studio atmosphere" },
+  { slug: "sofa-listening", name: "Прослушивание на диване", camera: "объектив 50 мм, lifestyle-ракурс", pose: "сидит на диване студии, слушает трек, расслабленная посадка", prompt: "seated on recording studio sofa, listening moment, relaxed hands, warm lamps and acoustic walls visible" },
+  { slug: "headphones-moment", name: "С наушниками", camera: "объектив 85 мм, крупный editorial", pose: "держит студийные наушники в руке или на шее", prompt: "holding studio headphones in hand or around neck, stylish creative editorial portrait, no logos" },
+  { slug: "producer-standing", name: "Producer portrait", camera: "объектив 50 мм, уровень глаз", pose: "стоит у оборудования, корпус чуть повернут", prompt: "standing near studio racks and console, slight torso turn, confident artist-producer portrait" },
+  { slug: "piano-corner", name: "У музыкального угла", camera: "объектив 70 мм, мягкий боковой свет", pose: "стоит у клавиш или музыкального угла, без игры", prompt: "near keyboard or musical corner, not playing, warm creative room light, elegant pose" },
+  { slug: "control-room", name: "В control room", camera: "широкий объектив 35 мм", pose: "стоит в control room, пространство студии хорошо видно", prompt: "in recording studio control room, wide view of console, panels, lights, person integrated into space" },
+  { slug: "doorway-studio", name: "В проходе студии", camera: "объектив 50 мм, документальный стиль", pose: "идёт между комнатами студии, естественный шаг", prompt: "walking between recording studio rooms, natural step, glass doors and warm acoustic panels visible" },
+  { slug: "music-hero", name: "Главный music кадр", camera: "лучший creative editorial-ракурс, объектив 70 мм", pose: "финальная уверенная поза в студии звукозаписи", prompt: "signature music recording studio editorial portrait, stylish creative outfit, cinematic warm atmosphere" },
+];
+
+const privateCinemaPoseTemplates = [
+  { slug: "cinema-seat", name: "В lounge-кресле", camera: "объектив 85 мм, тёплый экранный свет", pose: "сидит в мягком кресле кинозала, руки расслаблены", prompt: "seated in luxury private cinema lounge chair, hands relaxed, subtle projection glow, premium screening room mood" },
+  { slug: "aisle-light", name: "У подсветки прохода", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит у подсвеченного прохода, корпус слегка повернут", prompt: "standing near illuminated cinema aisle steps, dark acoustic panels around, elegant cinematic portrait" },
+  { slug: "screen-glow", name: "На фоне экрана", camera: "объектив 50 мм, мягкий контровой свет", pose: "стоит или сидит на фоне большого экрана", prompt: "portrait with large private cinema screen glow in background, no readable text, refined evening styling" },
+  { slug: "side-sofa", name: "Боковой lounge-кадр", camera: "объектив 70 мм, боковой ракурс", pose: "сидит в полуобороте, кресла и интерьер видны", prompt: "side-angle seated lounge portrait inside private cinema, plush seating and warm aisle lights visible" },
+  { slug: "back-row", name: "В верхнем ряду", camera: "объектив 70 мм, уровень глаз", pose: "стоит у верхнего ряда кресел, руки расслаблены", prompt: "standing by back row of private cinema seats, warm aisle lights, dark acoustic wall panels visible" },
+  { slug: "low-table", name: "У lounge-столика", camera: "объектив 50 мм, lifestyle-ракурс", pose: "сидит рядом с низким столиком, руки естественно видны", prompt: "seated near low lounge table in private cinema, hands visible, refined relaxed evening mood" },
+  { slug: "curtain-edge", name: "У тёмной шторы", camera: "объектив 85 мм, боковой свет", pose: "полуоборот у тёмной шторы или панели", prompt: "half-turn near dark curtain or acoustic panel, soft screen glow, elegant cinematic portrait" },
+  { slug: "wide-theater", name: "Широкий кадр кинозала", camera: "широкий объектив 35 мм", pose: "стоит внутри кинозала, пространство доминирует", prompt: "wide environmental private cinema shot, person smaller in frame, screen, seats and aisle lights dominate" },
+  { slug: "cinema-arrival", name: "Вход в кинозал", camera: "репортажный объектив 50 мм", pose: "идёт в зал, естественный шаг", prompt: "walking into luxury private cinema room, natural motion, warm premium theater lights" },
+  { slug: "cinema-hero", name: "Главный cinema кадр", camera: "лучший cinematic-ракурс, объектив 70 мм", pose: "финальная уверенная поза в приватном кинозале", prompt: "signature private cinema editorial portrait, premium dark lounge atmosphere, polished final image" },
+];
+
+const fashionBoutiquePoseTemplates = [
+  { slug: "clothing-rail", name: "У fashion-рейла", camera: "объектив 70 мм, витринный свет", pose: "стоит у рейла с одеждой, рука естественно рядом", prompt: "standing by sculptural clothing rail, garments without logos, polished boutique editorial styling" },
+  { slug: "mirror-boutique", name: "У зеркала", camera: "объектив 85 мм, мягкая глубина", pose: "полуоборот у большого зеркала, уверенный спокойный взгляд", prompt: "half-turn portrait near large boutique mirror, warm display lighting, premium retail architecture" },
+  { slug: "display-table", name: "У display-стола", camera: "объектив 50 мм, ракурс три четверти", pose: "стоит или сидит у display-стола, руки видны", prompt: "near luxury display table with accessories without logos, hands visible, refined fashion retail scene" },
+  { slug: "boutique-walk", name: "Проход по concept store", camera: "репортажный объектив 50 мм", pose: "идёт между рейлами, одежда в лёгком движении", prompt: "walking through concept store between rails, natural motion, elegant fashion editorial outfit" },
+  { slug: "shelf-accessories", name: "У полки аксессуаров", camera: "объектив 85 мм, мягкая глубина", pose: "стоит рядом с полкой аксессуаров, руки расслаблены", prompt: "standing beside curated accessory shelf, no logos, warm boutique display lighting, refined pose" },
+  { slug: "curved-wall", name: "У изогнутой стены", camera: "объектив 70 мм, архитектурный свет", pose: "полуоборот у изогнутой retail-стены", prompt: "half-turn near curved boutique wall, sculptural rails, polished architectural retail composition" },
+  { slug: "fitting-lounge", name: "В fitting lounge", camera: "объектив 50 мм, lifestyle-ракурс", pose: "сидит в зоне примерочной или lounge, руки видны", prompt: "seated in boutique fitting lounge, hands visible, mirrors and soft garments around, quiet luxury mood" },
+  { slug: "front-display", name: "У центральной витрины", camera: "объектив 70 мм, витринный свет", pose: "стоит у центральной display-зоны", prompt: "standing near central boutique display, warm gallery-like light, elegant fashion editorial styling" },
+  { slug: "wide-boutique", name: "Широкий boutique кадр", camera: "широкий объектив 35 мм", pose: "стоит внутри всего пространства бутика", prompt: "wide environmental concept store shot, person smaller in frame, rails, mirrors and display architecture dominate" },
+  { slug: "boutique-hero", name: "Главный boutique кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная fashion-поза в премиальном бутике", prompt: "signature fashion boutique editorial portrait, quiet luxury retail interior, polished final image" },
+];
+
+const wineCellarPoseTemplates = [
+  { slug: "tasting-table", name: "За tasting table", camera: "объектив 70 мм, тёплый подвесной свет", pose: "сидит или стоит у дегустационного стола, руки видны", prompt: "near wooden wine tasting table, hands visible, amber pendant lights, refined private club atmosphere" },
+  { slug: "wine-racks", name: "У винных стеллажей", camera: "объектив 85 мм, мягкая глубина", pose: "стоит у стеллажей, корпус слегка повернут", prompt: "standing by wooden wine racks, labels not readable, stone arches, elegant cellar portrait" },
+  { slug: "stone-arch", name: "У каменной арки", camera: "объектив 50 мм, архитектурный ракурс", pose: "стоит в каменной арке, интерьер хорошо виден", prompt: "standing under stone arch in wine cellar, warm private club light, full architectural context" },
+  { slug: "leather-chair", name: "В кожаном кресле", camera: "объектив 70 мм, боковой ракурс", pose: "сидит в кожаном кресле, расслабленная private-club поза", prompt: "seated in leather tasting chair, relaxed private club pose, wine cellar shelves behind" },
+  { slug: "cellar-walk", name: "Проход по винной комнате", camera: "репортажный объектив 50 мм", pose: "идёт вдоль стеллажей, естественный шаг", prompt: "walking along wine racks in refined cellar, natural motion, warm amber lighting, no readable labels" },
+  { slug: "candle-table", name: "У свечного света", camera: "объектив 85 мм, мягкая глубина", pose: "сидит или стоит рядом со свечами на столе", prompt: "near candlelit tasting table, warm soft highlights, leather chairs and stone walls visible" },
+  { slug: "private-club-corner", name: "Private club corner", camera: "объектив 70 мм, уровень глаз", pose: "стоит в lounge-углу винной комнаты", prompt: "standing in private club corner of wine cellar, leather seating and wooden racks, refined evening styling" },
+  { slug: "bottle-foreground", name: "Через детали стеллажей", camera: "объектив 85 мм, размытый передний план", pose: "обрамлён стеллажами или бутылками на переднем плане", prompt: "portrait framed through blurred wine racks and bottles, labels not readable, elegant cellar depth" },
+  { slug: "wide-cellar", name: "Широкий cellar кадр", camera: "широкий объектив 35 мм", pose: "стоит в пространстве винной комнаты, архитектура доминирует", prompt: "wide environmental wine cellar shot, person smaller in frame, stone arches, table and racks dominate" },
+  { slug: "cellar-hero", name: "Главный wine cellar кадр", camera: "лучший cinematic-ракурс, объектив 70 мм", pose: "финальная уверенная поза в винной комнате", prompt: "signature wine cellar editorial portrait, warm refined tasting room atmosphere, polished final image" },
+];
+
 const studioPoseTemplates = {
   "modern-office": officePoseTemplates,
   "executive-boardroom": boardroomPoseTemplates,
@@ -997,6 +1062,11 @@ const studioPoseTemplates = {
   "paris-street": parisStreetPoseTemplates,
   "tokyo-neon-night": tokyoNeonPoseTemplates,
   "new-york-editorial-street": newYorkStreetPoseTemplates,
+  "modern-editorial-studio": modernEditorialStudioPoseTemplates,
+  "music-recording-studio": musicRecordingStudioPoseTemplates,
+  "private-cinema": privateCinemaPoseTemplates,
+  "fashion-boutique": fashionBoutiquePoseTemplates,
+  "wine-cellar": wineCellarPoseTemplates,
 };
 
 const distanceVariants = [

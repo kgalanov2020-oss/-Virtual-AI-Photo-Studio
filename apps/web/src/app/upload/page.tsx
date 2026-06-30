@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { AuthNavAction } from "@/app/auth-nav-action";
 import { formatMoney, getPhotoPackage, PHOTO_PACKAGES, type PhotoPackageCode } from "@/lib/pricing";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { GenerationMode, UserProfile } from "@/lib/types";
@@ -61,9 +62,6 @@ export default function UploadPage() {
   const [generationMode, setGenerationMode] = useState<GenerationMode>("standard");
   const [selectedStudioSlug, setSelectedStudioSlug] = useState("modern-office");
   const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("free_1");
-  const [acceptedLegal, setAcceptedLegal] = useState(false);
-  const [acceptedPhotoRights, setAcceptedPhotoRights] = useState(false);
-  const [isSavingConsents, setIsSavingConsents] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
 
@@ -71,29 +69,21 @@ export default function UploadPage() {
   const isReady = readyCount >= 6;
   const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
   const hasFreeCredits = (profile?.free_images_remaining ?? 0) > 0;
-  const hasAcceptedStoredConsents = Boolean(
-    profile?.legal_terms_accepted_at &&
-      profile.privacy_accepted_at &&
-      profile.personal_data_accepted_at &&
-      profile.photo_rights_accepted_at,
-  );
-  const hasConsents = hasAcceptedStoredConsents || (acceptedLegal && acceptedPhotoRights);
+  const isAuthenticated = Boolean(userId && userEmail && profile);
   const canContinue =
     Boolean(userId && userEmail && profile) &&
     isReady &&
-    hasConsents &&
     (!selectedPackage.isFree || hasFreeCredits);
   const continueHint = useMemo(() => {
     if (!userId || !userEmail) return "Сначала войдите по email.";
     if (!profile) return "Загружаем профиль пользователя.";
     if (!isReady) return "Загрузите минимум 6 фото.";
-    if (!hasConsents) return "Подтвердите согласия.";
     if (selectedPackage.isFree && !hasFreeCredits) {
       return "Бесплатные фото закончились. Выберите платный пакет.";
     }
 
     return "";
-  }, [hasConsents, hasFreeCredits, isReady, profile, selectedPackage.isFree, userEmail, userId]);
+  }, [hasFreeCredits, isReady, profile, selectedPackage.isFree, userEmail, userId]);
   const statusText = useMemo(() => {
     if (readyCount === 0) return "Загрузите 6 селфи, чтобы начать.";
     if (readyCount < 6) return `Нужно ещё ${6 - readyCount} фото.`;
@@ -130,11 +120,13 @@ export default function UploadPage() {
       clearUserSession();
       setAuthError(null);
       setAuthMessage("Старая тестовая сессия сброшена. Войдите по email.");
+      redirectToLogin();
       return;
     }
 
     if (!user?.id || !user.email) {
       clearUserSession();
+      redirectToLogin();
       return;
     }
 
@@ -149,9 +141,12 @@ export default function UploadPage() {
     setUserId(null);
     setUserEmail("");
     setProfile(null);
-    setAcceptedLegal(false);
-    setAcceptedPhotoRights(false);
     setAuthPassword("");
+  }
+
+  function redirectToLogin() {
+    const nextPath = `${window.location.pathname}${window.location.search}`;
+    window.location.replace(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
   async function signOut() {
@@ -168,55 +163,6 @@ export default function UploadPage() {
       setSelectedPackageCode("studio_5");
     }
   }, [profile, selectedPackageCode]);
-
-  useEffect(() => {
-    let isCancelled = false;
-
-    async function saveAcceptedConsents() {
-      if (
-        !userId ||
-        !userEmail ||
-        !profile ||
-        hasAcceptedStoredConsents ||
-        !acceptedLegal ||
-        !acceptedPhotoRights
-      ) {
-        return;
-      }
-
-      setIsSavingConsents(true);
-      setAuthError(null);
-
-      try {
-        const nextProfile = await saveConsentsToProfile(userId, userEmail);
-        if (!isCancelled) {
-          setProfile(nextProfile);
-          setAuthMessage("Согласия сохранены в профиле.");
-        }
-      } catch (error) {
-        if (!isCancelled) {
-          setAuthError(error instanceof Error ? error.message : "Не удалось сохранить согласия.");
-        }
-      } finally {
-        if (!isCancelled) {
-          setIsSavingConsents(false);
-        }
-      }
-    }
-
-    void saveAcceptedConsents();
-
-    return () => {
-      isCancelled = true;
-    };
-  }, [
-    acceptedLegal,
-    acceptedPhotoRights,
-    hasAcceptedStoredConsents,
-    profile?.user_id,
-    userEmail,
-    userId,
-  ]);
 
   function getAuthCredentials() {
     const email = authEmail.trim();
@@ -238,11 +184,6 @@ export default function UploadPage() {
   async function registerWithEmailPassword() {
     const credentials = getAuthCredentials();
     if (!credentials || isAuthSubmitting) return;
-
-    if (!acceptedLegal || !acceptedPhotoRights) {
-      setAuthError("Перед регистрацией подтвердите пользовательское соглашение, политику конфиденциальности и право использовать загруженные фото.");
-      return;
-    }
 
     setIsAuthSubmitting(true);
     setUploadError(null);
@@ -347,43 +288,6 @@ export default function UploadPage() {
     const nextProfile = data as UserProfile;
     setAuthError(null);
     setProfile(nextProfile);
-    setAcceptedLegal(
-      Boolean(
-        nextProfile.legal_terms_accepted_at &&
-          nextProfile.privacy_accepted_at &&
-          nextProfile.personal_data_accepted_at,
-      ),
-    );
-    setAcceptedPhotoRights(Boolean(nextProfile.photo_rights_accepted_at));
-  }
-
-  async function saveConsentsToProfile(activeUserId: string, email: string) {
-    const supabase = createSupabaseBrowserClient();
-    const now = new Date().toISOString();
-    const { data, error } = await supabase
-      .from("user_profiles")
-      .upsert(
-        {
-          user_id: activeUserId,
-          email,
-          legal_terms_accepted_at: now,
-          privacy_accepted_at: now,
-          personal_data_accepted_at: now,
-          photo_rights_accepted_at: now,
-          updated_at: now,
-        },
-        { onConflict: "user_id" },
-      )
-      .select("*")
-      .single();
-
-    if (error || !data) {
-      throw new Error(error?.message ?? "Не удалось сохранить согласия.");
-    }
-
-    setAcceptedLegal(true);
-    setAcceptedPhotoRights(true);
-    return data as UserProfile;
   }
 
   function handleFiles(event: ChangeEvent<HTMLInputElement>) {
@@ -421,11 +325,6 @@ export default function UploadPage() {
       return;
     }
 
-    if (!hasConsents) {
-      setUploadError("Подтвердите согласия перед продолжением.");
-      return;
-    }
-
     setIsUploading(true);
     setUploadError(null);
     setUploadResult(null);
@@ -442,10 +341,6 @@ export default function UploadPage() {
 
       if (selectedPackage.isFree && !hasFreeCredits) {
         throw new Error("Бесплатные фото закончились. Выберите платный пакет.");
-      }
-
-      if (!hasAcceptedStoredConsents && acceptedLegal && acceptedPhotoRights) {
-        setProfile(await saveConsentsToProfile(activeUserId, activeEmail));
       }
 
       const { data: studio, error: studioError } = await supabase
@@ -527,6 +422,7 @@ export default function UploadPage() {
         </Link>
         <nav className="topnav" aria-label="Навигация">
           <Link href="/">Каталог</Link>
+          <AuthNavAction />
         </nav>
       </header>
 
@@ -537,258 +433,169 @@ export default function UploadPage() {
         </div>
       </section>
 
-      <section className="section auth-section">
-        <div className="section-header">
-          <div>
-            <h2>Email для аккаунта и чеков</h2>
-            <p>
-              Зарегистрируйтесь или войдите по email и паролю. На этот адрес
-              будут приходить чеки и доступ к фотосессиям.
-            </p>
-          </div>
-        </div>
-        {userId && userEmail ? (
-          <div className="account-state">
+      {!isAuthenticated ? (
+        <section className="section auth-gate">
+          <div className="section-header">
             <div>
-              <strong>{userEmail}</strong>
-              <span>email подтверждён, можно продолжать загрузку</span>
+              <h2>Сначала войдите в аккаунт</h2>
+              <p>
+                Аккаунт нужен для чеков, оплаты и доступа к вашим фотосессиям.
+              </p>
             </div>
-            <button className="button button-secondary" onClick={signOut} type="button">
-              Выйти
-            </button>
+            <Link
+              className="button button-primary"
+              href={`/login?next=${encodeURIComponent(`/upload?studio=${selectedStudioSlug}`)}`}
+            >
+              Регистрация/Войти
+            </Link>
           </div>
-        ) : (
-          <div className="auth-inline">
-            <input
-              autoComplete="email"
-              onChange={(event) => setAuthEmail(event.target.value)}
-              placeholder="email@example.com"
-              type="email"
-              value={authEmail}
-            />
-            <input
-              autoComplete="current-password"
-              onChange={(event) => setAuthPassword(event.target.value)}
-              placeholder="Пароль"
-              type="password"
-              value={authPassword}
-            />
-            <div className="auth-actions">
+          {authMessage ? <div className="upload-message success">{authMessage}</div> : null}
+          {authError ? <div className="upload-message error">{authError}</div> : null}
+        </section>
+      ) : null}
+
+      {isAuthenticated ? (
+        <>
+          <section className="section">
+            <div className="section-header">
+              <div>
+                <h2>Какие фото нужны</h2>
+                <p>
+                  От 6 обычных фото с телефона: анфас, полуобороты, профиль при
+                  дневном свете, без солнцезащитных очков и сильных теней.
+                  Чем больше подходящих фото, тем точнее результат.
+                </p>
+              </div>
+            </div>
+
+            <div className="guide-grid">
+              {selfieGuide.map((item, index) => (
+                <article className="guide-card" key={item.title}>
+                  <img className="guide-photo" alt={item.title} src={item.image} />
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{item.title}</strong>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="section child-mode-section">
+            <div className="section-header">
+              <div>
+                <h2>Пакет фотосессии</h2>
+                <p>
+                  Бесплатно доступно {profile?.free_images_remaining ?? 0} фото. После
+                  бесплатного теста можно выбрать платный пакет.
+                </p>
+              </div>
+            </div>
+            <div className="package-grid">
+              {PHOTO_PACKAGES.map((photoPackage) => {
+                const isDisabled = photoPackage.isFree && !hasFreeCredits;
+
+                return (
+                  <label
+                    className={`package-card ${selectedPackageCode === photoPackage.code ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
+                    key={photoPackage.code}
+                  >
+                    <input
+                      checked={selectedPackageCode === photoPackage.code}
+                      disabled={isDisabled}
+                      name="photo-package"
+                      onChange={() => setSelectedPackageCode(photoPackage.code)}
+                      type="radio"
+                    />
+                    <strong>{photoPackage.imageCount} фото</strong>
+                    <span>{formatMoney(photoPackage.amountCents)}</span>
+                    <em>{photoPackage.description}</em>
+                  </label>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="section child-mode-section">
+            <label className="mode-option">
+              <input
+                checked={generationMode === "child_safe"}
+                onChange={(event) =>
+                  setGenerationMode(event.target.checked ? "child_safe" : "standard")
+                }
+                type="checkbox"
+              />
+              <span>
+                <strong>Детский безопасный режим</strong>
+                <em>
+                  Для детских фото: полностью одетый ребёнок, школьный или детский
+                  портрет без взрослого делового образа и двусмысленных сцен.
+                </em>
+              </span>
+            </label>
+          </section>
+
+          <section className="section upload-action-section">
+            <label className="upload-dropzone">
+              <input accept={acceptedImageTypes} multiple onChange={handleFiles} type="file" />
+              <span>Выбрать фото</span>
+              <strong>Загрузите от 6 селфи одним разом</strong>
+              <em>JPG, PNG, WEBP, HEIC, HEIF или AVIF</em>
+            </label>
+          </section>
+
+          <section className="section">
+            <div className="section-header">
+              <div>
+                <h2>Выбранные фото</h2>
+                <p>После загрузки откроется экран проверки качества фото.</p>
+              </div>
+              {selfies.length > 0 ? (
+                <button className="button button-secondary" onClick={clearFiles} type="button">
+                  Очистить
+                </button>
+              ) : null}
+            </div>
+
+            {selfies.length > 0 ? (
+              <div className="selfie-grid">
+                {selfies.map((selfie) => (
+                  <article className="selfie-card" key={selfie.id}>
+                    <img alt={selfie.name} src={selfie.url} />
+                    <div>
+                      <strong>{selfie.name}</strong>
+                      <span>{formatFileSize(selfie.size)}</span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="empty-state">
+                <strong>Фото ещё не выбраны</strong>
+                <span>После выбора здесь появятся превью и список файлов.</span>
+              </div>
+            )}
+
+            <div className="upload-footer">
+              <Link className="button button-secondary" href="/">
+                Назад к студии
+              </Link>
               <button
                 className="button button-primary"
-                disabled={isAuthSubmitting || !authEmail.trim() || !authPassword.trim()}
-                onClick={registerWithEmailPassword}
+                disabled={!canContinue || isUploading}
+                onClick={handleUpload}
                 type="button"
               >
-                {isAuthSubmitting ? "Подождите..." : "Зарегистрироваться"}
-              </button>
-              <button
-                className="button button-secondary"
-                disabled={isAuthSubmitting || !authEmail.trim() || !authPassword.trim()}
-                onClick={loginWithEmailPassword}
-                type="button"
-              >
-                Войти
+                {isUploading ? "Загружаем..." : "Продолжить к проверке качества"}
               </button>
             </div>
-          </div>
-        )}
-        {authMessage ? <div className="upload-message success">{authMessage}</div> : null}
-        {authError ? <div className="upload-message error">{authError}</div> : null}
+            {!canContinue && continueHint ? (
+              <div className="upload-message muted">{continueHint}</div>
+            ) : null}
 
-        <div className="legal-consent-panel">
-          <p>
-            {hasAcceptedStoredConsents
-              ? "Согласия сохранены в профиле."
-              : "Подтвердите согласия один раз. Мы сохраним их в профиле после входа."}
-          </p>
-
-          <label className="consent-option">
-            <input
-              checked={acceptedLegal}
-              disabled={hasAcceptedStoredConsents || isSavingConsents}
-              onChange={(event) => setAcceptedLegal(event.target.checked)}
-              type="checkbox"
-            />
-            <span>
-              Я принимаю{" "}
-              <Link href="/oferta" target="_blank">
-                Пользовательское соглашение
-              </Link>
-              ,{" "}
-              <Link href="/privacy" target="_blank">
-                Политику конфиденциальности
-              </Link>{" "}
-              и даю{" "}
-              <Link href="/personal-data-consent" target="_blank">
-                согласие на обработку персональных данных
-              </Link>
-              .
-            </span>
-          </label>
-
-          <label className="consent-option">
-            <input
-              checked={acceptedPhotoRights}
-              disabled={hasAcceptedStoredConsents || isSavingConsents}
-              onChange={(event) => setAcceptedPhotoRights(event.target.checked)}
-              type="checkbox"
-            />
-            <span>
-              Я подтверждаю, что мне исполнилось 18 лет, я имею право использовать
-              загруженные изображения, не загружаю чужие фото без согласия и не создаю
-              незаконный или запрещённый контент. Если на фото ребёнок, я являюсь
-              родителем/законным представителем или имею согласие на использование
-              изображения.
-            </span>
-          </label>
-
-          <small>
-            Загруженные фото используются для создания AI-фотосессии и могут временно
-            храниться для генерации изображений, проверки качества, технической
-            поддержки и обеспечения работы сервиса.
-          </small>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="section-header">
-          <div>
-            <h2>Какие фото нужны</h2>
-            <p>
-              От 6 обычных фото с телефона: анфас, полуобороты, профиль при
-              дневном свете, без солнцезащитных очков и сильных теней.
-              Чем больше подходящих фото, тем точнее результат.
-            </p>
-          </div>
-        </div>
-
-        <div className="guide-grid">
-          {selfieGuide.map((item, index) => (
-            <article className="guide-card" key={item.title}>
-              <img className="guide-photo" alt={item.title} src={item.image} />
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{item.title}</strong>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="section child-mode-section">
-        <div className="section-header">
-          <div>
-            <h2>Пакет фотосессии</h2>
-            <p>
-              Бесплатно доступно {profile?.free_images_remaining ?? 0} фото. После
-              бесплатного теста можно выбрать платный пакет.
-            </p>
-          </div>
-        </div>
-        <div className="package-grid">
-          {PHOTO_PACKAGES.map((photoPackage) => {
-            const isDisabled = photoPackage.isFree && !hasFreeCredits;
-
-            return (
-              <label
-                className={`package-card ${selectedPackageCode === photoPackage.code ? "active" : ""} ${isDisabled ? "disabled" : ""}`}
-                key={photoPackage.code}
-              >
-                <input
-                  checked={selectedPackageCode === photoPackage.code}
-                  disabled={isDisabled}
-                  name="photo-package"
-                  onChange={() => setSelectedPackageCode(photoPackage.code)}
-                  type="radio"
-                />
-                <strong>{photoPackage.imageCount} фото</strong>
-                <span>{formatMoney(photoPackage.amountCents)}</span>
-                <em>{photoPackage.description}</em>
-              </label>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="section child-mode-section">
-        <label className="mode-option">
-          <input
-            checked={generationMode === "child_safe"}
-            onChange={(event) =>
-              setGenerationMode(event.target.checked ? "child_safe" : "standard")
-            }
-            type="checkbox"
-          />
-          <span>
-            <strong>Детский безопасный режим</strong>
-            <em>
-              Для детских фото: полностью одетый ребёнок, школьный или детский
-              портрет без взрослого делового образа и двусмысленных сцен.
-            </em>
-          </span>
-        </label>
-      </section>
-
-      <section className="section upload-action-section">
-        <label className="upload-dropzone">
-          <input accept={acceptedImageTypes} multiple onChange={handleFiles} type="file" />
-          <span>Выбрать фото</span>
-          <strong>Загрузите от 6 селфи одним разом</strong>
-          <em>JPG, PNG, WEBP, HEIC, HEIF или AVIF</em>
-        </label>
-      </section>
-
-      <section className="section">
-        <div className="section-header">
-          <div>
-            <h2>Выбранные фото</h2>
-            <p>После загрузки откроется экран проверки качества фото.</p>
-          </div>
-          {selfies.length > 0 ? (
-            <button className="button button-secondary" onClick={clearFiles} type="button">
-              Очистить
-            </button>
-          ) : null}
-        </div>
-
-        {selfies.length > 0 ? (
-          <div className="selfie-grid">
-            {selfies.map((selfie) => (
-              <article className="selfie-card" key={selfie.id}>
-                <img alt={selfie.name} src={selfie.url} />
-                <div>
-                  <strong>{selfie.name}</strong>
-                  <span>{formatFileSize(selfie.size)}</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="empty-state">
-            <strong>Фото ещё не выбраны</strong>
-            <span>После выбора здесь появятся превью и список файлов.</span>
-          </div>
-        )}
-
-        <div className="upload-footer">
-          <Link className="button button-secondary" href="/">
-            Назад к студии
-          </Link>
-          <button
-            className="button button-primary"
-            disabled={!canContinue || isUploading}
-            onClick={handleUpload}
-            type="button"
-          >
-            {isUploading ? "Загружаем..." : "Продолжить к проверке качества"}
-          </button>
-        </div>
-        {!canContinue && continueHint ? (
-          <div className="upload-message muted">{continueHint}</div>
-        ) : null}
-
-        {uploadError ? <div className="upload-message error">{uploadError}</div> : null}
-        {uploadResult ? <div className="upload-message success">{uploadResult}</div> : null}
-      </section>
+            {uploadError ? <div className="upload-message error">{uploadError}</div> : null}
+            {uploadResult ? <div className="upload-message success">{uploadResult}</div> : null}
+          </section>
+        </>
+      ) : null}
     </main>
   );
 }

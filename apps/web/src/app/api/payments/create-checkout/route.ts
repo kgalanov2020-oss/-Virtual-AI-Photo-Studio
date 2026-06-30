@@ -14,6 +14,10 @@ type YooKassaPayment = {
   confirmation?: {
     confirmation_url?: string;
   };
+  metadata?: {
+    job_id?: string;
+    user_id?: string;
+  };
 };
 
 export async function POST(request: NextRequest) {
@@ -71,6 +75,50 @@ export async function POST(request: NextRequest) {
 
     if (selectedPackage.isFree) {
       return NextResponse.json({ ok: true, paid: true, redirectUrl: `/generation/${jobId}` });
+    }
+
+    const { data: pendingOrders, error: pendingOrderError } = await supabase
+      .from("orders")
+      .select("provider_session_id, checkout_url")
+      .eq("job_id", jobId)
+      .eq("user_id", userId)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (pendingOrderError) {
+      throw new Error(pendingOrderError.message);
+    }
+
+    for (const pendingOrder of pendingOrders ?? []) {
+      if (!pendingOrder.provider_session_id) {
+        continue;
+      }
+
+      const existingPayment = await retrieveYooKassaPayment(
+        yookassaShopId,
+        yookassaSecretKey,
+        pendingOrder.provider_session_id,
+      );
+
+      if (existingPayment.status === "succeeded") {
+        await markPaymentPaid({
+          supabase,
+          jobId,
+          userId,
+          paymentId: existingPayment.id,
+        });
+
+        return NextResponse.json({ ok: true, paid: true, redirectUrl: `/generation/${jobId}` });
+      }
+
+      if (pendingOrder.checkout_url && !["canceled", "failed"].includes(existingPayment.status)) {
+        return NextResponse.json({
+          ok: true,
+          checkoutUrl: pendingOrder.checkout_url,
+          label: formatMoney(selectedPackage.amountCents),
+        });
+      }
     }
 
     const origin = request.headers.get("origin") ?? new URL(request.url).origin;
@@ -133,6 +181,52 @@ export async function POST(request: NextRequest) {
       { error: error instanceof Error ? error.message : "Не удалось создать оплату." },
       { status: 500 },
     );
+  }
+}
+
+async function markPaymentPaid({
+  supabase,
+  jobId,
+  userId,
+  paymentId,
+}: {
+  supabase: ReturnType<typeof createSupabaseAdminClient>;
+  jobId: string;
+  userId: string;
+  paymentId: string;
+}) {
+  const paidAt = new Date().toISOString();
+  const { error: orderError } = await supabase
+    .from("orders")
+    .update({
+      status: "paid",
+      provider_payment_id: paymentId,
+      paid_at: paidAt,
+      updated_at: paidAt,
+    })
+    .eq("provider_session_id", paymentId)
+    .eq("job_id", jobId)
+    .eq("user_id", userId);
+
+  if (orderError) {
+    throw new Error(orderError.message);
+  }
+
+  const { error: jobError } = await supabase
+    .from("jobs")
+    .update({
+      status: "queued",
+      payment_status: "paid",
+      paid_at: paidAt,
+      progress: 5,
+      queued_at: paidAt,
+      error_message: null,
+    })
+    .eq("id", jobId)
+    .eq("user_id", userId);
+
+  if (jobError) {
+    throw new Error(jobError.message);
   }
 }
 
@@ -206,6 +300,24 @@ async function createYooKassaPayment({
 
   if (!response.ok) {
     throw new Error(data.description ?? data.error?.message ?? "ЮKassa не создала платёж.");
+  }
+
+  return data;
+}
+
+async function retrieveYooKassaPayment(shopId: string, secretKey: string, paymentId: string) {
+  const response = await fetch(`https://api.yookassa.ru/v3/payments/${paymentId}`, {
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${shopId}:${secretKey}`).toString("base64")}`,
+    },
+  });
+  const data = (await response.json()) as YooKassaPayment & {
+    description?: string;
+    error?: { message?: string };
+  };
+
+  if (!response.ok) {
+    throw new Error(data.description ?? data.error?.message ?? "Не удалось проверить платёж ЮKassa.");
   }
 
   return data;

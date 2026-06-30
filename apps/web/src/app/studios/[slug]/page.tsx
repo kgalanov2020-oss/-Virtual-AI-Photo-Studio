@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthNavAction } from "@/app/auth-nav-action";
 import { getStudioSession } from "@/lib/studios";
 
 type StudioPageProps = {
@@ -35,6 +36,7 @@ export default async function StudioPage({ params }: StudioPageProps) {
         <nav className="topnav" aria-label="Навигация">
           <Link href="/">Каталог</Link>
           <Link href={`/upload?studio=${studio.slug}`}>Загрузить селфи</Link>
+          <AuthNavAction />
         </nav>
       </header>
 

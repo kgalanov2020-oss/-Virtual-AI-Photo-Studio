@@ -1,5 +1,6 @@
 import { PRODUCT_IMAGES_PER_STUDIO, TARGET_SHOTS_PER_STUDIO } from "@/lib/generation";
 import { getActiveStudios } from "@/lib/studios";
+import { AuthNavAction } from "./auth-nav-action";
 
 export const dynamic = "force-dynamic";
 
@@ -29,6 +30,11 @@ const studioLabels: Record<string, string> = {
   "paris-street": "Paris editorial",
   "tokyo-neon-night": "Neon night",
   "new-york-editorial-street": "NY street",
+  "modern-editorial-studio": "Studio editorial",
+  "music-recording-studio": "Creative portrait",
+  "private-cinema": "Cinema lounge",
+  "fashion-boutique": "Fashion retail",
+  "wine-cellar": "Private club",
 };
 
 export default async function Home() {
@@ -53,6 +59,7 @@ export default async function Home() {
         </a>
         <nav aria-label="Главная навигация">
           <a href="#studios">Каталог</a>
+          <AuthNavAction />
         </nav>
       </header>
 

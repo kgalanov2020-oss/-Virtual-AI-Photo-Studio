@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const siteUrl = "https://virtual-ai-photo-studio.onrender.com";
+const siteUrl = "https://virtualphotostudio.ru";
 
 export default function robots(): MetadataRoute.Robots {
   return {

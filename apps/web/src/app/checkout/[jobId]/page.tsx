@@ -54,6 +54,19 @@ export default function CheckoutPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, paymentReturn, cancelled]);
 
+  useEffect(() => {
+    if (job?.payment_status !== "pending") {
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      void confirmLatestPendingPayment({ silent: true });
+    }, 5000);
+
+    return () => window.clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [job?.payment_status, jobId]);
+
   async function loadCheckout() {
     setIsLoading(true);
     setError(null);
@@ -129,41 +142,19 @@ export default function CheckoutPage() {
     }
   }
 
-  async function confirmLatestPendingPayment() {
-    setIsPaying(true);
-    setError(null);
-    setMessage("Проверяем платёж...");
-
-    try {
-      const supabase = createSupabaseBrowserClient();
-      const { data: orders, error: orderError } = await supabase
-        .from("orders")
-        .select("provider_session_id")
-        .eq("job_id", jobId)
-        .eq("status", "pending")
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      if (orderError) {
-        throw new Error(orderError.message);
-      }
-
-      const paymentId = orders?.[0]?.provider_session_id;
-      if (!paymentId) {
-        throw new Error("Не найден ожидающий платёж для этого заказа.");
-      }
-
-      await confirmPayment(paymentId);
-    } catch (confirmError) {
-      setError(confirmError instanceof Error ? confirmError.message : "Ошибка подтверждения оплаты.");
-      setIsPaying(false);
-    }
+  async function confirmLatestPendingPayment(options: { silent?: boolean } = {}) {
+    await confirmPayment(undefined, options);
   }
 
-  async function confirmPayment(activeSessionId: string) {
-    setIsPaying(true);
-    setError(null);
-    setMessage("Проверяем оплату...");
+  async function confirmPayment(
+    activeSessionId?: string,
+    options: { silent?: boolean } = {},
+  ) {
+    if (!options.silent) {
+      setIsPaying(true);
+      setError(null);
+      setMessage("Проверяем оплату...");
+    }
 
     try {
       const supabase = createSupabaseBrowserClient();
@@ -185,15 +176,22 @@ export default function CheckoutPage() {
       const data = (await response.json()) as CheckoutResponse;
 
       if (!response.ok || data.error) {
+        if (options.silent) {
+          return;
+        }
         throw new Error(data.error ?? "Не удалось подтвердить оплату.");
       }
 
       setMessage("Оплата подтверждена. Переходим к генерации.");
       window.location.href = data.redirectUrl ?? `/generation/${jobId}`;
     } catch (confirmError) {
-      setError(confirmError instanceof Error ? confirmError.message : "Ошибка подтверждения оплаты.");
+      if (!options.silent) {
+        setError(confirmError instanceof Error ? confirmError.message : "Ошибка подтверждения оплаты.");
+      }
     } finally {
-      setIsPaying(false);
+      if (!options.silent) {
+        setIsPaying(false);
+      }
       await loadCheckout();
     }
   }
@@ -248,7 +246,16 @@ export default function CheckoutPage() {
             <Link className="button button-secondary" href={`/generation/${jobId}`}>
               Перейти к генерации
             </Link>
-          ) : null}
+          ) : (
+            <button
+              className="button button-secondary"
+              disabled={isLoading || isPaying}
+              onClick={() => confirmLatestPendingPayment()}
+              type="button"
+            >
+              Проверить оплату
+            </button>
+          )}
         </aside>
       </section>
 
