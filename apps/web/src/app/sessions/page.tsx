@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AuthNavAction } from "@/app/auth-nav-action";
-import { formatMoney } from "@/lib/pricing";
+import { formatMoney, getPhotoPackage } from "@/lib/pricing";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { GeneratedImage, Job, Order, Studio, UserProfile } from "@/lib/types";
 
@@ -55,6 +55,10 @@ export default function SessionsPage() {
         0,
       ),
     [rows],
+  );
+  const promoLaunchSize = getPhotoPackage("free_1").imageCount;
+  const availablePromoLaunches = Math.floor(
+    (profile?.free_images_remaining ?? 0) / promoLaunchSize,
   );
 
   async function loadSessions() {
@@ -280,8 +284,8 @@ export default function SessionsPage() {
                 <span>готовых фото</span>
               </div>
               <div>
-                <strong>{profile?.free_images_remaining ?? 0}</strong>
-                <span>бесплатных фото</span>
+                <strong>{availablePromoLaunches}</strong>
+                <span>промо-запусков</span>
               </div>
               <div>
                 <strong>{paidRemaining}</strong>

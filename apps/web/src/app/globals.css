@@ -324,6 +324,68 @@ a {
   text-align: right;
 }
 
+.before-after-section {
+  background: #ecefec;
+  border-block: 1px solid #d7ddd8;
+}
+
+.before-after-grid {
+  align-items: stretch;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(280px, 0.72fr) minmax(0, 1.28fr);
+  margin-top: 34px;
+}
+
+.before-after-column {
+  background: rgba(255, 255, 255, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.86);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.before-after-column > span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.before-after-selfies,
+.before-after-results {
+  display: grid;
+  gap: 12px;
+}
+
+.before-after-selfies {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.before-after-results {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.before-after-selfies img,
+.before-after-results img {
+  background: var(--panel);
+  border-radius: 8px;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.before-after-selfies img {
+  aspect-ratio: 3 / 4;
+}
+
+.before-after-results img {
+  aspect-ratio: 4 / 5;
+}
+
 .atelier-footer {
   align-items: center;
   border-top: 1px solid var(--line);
@@ -2153,11 +2215,16 @@ h1 {
   .atelier-intro,
   .atelier-result,
   .atelier-selfies,
+  .before-after-grid,
   .atelier-section-head {
     grid-template-columns: 1fr;
   }
 
   .atelier-studio-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .before-after-results {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -2350,6 +2417,14 @@ h1 {
   .atelier-studio-grid {
     gap: 14px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .before-after-selfies {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .before-after-results {
+    grid-template-columns: 1fr;
   }
 
   .atelier-studio-tile {

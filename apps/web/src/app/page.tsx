@@ -103,6 +103,39 @@ export default async function Home() {
         <p>Готовые пространства с продуманным светом, одеждой и позами</p>
       </section>
 
+      <section className="atelier-section before-after-section">
+        <div className="atelier-section-head">
+          <div>
+            <h2>Из обычных селфи в готовую фотосессию</h2>
+          </div>
+          <p>
+            Загружаете несколько простых фото с телефона, выбираете интерьер, а сервис
+            собирает серию портретов с одеждой, светом и позами под выбранную локацию
+          </p>
+        </div>
+
+        <div className="before-after-grid" aria-label="Пример до и после">
+          <div className="before-after-column">
+            <span>До</span>
+            <div className="before-after-selfies">
+              <img alt="Селфи анфас" src="/selfie-guide/01-front-neutral.jpg" />
+              <img alt="Селфи полуоборот" src="/selfie-guide/03-left-three-quarter.jpg" />
+              <img alt="Селфи профиль" src="/selfie-guide/05-left-profile.jpg" />
+            </div>
+          </div>
+
+          <div className="before-after-column before-after-column-featured">
+            <span>После</span>
+            <div className="before-after-results">
+              <img alt="AI-фотосессия в luxury garage" src="/before-after/after-luxury-garage-01.jpg" />
+              <img alt="AI-фотосессия у автомобиля" src="/before-after/after-luxury-garage-02.jpg" />
+              <img alt="AI-фотосессия в премиальном гараже" src="/before-after/after-luxury-garage-03.jpg" />
+              <img alt="AI-портрет в luxury garage" src="/before-after/after-luxury-garage-04.jpg" />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="atelier-section" id="studios">
         <div className="atelier-section-head atelier-section-head-reverse">
           <p>

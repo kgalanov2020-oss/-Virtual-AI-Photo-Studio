@@ -69,9 +69,12 @@ export default function UploadPage() {
   const readyCount = selfies.length;
   const isReady = readyCount >= 6;
   const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
+  const promoLaunchSize = getPhotoPackage("free_1").imageCount;
+  const freeImagesRemaining = profile?.free_images_remaining ?? 0;
+  const availablePromoLaunches = Math.floor(freeImagesRemaining / promoLaunchSize);
   const hasFreeCredits =
     !selectedPackage.isFree ||
-    (profile?.free_images_remaining ?? 0) >= selectedPackage.imageCount;
+    freeImagesRemaining >= selectedPackage.imageCount;
   const isAuthenticated = Boolean(userId && userEmail && profile);
   const canContinue =
     Boolean(userId && userEmail && profile) &&
@@ -254,10 +257,13 @@ export default function UploadPage() {
         setSelectedPackageCode("free_1");
       }
       setPromoCode("");
+      const promoLaunchSize = getPhotoPackage("free_1").imageCount;
+      const nextPromoLaunches = Math.floor(
+        (payload.freeImagesRemaining ?? 0) / promoLaunchSize,
+      );
+
       setPromoMessage(
-        `Промокод применён: +${payload.creditsGranted ?? 0} фото. Баланс: ${
-          payload.freeImagesRemaining ?? 0
-        }.`,
+        `Промокод применён. Доступно промо-запусков по ${promoLaunchSize} фото: ${nextPromoLaunches}.`,
       );
     } catch (error) {
       setPromoError(error instanceof Error ? error.message : "Неизвестная ошибка.");
@@ -462,8 +468,8 @@ export default function UploadPage() {
               <div>
                 <h2>Пакет фотосессии</h2>
                 <p>
-                  Бесплатно доступно {profile?.free_images_remaining ?? 0} фото. Один
-                  промо-запуск использует 20 фото.
+                  Доступно промо-запусков по {promoLaunchSize} фото:{" "}
+                  {availablePromoLaunches}.
                 </p>
               </div>
             </div>
