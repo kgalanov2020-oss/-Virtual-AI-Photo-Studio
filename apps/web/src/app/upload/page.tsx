@@ -46,6 +46,7 @@ const selfieGuide = [
 
 const acceptedImageTypes = ".jpg,.jpeg,.png,.webp,.heic,.heif,.avif";
 const acceptedImageExtensions = new Set(["jpg", "jpeg", "png", "webp", "heic", "heif", "avif"]);
+const visiblePhotoPackages = PHOTO_PACKAGES.filter((photoPackage) => photoPackage.code !== "free_1");
 
 export default function UploadPage() {
   const router = useRouter();
@@ -58,7 +59,7 @@ export default function UploadPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [generationMode, setGenerationMode] = useState<GenerationMode>("standard");
   const [selectedStudioSlug, setSelectedStudioSlug] = useState("modern-office");
-  const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("free_1");
+  const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("studio_5");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [promoCode, setPromoCode] = useState("");
@@ -69,7 +70,6 @@ export default function UploadPage() {
   const readyCount = selfies.length;
   const isReady = readyCount >= 6;
   const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
-  const freePackageSize = getPhotoPackage("free_1").imageCount;
   const freeImagesRemaining = profile?.free_images_remaining ?? 0;
   const hasEnoughPhotoBalance = freeImagesRemaining >= selectedPackage.imageCount;
   const isAuthenticated = Boolean(userId && userEmail && profile);
@@ -159,15 +159,10 @@ export default function UploadPage() {
   }
 
   useEffect(() => {
-    const freePackage = getPhotoPackage("free_1");
-    if (
-      selectedPackageCode === "free_1" &&
-      profile &&
-      profile.free_images_remaining < freePackage.imageCount
-    ) {
+    if (selectedPackageCode === "free_1") {
       setSelectedPackageCode("studio_5");
     }
-  }, [profile, selectedPackageCode]);
+  }, [selectedPackageCode]);
 
   async function loadOrCreateProfile(activeUserId: string, email: string) {
     const supabase = createSupabaseBrowserClient();
@@ -249,9 +244,8 @@ export default function UploadPage() {
             }
           : currentProfile,
       );
-      const freePackage = getPhotoPackage("free_1");
-      if ((payload.freeImagesRemaining ?? 0) >= freePackage.imageCount) {
-        setSelectedPackageCode("free_1");
+      if ((payload.freeImagesRemaining ?? 0) >= getPhotoPackage("studio_5").imageCount) {
+        setSelectedPackageCode("studio_5");
       }
       setPromoCode("");
       setPromoMessage(
@@ -459,14 +453,11 @@ export default function UploadPage() {
             <div className="section-header">
               <div>
                 <h2>Пакет фотосессии</h2>
-                <p>
-                  Бесплатно доступно {freeImagesRemaining} фото. Приветственный
-                  запуск использует {freePackageSize} фото.
-                </p>
+                <p>На балансе доступно {freeImagesRemaining} фото.</p>
               </div>
             </div>
             <div className="package-grid">
-              {PHOTO_PACKAGES.map((photoPackage) => {
+              {visiblePhotoPackages.map((photoPackage) => {
                 const packageCoveredByBalance = freeImagesRemaining >= photoPackage.imageCount;
                 const isDisabled = photoPackage.isFree && !packageCoveredByBalance;
 
@@ -495,8 +486,8 @@ export default function UploadPage() {
               <div>
                 <strong>Есть промокод?</strong>
                 <span>
-                  Введите код, чтобы пополнить бесплатный баланс на количество фото
-                  по условиям промокода.
+                  Введите код, чтобы пополнить баланс на количество фото по условиям
+                  промокода.
                 </span>
               </div>
               <div className="promo-code-form">

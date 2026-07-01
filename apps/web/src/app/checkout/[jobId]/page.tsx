@@ -37,8 +37,8 @@ export default function CheckoutPage() {
   const activePackage = useMemo(() => getPhotoPackage(job?.product_code), [job?.product_code]);
   const canUsePhotoBalance = photoBalance >= activePackage.imageCount;
   const price = useMemo(
-    () => formatMoney(activePackage.amountCents, job?.currency),
-    [job?.currency, activePackage.amountCents],
+    () => (canUsePhotoBalance ? "С баланса" : formatMoney(activePackage.amountCents, job?.currency)),
+    [job?.currency, activePackage.amountCents, canUsePhotoBalance],
   );
 
   useEffect(() => {
@@ -223,10 +223,10 @@ export default function CheckoutPage() {
       <section className="checkout-layout">
         <div>
           <p className="eyebrow">Шаг оплаты</p>
-          <h1>Оплатите генерацию</h1>
+          <h1>{canUsePhotoBalance ? "Запустите генерацию" : "Оплатите генерацию"}</h1>
           <p className="lead">
             Фото уже загружены и приняты. Если на балансе хватает фото, заказ
-            перейдёт в очередь без оплаты.
+            перейдёт в очередь без оплаты. Если не хватает, покупка пополнит баланс.
           </p>
         </div>
 
@@ -262,17 +262,17 @@ export default function CheckoutPage() {
           >
             {isPaying
               ? canUsePhotoBalance
-                ? "Списываем с баланса..."
+                ? "Запускаем с баланса..."
                 : "Переходим к оплате..."
               : canUsePhotoBalance
-                ? "Списать с баланса и продолжить"
-                : "Оплатить и продолжить"}
+                ? "Запустить с баланса"
+                : "Купить пакет и продолжить"}
           </button>
           {job?.payment_status === "paid" ? (
             <Link className="button button-secondary" href={`/generation/${jobId}`}>
               Перейти к генерации
             </Link>
-          ) : (
+          ) : canUsePhotoBalance ? null : (
             <button
               className="button button-secondary"
               disabled={isLoading || isPaying}

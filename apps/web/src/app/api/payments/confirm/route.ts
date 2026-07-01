@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     const { data: pendingOrders, error: orderLookupError } = await supabase
         .from("orders")
-        .select("provider_session_id")
+        .select("provider_session_id, target_image_count")
         .eq("job_id", jobId)
         .eq("user_id", userId)
         .eq("status", "pending")
@@ -86,6 +86,7 @@ export async function POST(request: NextRequest) {
 
     let paidSession: YooKassaPayment | null = null;
     let lastCheckedSession: YooKassaPayment | null = null;
+    let paidTargetImageCount = 0;
 
     for (const activeSessionId of sessionIdsToCheck) {
       const session = await retrieveYooKassaPayment(yookassaShopId, yookassaSecretKey, activeSessionId);
@@ -97,6 +98,9 @@ export async function POST(request: NextRequest) {
 
       if (session.status === "succeeded") {
         paidSession = session;
+        paidTargetImageCount =
+          pendingOrders?.find((order) => order.provider_session_id === activeSessionId)
+            ?.target_image_count ?? 0;
         break;
       }
     }
@@ -128,6 +132,14 @@ export async function POST(request: NextRequest) {
 
     if (orderError) {
       throw new Error(orderError.message);
+    }
+
+    if (paidTargetImageCount > 0) {
+      await addPhotoBalance({
+        supabase,
+        userId,
+        imageCount: paidTargetImageCount,
+      });
     }
 
     const { error: jobUpdateError } = await supabase
@@ -169,6 +181,38 @@ async function retrieveYooKassaPayment(shopId: string, secretKey: string, paymen
   }
 
   return data;
+}
+
+async function addPhotoBalance({
+  supabase,
+  userId,
+  imageCount,
+}: {
+  supabase: ReturnType<typeof createSupabaseAdminClient>;
+  userId: string;
+  imageCount: number;
+}) {
+  const { data: profile, error: profileError } = await supabase
+    .from("user_profiles")
+    .select("free_images_remaining")
+    .eq("user_id", userId)
+    .single();
+
+  if (profileError || !profile) {
+    throw new Error(profileError?.message ?? "Профиль пользователя не найден.");
+  }
+
+  const { error: updateError } = await supabase
+    .from("user_profiles")
+    .update({
+      free_images_remaining: profile.free_images_remaining + imageCount,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId);
+
+  if (updateError) {
+    throw new Error(updateError.message);
+  }
 }
 
 function readBearerToken(request: NextRequest) {

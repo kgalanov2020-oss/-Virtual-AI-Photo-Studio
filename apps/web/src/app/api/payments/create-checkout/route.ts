@@ -135,6 +135,7 @@ export async function POST(request: NextRequest) {
           jobId,
           userId,
           paymentId: existingPayment.id,
+          selectedPackage,
         });
 
         return NextResponse.json({ ok: true, paid: true, redirectUrl: `/generation/${jobId}` });
@@ -251,11 +252,13 @@ async function markPaymentPaid({
   jobId,
   userId,
   paymentId,
+  selectedPackage,
 }: {
   supabase: ReturnType<typeof createSupabaseAdminClient>;
   jobId: string;
   userId: string;
   paymentId: string;
+  selectedPackage: ReturnType<typeof getPhotoPackage>;
 }) {
   const paidAt = new Date().toISOString();
   const { error: orderError } = await supabase
@@ -274,6 +277,12 @@ async function markPaymentPaid({
     throw new Error(orderError.message);
   }
 
+  await addPhotoBalance({
+    supabase,
+    userId,
+    imageCount: selectedPackage.imageCount,
+  });
+
   const { error: jobError } = await supabase
     .from("jobs")
     .update({
@@ -289,6 +298,38 @@ async function markPaymentPaid({
 
   if (jobError) {
     throw new Error(jobError.message);
+  }
+}
+
+async function addPhotoBalance({
+  supabase,
+  userId,
+  imageCount,
+}: {
+  supabase: ReturnType<typeof createSupabaseAdminClient>;
+  userId: string;
+  imageCount: number;
+}) {
+  const { data: profile, error: profileError } = await supabase
+    .from("user_profiles")
+    .select("free_images_remaining")
+    .eq("user_id", userId)
+    .single();
+
+  if (profileError || !profile) {
+    throw new Error(profileError?.message ?? "Профиль пользователя не найден.");
+  }
+
+  const { error: updateError } = await supabase
+    .from("user_profiles")
+    .update({
+      free_images_remaining: profile.free_images_remaining + imageCount,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId);
+
+  if (updateError) {
+    throw new Error(updateError.message);
   }
 }
 

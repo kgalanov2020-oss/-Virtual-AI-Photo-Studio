@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   const supabase = createSupabaseAdminClient();
   const { data: existingOrder, error: existingError } = await supabase
     .from("orders")
-    .select("id, status")
+    .select("id, status, target_image_count")
     .eq("provider_session_id", paymentId)
     .eq("job_id", jobId)
     .eq("user_id", userId)
@@ -69,6 +69,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: orderError.message }, { status: 500 });
   }
 
+  if ((existingOrder?.target_image_count ?? 0) > 0) {
+    const balanceError = await addPhotoBalance({
+      supabase,
+      userId,
+      imageCount: existingOrder?.target_image_count ?? 0,
+    });
+
+    if (balanceError) {
+      return NextResponse.json({ error: balanceError }, { status: 500 });
+    }
+  }
+
   const { error: jobError } = await supabase
     .from("jobs")
     .update({
@@ -87,4 +99,34 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ status: "success", payment_id: paymentId });
+}
+
+async function addPhotoBalance({
+  supabase,
+  userId,
+  imageCount,
+}: {
+  supabase: ReturnType<typeof createSupabaseAdminClient>;
+  userId: string;
+  imageCount: number;
+}) {
+  const { data: profile, error: profileError } = await supabase
+    .from("user_profiles")
+    .select("free_images_remaining")
+    .eq("user_id", userId)
+    .single();
+
+  if (profileError || !profile) {
+    return profileError?.message ?? "Профиль пользователя не найден.";
+  }
+
+  const { error: updateError } = await supabase
+    .from("user_profiles")
+    .update({
+      free_images_remaining: profile.free_images_remaining + imageCount,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId);
+
+  return updateError?.message ?? null;
 }

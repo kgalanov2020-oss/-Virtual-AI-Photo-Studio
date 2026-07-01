@@ -4,7 +4,6 @@ import { generateBusinessPortrait } from "@/lib/comfy/client";
 import { getTargetShots, getTargetVariationCount, isTargetVariation } from "@/lib/generation";
 import { generateGeminiStudioPhoto } from "@/lib/gemini/client";
 import { PAYMENTS_ENABLED } from "@/lib/payments";
-import { getPhotoPackage } from "@/lib/pricing";
 import { createSupabaseAdminClient } from "@/lib/supabase";
 import type { GenerationMode, Job, StudioShot, UploadedSelfie } from "@/lib/types";
 
@@ -65,8 +64,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       );
     }
 
-    const selectedPackage = getPhotoPackage(job.product_code);
-    const shouldDebitPhotoBalance = selectedPackage.isFree || job.amount_cents === 0;
+    const shouldDebitPhotoBalance = true;
 
     if (!["queued", "running", "failed"].includes(job.status)) {
       return NextResponse.json(

@@ -481,7 +481,7 @@
       "description": "Атмосферная студия звукозаписи: акустические панели, микшерный пульт, микрофон, тёплый свет и creative portrait mood.",
       "preview_url": "/studios/music-recording-studio/preview.png",
       "base_prompt": "in a premium music recording studio with acoustic wood panels, mixing console, studio microphone, warm lamps, glass vocal booth, cinematic creative portrait atmosphere",
-      "wardrobe_prompt": "music recording studio wardrobe: stylish creative outfit, leather jacket, relaxed blazer, dark denim, simple jewelry, confident artist or producer editorial styling",
+      "wardrobe_prompt": "music recording studio wardrobe: polished creative portrait outfit with one clean layer only: dark knit, simple turtleneck, plain shirt, overshirt, tailored trousers or dark denim, minimal jewelry, confident artist or producer editorial styling. No leather jacket over blazer, no blazer under leather jacket, no double jackets, no bulky layered outerwear, no messy rock costume.",
       "gallery_urls": [
         "/studios/music-recording-studio/master-wide.png",
         "/studios/music-recording-studio/angle-02.png",
