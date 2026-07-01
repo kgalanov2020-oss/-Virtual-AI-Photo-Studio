@@ -151,6 +151,21 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
     description:
       "Desert resort / марокканский riad: арки, плитка, внутренний дворик, фонтан, пальмы, фонари и тёплый luxury travel-свет.",
   },
+  "white-cyclorama-studio": {
+    name: "Белая фотостудия",
+    description:
+      "Белая циклорама и чистая high-key студия: мягкий свет, светлые кубы, минимализм и аккуратный fashion/editorial-образ.",
+  },
+  "pink-pastel-studio": {
+    name: "Розовая фотостудия",
+    description:
+      "Пастельно-розовая fashion/beauty студия: blush-циклорама, мягкие шторы, кубы, beauty-свет и нежная editorial-атмосфера.",
+  },
+  "powder-blue-studio": {
+    name: "Светло-голубая фотостудия",
+    description:
+      "Светло-голубая студия: powder-blue циклорама, прохладный мягкий свет, минимальные кубы и воздушный clean editorial-образ.",
+  },
 };
 
 const shotTranslations: Record<

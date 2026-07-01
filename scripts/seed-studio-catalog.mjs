@@ -1049,6 +1049,45 @@ const moroccanRiadPoseTemplates = [
   { slug: "riad-hero", name: "Главный riad кадр", camera: "лучший travel editorial-ракурс, объектив 70 мм", pose: "финальная уверенная поза в тёплом riad-интерьере", prompt: "signature Moroccan riad luxury travel editorial portrait, warm golden light, polished final resort image" },
 ];
 
+const whiteCycloramaStudioPoseTemplates = [
+  { slug: "white-cyclorama", name: "У белой циклорамы", camera: "объектив 70 мм, мягкий high-key свет", pose: "стоит на белой циклораме, корпус слегка повернут, руки видны", prompt: "standing on seamless white cyclorama, slight torso turn, hands visible, clean high-key fashion studio portrait" },
+  { slug: "softbox-edge", name: "У softbox-света", camera: "объектив 85 мм, мягкий боковой свет", pose: "стоит рядом с большим softbox, лицо в мягком боковом свете", prompt: "near large softbox edge, soft side light on face, white studio equipment visible, minimal premium set" },
+  { slug: "ivory-cubes", name: "У светлых кубов", camera: "объектив 50 мм, ракурс три четверти", pose: "сидит или стоит у светлых posing cubes, руки естественно расположены", prompt: "seated or standing near ivory posing cubes, elegant hands, clean white fashion studio composition" },
+  { slug: "minimal-standing", name: "Минималистичный портрет", camera: "объектив 85 мм, уровень глаз", pose: "стоит спокойно, руки видны, чистый фон доминирует", prompt: "minimal standing high-key studio portrait, hands visible, clean white negative space dominates" },
+  { slug: "cyclorama-walk", name: "Движение по циклораме", camera: "репортажный объектив 50 мм", pose: "идёт по белой циклораме, лёгкое движение одежды", prompt: "walking across seamless white cyclorama, subtle outfit movement, clean editorial studio motion" },
+  { slug: "floor-seated", name: "Низкая посадка", camera: "объектив 70 мм, низкий спокойный ракурс", pose: "сидит на полу или низком кубе, поза естественная и аккуратная", prompt: "relaxed seated pose on white floor or low cube, elegant hands, premium high-key editorial body language" },
+  { slug: "reflector-light", name: "У отражателя", camera: "объектив 70 мм, мягкий beauty-свет", pose: "стоит у отражателя или световой стойки, лицо открыто", prompt: "standing near reflector and light stand, open face, bright clean beauty lighting, white studio setting" },
+  { slug: "profile-white", name: "Профиль на белом", camera: "объектив 85 мм, боковой свет", pose: "профиль или полуоборот, выразительный силуэт на белом фоне", prompt: "side profile or half-turn against white cyclorama, sculpted soft shadow, refined high-key fashion portrait" },
+  { slug: "wide-white-studio", name: "Широкий кадр студии", camera: "широкий объектив 35 мм", pose: "стоит внутри всей белой студии, оборудование и фон видны", prompt: "wide environmental white photo studio shot, person smaller in frame, cyclorama, softboxes and posing cubes dominate" },
+  { slug: "white-studio-hero", name: "Главный white studio кадр", camera: "лучший editorial-ракурс, объектив 70 мм", pose: "финальная чистая fashion-поза в белой студии", prompt: "signature white high-key photo studio fashion portrait, clean light, uncluttered polished final image" },
+];
+
+const pinkPastelStudioPoseTemplates = [
+  { slug: "pink-cyclorama", name: "У розовой циклорамы", camera: "объектив 70 мм, мягкий beauty-свет", pose: "стоит на blush-циклораме, спокойный поворот корпуса", prompt: "standing on blush pink seamless cyclorama, soft beauty lighting, refined pastel fashion portrait" },
+  { slug: "sheer-curtains", name: "У мягких штор", camera: "объектив 85 мм, рассеянный оконный свет", pose: "полуоборот у прозрачных штор, руки расслаблены", prompt: "half-turn near sheer pink curtains, diffused window light, delicate beauty editorial mood" },
+  { slug: "pink-cubes", name: "У розовых кубов", camera: "объектив 50 мм, ракурс три четверти", pose: "сидит или стоит у розовых posing cubes, руки видны", prompt: "seated or standing near pink posing cubes, hands visible, polished pastel studio styling" },
+  { slug: "beauty-close", name: "Beauty-портрет", camera: "объектив 85 мм, мягкая глубина", pose: "стоит близко к камере, лицо открыто, плечи расслаблены", prompt: "soft beauty portrait on pastel pink studio background, relaxed shoulders, clean face light" },
+  { slug: "pink-walk", name: "Движение по студии", camera: "репортажный объектив 50 мм", pose: "идёт по розовой студии, лёгкое движение ткани", prompt: "walking across pastel pink studio set, subtle fabric movement, soft editorial fashion moment" },
+  { slug: "floor-pose", name: "Низкая fashion-поза", camera: "объектив 70 мм, низкий fashion-ракурс", pose: "сидит на полу или кубе, поза мягкая и элегантная", prompt: "relaxed seated pose on pink floor or cube, elegant hands, tasteful beauty editorial body language" },
+  { slug: "softbox-pink", name: "У softbox в розовом сете", camera: "объектив 70 мм, боковой свет", pose: "стоит рядом со студийным светом, лицо не перекрыто", prompt: "near large softbox in pastel pink studio, clean side light on face, professional beauty set visible" },
+  { slug: "profile-pink", name: "Профиль в пастели", camera: "объектив 85 мм, мягкий боковой свет", pose: "профиль или полуоборот на розовом фоне", prompt: "side profile or half-turn against blush pink cyclorama, delicate shadow, elegant pastel fashion portrait" },
+  { slug: "wide-pink-studio", name: "Широкий pink studio кадр", camera: "широкий объектив 35 мм", pose: "стоит внутри всей розовой студии, шторы и кубы видны", prompt: "wide environmental pastel pink studio shot, person smaller in frame, curtains, softboxes and posing cubes dominate" },
+  { slug: "pink-studio-hero", name: "Главный pink studio кадр", camera: "лучший beauty-ракурс, объектив 70 мм", pose: "финальная нежная fashion-поза в розовой студии", prompt: "signature pastel pink beauty studio editorial portrait, soft polished final fashion image" },
+];
+
+const powderBlueStudioPoseTemplates = [
+  { slug: "blue-cyclorama", name: "У голубой циклорамы", camera: "объектив 70 мм, прохладный мягкий свет", pose: "стоит на светло-голубой циклораме, руки видны", prompt: "standing on pale powder blue seamless cyclorama, hands visible, airy clean editorial studio portrait" },
+  { slug: "blue-softbox", name: "У холодного softbox-света", camera: "объектив 85 мм, мягкий боковой свет", pose: "стоит рядом с softbox, лицо в прохладном мягком свете", prompt: "near large softbox edge, cool soft side light on face, powder blue studio equipment visible" },
+  { slug: "blue-cubes", name: "У голубых кубов", camera: "объектив 50 мм, ракурс три четверти", pose: "сидит или стоит у голубых и белых posing cubes", prompt: "seated or standing near pale blue and white posing cubes, elegant hands, clean airy studio styling" },
+  { slug: "clean-standing", name: "Воздушный портрет", camera: "объектив 85 мм, уровень глаз", pose: "стоит спокойно, лёгкий поворот корпуса, много чистого фона", prompt: "minimal airy standing portrait, slight torso turn, powder blue negative space, polished clean fashion look" },
+  { slug: "blue-walk", name: "Движение по голубой студии", camera: "репортажный объектив 50 мм", pose: "идёт по студии, естественный шаг и лёгкое движение одежды", prompt: "walking across powder blue cyclorama, natural step, subtle outfit movement, cool clean editorial mood" },
+  { slug: "low-blue-pose", name: "Низкий ракурс", camera: "объектив 70 мм, низкий спокойный ракурс", pose: "сидит на полу или низком кубе, руки элегантно видны", prompt: "relaxed seated pose on pale blue floor or low cube, elegant hands, refined cool studio body language" },
+  { slug: "reflector-blue", name: "У отражателя", camera: "объектив 70 мм, soft daylight", pose: "стоит у отражателя, лицо открыто, плечи расслаблены", prompt: "standing near reflector in powder blue studio, open face, cool soft daylight, relaxed shoulders" },
+  { slug: "profile-blue", name: "Профиль в голубом", camera: "объектив 85 мм, боковой свет", pose: "профиль или полуоборот на голубом фоне", prompt: "side profile or half-turn against powder blue cyclorama, gentle cool shadow, clean editorial portrait" },
+  { slug: "wide-blue-studio", name: "Широкий blue studio кадр", camera: "широкий объектив 35 мм", pose: "стоит внутри всей голубой студии, свет и кубы видны", prompt: "wide environmental powder blue photo studio shot, person smaller in frame, cyclorama, softboxes and cubes dominate" },
+  { slug: "blue-studio-hero", name: "Главный blue studio кадр", camera: "лучший clean editorial-ракурс, объектив 70 мм", pose: "финальная воздушная fashion-поза в голубой студии", prompt: "signature powder blue clean studio editorial portrait, airy cool light, polished final image" },
+];
+
 const wineCellarPoseTemplates = [
   { slug: "tasting-table", name: "За tasting table", camera: "объектив 70 мм, тёплый подвесной свет", pose: "сидит или стоит у дегустационного стола, руки видны", prompt: "near wooden wine tasting table, hands visible, amber pendant lights, refined private club atmosphere" },
   { slug: "wine-racks", name: "У винных стеллажей", camera: "объектив 85 мм, мягкая глубина", pose: "стоит у стеллажей, корпус слегка повернут", prompt: "standing by wooden wine racks, labels not readable, stone arches, elegant cellar portrait" },
@@ -1106,6 +1145,9 @@ const studioPoseTemplates = {
   "black-photo-studio": blackPhotoStudioPoseTemplates,
   "fashion-boutique": fashionBoutiquePoseTemplates,
   "moroccan-riad": moroccanRiadPoseTemplates,
+  "white-cyclorama-studio": whiteCycloramaStudioPoseTemplates,
+  "pink-pastel-studio": pinkPastelStudioPoseTemplates,
+  "powder-blue-studio": powderBlueStudioPoseTemplates,
 };
 
 const distanceVariants = [

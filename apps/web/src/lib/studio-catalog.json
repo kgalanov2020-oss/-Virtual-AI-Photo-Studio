@@ -569,6 +569,63 @@
         "/studios/moroccan-riad/detail-shot.png",
         "/studios/moroccan-riad/alternate-wide.png"
       ]
+    },
+    {
+      "slug": "white-cyclorama-studio",
+      "name": "Белая фотостудия",
+      "description": "Белая циклорама и чистая high-key студия: мягкий свет, светлые кубы, минимализм и аккуратный fashion/editorial-образ.",
+      "preview_url": "/studios/white-cyclorama-studio/preview.png",
+      "base_prompt": "inside a premium white photo studio with seamless white cyclorama, matte white floor, ivory posing cubes, professional softboxes, reflectors, light stands, bright high-key fashion portrait set, clean minimal editorial atmosphere",
+      "wardrobe_prompt": "white studio wardrobe: clean high-key fashion styling, white, ivory, beige or monochrome outfit, structured blazer, silk blouse, tailored trousers, minimal jewelry, no logos, fully clothed premium editorial look",
+      "gallery_urls": [
+        "/studios/white-cyclorama-studio/master-wide.png",
+        "/studios/white-cyclorama-studio/angle-02.png",
+        "/studios/white-cyclorama-studio/angle-03.png",
+        "/studios/white-cyclorama-studio/angle-04.png",
+        "/studios/white-cyclorama-studio/angle-05.png",
+        "/studios/white-cyclorama-studio/angle-06.png",
+        "/studios/white-cyclorama-studio/angle-07.png",
+        "/studios/white-cyclorama-studio/detail-shot.png",
+        "/studios/white-cyclorama-studio/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "pink-pastel-studio",
+      "name": "Розовая фотостудия",
+      "description": "Пастельно-розовая fashion/beauty студия: blush-циклорама, мягкие шторы, кубы, beauty-свет и нежная editorial-атмосфера.",
+      "preview_url": "/studios/pink-pastel-studio/preview.png",
+      "base_prompt": "inside a premium pastel pink fashion and beauty photo studio with blush pink seamless cyclorama, matte rose floor, sculptural pink posing cubes, sheer curtains, softboxes, reflectors, delicate editorial beauty lighting, clean tasteful studio atmosphere",
+      "wardrobe_prompt": "pink studio wardrobe: soft beauty editorial styling, pastel pink, cream, white or rose outfit, silk blouse, elegant dress, tailored light suit, delicate accessories, no logos, fully clothed polished fashion look",
+      "gallery_urls": [
+        "/studios/pink-pastel-studio/master-wide.png",
+        "/studios/pink-pastel-studio/angle-02.png",
+        "/studios/pink-pastel-studio/angle-03.png",
+        "/studios/pink-pastel-studio/angle-04.png",
+        "/studios/pink-pastel-studio/angle-05.png",
+        "/studios/pink-pastel-studio/angle-06.png",
+        "/studios/pink-pastel-studio/angle-07.png",
+        "/studios/pink-pastel-studio/detail-shot.png",
+        "/studios/pink-pastel-studio/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "powder-blue-studio",
+      "name": "Светло-голубая фотостудия",
+      "description": "Светло-голубая студия: powder-blue циклорама, прохладный мягкий свет, минимальные кубы и воздушный clean editorial-образ.",
+      "preview_url": "/studios/powder-blue-studio/preview.png",
+      "base_prompt": "inside a premium light powder blue photo studio with pale blue seamless cyclorama, matte light blue floor, white and blue posing cubes, professional softboxes, reflectors, airy cool daylight, clean minimal fashion portrait set, refined editorial atmosphere",
+      "wardrobe_prompt": "powder blue studio wardrobe: airy clean editorial styling, light blue, white, silver, cream or denim accents, tailored separates, silk blouse, elegant dress, minimal accessories, no logos, fully clothed polished studio look",
+      "gallery_urls": [
+        "/studios/powder-blue-studio/master-wide.png",
+        "/studios/powder-blue-studio/angle-02.png",
+        "/studios/powder-blue-studio/angle-03.png",
+        "/studios/powder-blue-studio/angle-04.png",
+        "/studios/powder-blue-studio/angle-05.png",
+        "/studios/powder-blue-studio/angle-06.png",
+        "/studios/powder-blue-studio/angle-07.png",
+        "/studios/powder-blue-studio/detail-shot.png",
+        "/studios/powder-blue-studio/alternate-wide.png"
+      ]
     }
   ]
 }
