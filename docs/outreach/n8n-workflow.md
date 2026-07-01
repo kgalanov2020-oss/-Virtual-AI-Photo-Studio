@@ -10,12 +10,19 @@
 GOOGLE_PLACES_API_KEY
 SUPABASE_SERVICE_ROLE_KEY
 NEXT_PUBLIC_SUPABASE_URL
-OUTREACH_LIMIT=1000
+OUTREACH_LIMIT=10000
 OUTREACH_PROMO_CODE=STUDIO
 OUTREACH_ADMIN_TOKEN
+SMTP_HOST
+SMTP_PORT
+SMTP_SECURE=true
+SMTP_USER
+SMTP_PASS
+SMTP_FROM
+SMTP_REPLY_TO
 ```
 
-Расписание в `render.yaml`: 1-е число месяца, 02:00 UTC. Для первого сбора 1000 студий лучше открыть Cron Job в Render и нажать `Trigger Run`.
+Расписание в `render.yaml`: 1-е число месяца, 02:00 UTC. Для первого сбора 10000 студий лучше открыть Cron Job в Render и нажать `Trigger Run`.
 
 Лиды смотреть на сайте:
 
@@ -33,7 +40,7 @@ https://virtualphotostudio.ru/outreach
 $env:GOOGLE_PLACES_API_KEY="ваш_google_places_key"
 $env:NEXT_PUBLIC_SUPABASE_URL="ваш_supabase_url"
 $env:SUPABASE_SERVICE_ROLE_KEY="ваш_service_role_key"
-$env:OUTREACH_LIMIT="1000"
+$env:OUTREACH_LIMIT="10000"
 $env:OUTREACH_PROMO_CODE="STUDIO"
 node scripts/outreach/collect-photo-studios.mjs
 node scripts/outreach/prepare-email-campaign.mjs
@@ -78,12 +85,45 @@ tmp/outreach/photo-studio-leads.csv
 
 ## Настройки отправки
 
-- Новый доменный ящик: `partners@virtualphotostudio.ru`
+- Новый доменный ящик: `partners@virtualphotostudio.ru` или `hello@virtualphotostudio.ru`
 - Лимит первого дня: 20 писем
 - Через 2-3 дня: 40-60 писем/день
-- Для базы 1000 студий отправлять волнами, не всем за один день
+- Для базы 10000 студий отправлять волнами, не всем за один день
 - Не отправлять повторно на один домен чаще 1 раза в 14 дней
 - Все ответы с `стоп`, `unsubscribe`, `не пишите` переносить в stop-list
+
+## Доменная почта
+
+Рекомендуемый ящик для проекта:
+
+```text
+partners@virtualphotostudio.ru
+```
+
+Подойдут сервисы:
+
+- Яндекс 360 для бизнеса: удобно для домена `.ru`.
+- Mail.ru для бизнеса/VK WorkSpace.
+- Timeweb/REG.RU почта домена, если домен уже там.
+- SMTP2GO/Postmark/SendGrid для отправки через API/SMTP, когда объёмы станут больше.
+
+Обязательно настроить DNS:
+
+- SPF
+- DKIM
+- DMARC
+
+Render web-сервису нужны переменные:
+
+```text
+SMTP_HOST
+SMTP_PORT
+SMTP_SECURE=true
+SMTP_USER
+SMTP_PASS
+SMTP_FROM=Virtual AI Photo Studio <partners@virtualphotostudio.ru>
+SMTP_REPLY_TO=partners@virtualphotostudio.ru
+```
 
 ## Тема письма
 

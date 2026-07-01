@@ -13,6 +13,7 @@ type OutreachLead = {
   source: string;
   promo_code: string;
   status: string;
+  last_contacted_at: string | null;
   created_at: string;
 };
 
@@ -45,6 +46,9 @@ export default function OutreachPage() {
   const [leads, setLeads] = useState<OutreachLead[]>([]);
   const [leadsMessage, setLeadsMessage] = useState("");
   const [isLoadingLeads, setIsLoadingLeads] = useState(false);
+  const [emailOnly, setEmailOnly] = useState(true);
+  const [sendingLeadId, setSendingLeadId] = useState<string | null>(null);
+  const [deletingLeadId, setDeletingLeadId] = useState<string | null>(null);
 
   const variables = useMemo(
     () => ({
@@ -81,7 +85,11 @@ export default function OutreachPage() {
     window.localStorage.setItem("outreach_admin_token", token);
 
     try {
-      const response = await fetch("/api/outreach/leads?limit=1000", {
+      const params = new URLSearchParams({
+        emailOnly: String(emailOnly),
+        limit: "10000",
+      });
+      const response = await fetch(`/api/outreach/leads?${params}`, {
         headers: {
           "x-outreach-token": token,
         },
@@ -98,6 +106,81 @@ export default function OutreachPage() {
       setLeadsMessage(error instanceof Error ? error.message : "Не удалось загрузить лиды.");
     } finally {
       setIsLoadingLeads(false);
+    }
+  }
+
+  async function sendLead(lead: OutreachLead) {
+    const token = adminToken.trim();
+    if (!token) {
+      setLeadsMessage("Введите админ-токен перед отправкой.");
+      return;
+    }
+
+    setSendingLeadId(lead.id);
+    setLeadsMessage("");
+
+    try {
+      const response = await fetch("/api/outreach/send", {
+        body: JSON.stringify({ leadId: lead.id }),
+        headers: {
+          "content-type": "application/json",
+          "x-outreach-token": token,
+        },
+        method: "POST",
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Не удалось отправить письмо.");
+      }
+
+      setLeads((current) =>
+        current.map((item) =>
+          item.id === lead.id
+            ? { ...item, last_contacted_at: payload.lead.last_contacted_at, status: "sent" }
+            : item,
+        ),
+      );
+      setLeadsMessage(`Письмо отправлено: ${lead.studio_name}.`);
+    } catch (error) {
+      setLeadsMessage(error instanceof Error ? error.message : "Не удалось отправить письмо.");
+    } finally {
+      setSendingLeadId(null);
+    }
+  }
+
+  async function deleteLead(lead: OutreachLead) {
+    const token = adminToken.trim();
+    if (!token) {
+      setLeadsMessage("Введите админ-токен перед удалением.");
+      return;
+    }
+
+    const confirmed = window.confirm(`Удалить лид "${lead.studio_name}"?`);
+    if (!confirmed) return;
+
+    setDeletingLeadId(lead.id);
+    setLeadsMessage("");
+
+    try {
+      const response = await fetch(`/api/outreach/leads?leadId=${lead.id}`, {
+        headers: {
+          "x-outreach-token": token,
+        },
+        method: "DELETE",
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Не удалось удалить лид.");
+      }
+
+      setLeads((current) => current.filter((item) => item.id !== lead.id));
+      setLeadsMessage(`Лид удалён: ${lead.studio_name}.`);
+    } catch (error) {
+      setLeadsMessage(error instanceof Error ? error.message : "Не удалось удалить лид.");
+    } finally {
+      setDeletingLeadId(null);
     }
   }
 
@@ -236,6 +319,14 @@ export default function OutreachPage() {
               value={adminToken}
             />
           </label>
+          <label className="outreach-checkbox-label">
+            <input
+              checked={emailOnly}
+              onChange={(event) => setEmailOnly(event.target.checked)}
+              type="checkbox"
+            />
+            <span>Только с email</span>
+          </label>
           <button className="button button-primary" disabled={isLoadingLeads} onClick={loadLeads}>
             {isLoadingLeads ? "Загрузка..." : "Показать студии"}
           </button>
@@ -254,6 +345,7 @@ export default function OutreachPage() {
                 <th>Сайт</th>
                 <th>Статус</th>
                 <th>Промокод</th>
+                <th>Действие</th>
               </tr>
             </thead>
             <tbody>
@@ -275,11 +367,35 @@ export default function OutreachPage() {
                     </td>
                     <td>{lead.status}</td>
                     <td>{lead.promo_code}</td>
+                    <td>
+                      <div className="outreach-row-actions">
+                        <button
+                          className="outreach-send-button"
+                          disabled={!lead.email || lead.status === "sent" || sendingLeadId === lead.id}
+                          onClick={() => sendLead(lead)}
+                          type="button"
+                        >
+                          {sendingLeadId === lead.id
+                            ? "Отправка..."
+                            : lead.status === "sent"
+                              ? "Отправлено"
+                              : "Отправить"}
+                        </button>
+                        <button
+                          className="outreach-delete-button"
+                          disabled={deletingLeadId === lead.id}
+                          onClick={() => deleteLead(lead)}
+                          type="button"
+                        >
+                          {deletingLeadId === lead.id ? "Удаление..." : "Удалить"}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={7}>Пока нет загруженных лидов.</td>
+                  <td colSpan={8}>Пока нет загруженных лидов.</td>
                 </tr>
               )}
             </tbody>

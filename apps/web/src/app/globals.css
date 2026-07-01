@@ -1688,7 +1688,7 @@ h1 {
   align-items: end;
   display: grid;
   gap: 14px;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   margin-bottom: 16px;
 }
 
@@ -1710,6 +1710,21 @@ h1 {
   font: inherit;
   min-height: 52px;
   padding: 0 18px;
+}
+
+.outreach-token-row .outreach-checkbox-label {
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: flex;
+  gap: 8px;
+  min-height: 52px;
+  padding: 0 16px;
+}
+
+.outreach-token-row .outreach-checkbox-label input {
+  min-height: 0;
+  padding: 0;
 }
 
 .outreach-leads-scroll {
@@ -1740,6 +1755,37 @@ h1 {
 .outreach-leads-table a {
   color: var(--accent);
   font-weight: 800;
+}
+
+.outreach-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.outreach-send-button,
+.outreach-delete-button {
+  background: var(--accent);
+  border: 0;
+  border-radius: 999px;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  min-height: 38px;
+  padding: 0 14px;
+}
+
+.outreach-delete-button {
+  background: #1f1d1a;
+}
+
+.outreach-send-button:disabled,
+.outreach-delete-button:disabled {
+  background: #d8d2ca;
+  color: #82786e;
+  cursor: not-allowed;
 }
 
 .mode-option {
