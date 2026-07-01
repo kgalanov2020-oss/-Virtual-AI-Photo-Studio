@@ -101,19 +101,19 @@ export default async function Home() {
           <div className="before-after-column">
             <span>До</span>
             <div className="before-after-selfies">
-              <img alt="Селфи анфас" src="/selfie-guide/01-front-neutral.jpg" />
-              <img alt="Селфи полуоборот" src="/selfie-guide/03-left-three-quarter.jpg" />
-              <img alt="Селфи профиль" src="/selfie-guide/05-left-profile.jpg" />
+              <img alt="Селфи анфас" decoding="async" src="/selfie-guide/01-front-neutral.webp" />
+              <img alt="Селфи полуоборот" decoding="async" src="/selfie-guide/03-left-three-quarter.webp" />
+              <img alt="Селфи профиль" decoding="async" src="/selfie-guide/05-left-profile.webp" />
             </div>
           </div>
 
           <div className="before-after-column before-after-column-featured">
             <span>После</span>
             <div className="before-after-results">
-              <img alt="AI-фотосессия в luxury garage" src="/before-after/after-luxury-garage-01.jpg" />
-              <img alt="AI-фотосессия у автомобиля" src="/before-after/after-luxury-garage-02.jpg" />
-              <img alt="AI-фотосессия в премиальном гараже" src="/before-after/after-luxury-garage-03.jpg" />
-              <img alt="AI-портрет в luxury garage" src="/before-after/after-luxury-garage-04.jpg" />
+              <img alt="AI-фотосессия в luxury garage" decoding="async" src="/before-after/after-luxury-garage-01.webp" />
+              <img alt="AI-фотосессия у автомобиля" decoding="async" src="/before-after/after-luxury-garage-02.webp" />
+              <img alt="AI-фотосессия в премиальном гараже" decoding="async" src="/before-after/after-luxury-garage-03.webp" />
+              <img alt="AI-портрет в luxury garage" decoding="async" src="/before-after/after-luxury-garage-04.webp" />
             </div>
           </div>
         </div>
@@ -140,7 +140,15 @@ export default async function Home() {
         <div className="atelier-studio-grid">
           {studios.map((studio, index) => (
             <article className="atelier-studio-tile" key={studio.id}>
-              {studio.preview_url ? <img alt={studio.name} src={studio.preview_url} /> : null}
+              {studio.preview_url ? (
+                <img
+                  alt={studio.name}
+                  decoding="async"
+                  fetchPriority={index < 3 ? "high" : "auto"}
+                  loading={index < 3 ? "eager" : "lazy"}
+                  src={studio.preview_url}
+                />
+              ) : null}
               <a href={`/studios/${studio.slug}`}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
                 <div>

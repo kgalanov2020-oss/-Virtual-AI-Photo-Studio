@@ -20,27 +20,27 @@ type SelectedSelfie = {
 const selfieGuide = [
   {
     title: "Анфас с нейтральным выражением лица",
-    image: "/selfie-guide/01-front-neutral.jpg",
+    image: "/selfie-guide/01-front-neutral.webp",
   },
   {
     title: "Анфас с лёгкой улыбкой",
-    image: "/selfie-guide/02-front-smile.jpg",
+    image: "/selfie-guide/02-front-smile.webp",
   },
   {
     title: "Левый полуоборот",
-    image: "/selfie-guide/03-left-three-quarter.jpg",
+    image: "/selfie-guide/03-left-three-quarter.webp",
   },
   {
     title: "Правый полуоборот",
-    image: "/selfie-guide/04-right-three-quarter.jpg",
+    image: "/selfie-guide/04-right-three-quarter.webp",
   },
   {
     title: "Левый профиль",
-    image: "/selfie-guide/05-left-profile.jpg",
+    image: "/selfie-guide/05-left-profile.webp",
   },
   {
     title: "Правый профиль",
-    image: "/selfie-guide/06-right-profile.jpg",
+    image: "/selfie-guide/06-right-profile.webp",
   },
 ];
 

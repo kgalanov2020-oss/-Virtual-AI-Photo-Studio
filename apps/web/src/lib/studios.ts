@@ -2,6 +2,7 @@ import { createSupabaseBrowserClient, hasSupabaseEnv } from "./supabase";
 import catalog from "./studio-catalog.json";
 import type { Studio, StudioShot } from "./types";
 import { translateShot, translateStudio } from "./ru";
+import { preferWebpAsset } from "./assets";
 
 type CatalogStudio = {
   slug: string;
@@ -98,7 +99,8 @@ function withCatalogMetadata(studio: Studio): Studio {
 
   return {
     ...studio,
-    gallery_urls: catalogStudio?.gallery_urls,
+    preview_url: preferWebpAsset(studio.preview_url),
+    gallery_urls: catalogStudio?.gallery_urls?.map((url) => preferWebpAsset(url) ?? url),
     wardrobe_prompt: catalogStudio?.wardrobe_prompt,
   };
 }

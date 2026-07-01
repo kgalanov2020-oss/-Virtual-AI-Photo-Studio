@@ -442,11 +442,11 @@ function buildHtmlEmail(textBody: string, promoCode: string) {
       <div class="outreach-email-comparison">
         <div>
           <span>До</span>
-          <img alt="Селфи до AI-фотосессии" src="https://virtualphotostudio.ru/selfie-guide/01-front-neutral.jpg">
+          <img alt="Селфи до AI-фотосессии" src="https://virtualphotostudio.ru/selfie-guide/01-front-neutral.webp">
         </div>
         <div>
           <span>После</span>
-          <img alt="Результат AI-фотосессии" src="https://virtualphotostudio.ru/before-after/after-luxury-garage-01.jpg">
+          <img alt="Результат AI-фотосессии" src="https://virtualphotostudio.ru/before-after/after-luxury-garage-01.webp">
         </div>
       </div>
       <a class="outreach-email-button" href="https://virtualphotostudio.ru/">Посмотреть сервис и пример до/после</a>

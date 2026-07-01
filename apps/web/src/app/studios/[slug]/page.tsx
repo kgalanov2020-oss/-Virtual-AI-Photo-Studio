@@ -58,6 +58,8 @@ export default async function StudioPage({ params }: StudioPageProps) {
           <img
             alt={studio.name}
             className="studio-detail-cover"
+            decoding="async"
+            fetchPriority="high"
             src={studio.preview_url}
           />
         ) : null}
@@ -74,7 +76,9 @@ export default async function StudioPage({ params }: StudioPageProps) {
           {galleryUrls.map((url, index) => (
             <img
               alt={`${studio.name} ракурс ${index + 1}`}
+              decoding="async"
               key={`${url}-${index}`}
+              loading={index < 2 ? "eager" : "lazy"}
               src={url}
             />
           ))}

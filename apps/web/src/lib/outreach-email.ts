@@ -44,11 +44,11 @@ export function buildOutreachHtml(variables: OutreachEmailVariables) {
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0;">
             <div>
               <div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:#8b7d70;text-transform:uppercase;margin-bottom:8px;">До</div>
-              <img src="https://virtualphotostudio.ru/selfie-guide/01-front-neutral.jpg" alt="Селфи до AI-фотосессии" style="width:100%;border-radius:10px;display:block;">
+              <img src="https://virtualphotostudio.ru/selfie-guide/01-front-neutral.webp" alt="Селфи до AI-фотосессии" style="width:100%;border-radius:10px;display:block;">
             </div>
             <div>
               <div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:#8b7d70;text-transform:uppercase;margin-bottom:8px;">После</div>
-              <img src="https://virtualphotostudio.ru/before-after/after-luxury-garage-01.jpg" alt="Результат AI-фотосессии" style="width:100%;border-radius:10px;display:block;">
+              <img src="https://virtualphotostudio.ru/before-after/after-luxury-garage-01.webp" alt="Результат AI-фотосессии" style="width:100%;border-radius:10px;display:block;">
             </div>
           </div>
           <div style="background:#f3eee8;border:1px solid #e0d6ca;border-radius:12px;margin:0 0 20px;padding:18px;">

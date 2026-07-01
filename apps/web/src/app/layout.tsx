@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     siteName: "Virtual AI Photo Studio",
     images: [
       {
-        url: "/studios/modern-office/master-wide.png",
+        url: "/studios/modern-office/master-wide.webp",
         width: 1366,
         height: 768,
         alt: "Virtual AI Photo Studio — фотосессия в выбранном интерьере",
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Virtual AI Photo Studio",
     description: siteDescription,
-    images: ["/studios/modern-office/master-wide.png"],
+    images: ["/studios/modern-office/master-wide.webp"],
   },
   robots: {
     index: true,
