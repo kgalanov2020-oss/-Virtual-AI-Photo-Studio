@@ -77,3 +77,24 @@ services:
         value: 10000
       - key: OUTREACH_PROMO_CODE
         value: STUDIO
+  - type: cron
+    name: virtual-ai-photo-studio-media-cleanup
+    runtime: node
+    plan: starter
+    branch: main
+    schedule: "30 3 * * *"
+    buildCommand: corepack enable && corepack prepare pnpm@10.18.3 --activate && pnpm install --frozen-lockfile
+    startCommand: corepack enable && corepack prepare pnpm@10.18.3 --activate && node scripts/cleanup-expired-media.mjs
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.0
+      - key: PNPM_VERSION
+        value: 10.18.3
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: PHOTO_RETENTION_DAYS
+        value: 30
+      - key: CLEANUP_BATCH_SIZE
+        value: 500
