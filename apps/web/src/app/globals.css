@@ -54,9 +54,19 @@ a {
 }
 
 .atelier-brand {
-  align-items: baseline;
+  align-items: center;
   display: flex;
-  gap: 12px;
+  gap: 10px;
+}
+
+.atelier-brand::before,
+.brand::before {
+  background: url("/icon.svg") center / contain no-repeat;
+  content: "";
+  display: inline-block;
+  flex: 0 0 auto;
+  height: 26px;
+  width: 26px;
 }
 
 .atelier-brand span {
@@ -637,6 +647,9 @@ a {
 }
 
 .brand {
+  align-items: center;
+  display: inline-flex;
+  gap: 10px;
   font-size: 14px;
   font-weight: 900;
   letter-spacing: 0.08em;
