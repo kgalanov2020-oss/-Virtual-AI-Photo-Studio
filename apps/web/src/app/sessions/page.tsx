@@ -45,13 +45,17 @@ export default function SessionsPage() {
     loadSessions();
   }, []);
 
-  const remainingImages = useMemo(
+  const availableImages = useMemo(
     () =>
+      (profile?.free_images_remaining ?? 0) +
       rows.reduce(
-        (sum, row) => sum + Math.max(0, row.job.target_image_count - row.generatedCount),
+        (sum, row) =>
+          row.job.payment_status === "paid" && row.job.product_code !== "free_1"
+            ? sum + Math.max(0, row.job.target_image_count - row.generatedCount)
+            : sum,
         0,
       ),
-    [rows],
+    [profile?.free_images_remaining, rows],
   );
 
   async function loadSessions() {
@@ -277,8 +281,8 @@ export default function SessionsPage() {
                 <span>готовых фото</span>
               </div>
               <div>
-                <strong>{remainingImages}</strong>
-                <span>фото осталось</span>
+                <strong>{availableImages}</strong>
+                <span>доступно фото</span>
               </div>
             </div>
 
