@@ -516,9 +516,9 @@
     {
       "slug": "black-photo-studio",
       "name": "Black Photo Studio",
-      "description": "Чёрная циклорама и минималистичная fashion-студия: сильный направленный свет, чистый фон, студийное оборудование и лаконичный editorial-образ.",
+      "description": "Чёрная fashion-gallery студия: глянцевый каменный пол, curved cyclorama, хромированные блоки, вертикальный strip-light и дорогой editorial-свет.",
       "preview_url": "/studios/black-photo-studio/preview.png",
-      "base_prompt": "inside a black minimal fashion photo studio with seamless black cyclorama, matte dark floor, professional softboxes, spotlights, light stands, posing cube, clean uncluttered editorial portrait set, dramatic controlled studio lighting",
+      "base_prompt": "inside a luxury black fashion gallery photo studio with black limewash plaster walls, seamless curved black cyclorama, glossy black stone floor reflections, chrome and brushed steel posing blocks, vertical strip lights, overhead softboxes, premium editorial runway atmosphere, dramatic controlled studio lighting",
       "wardrobe_prompt": "black photo studio wardrobe: minimal fashion editorial outfit, monochrome black or white styling, structured blazer, fitted trousers, leather or satin accents, no logos, fully clothed high-fashion look",
       "gallery_urls": [
         "/studios/black-photo-studio/master-wide.png",
@@ -573,9 +573,9 @@
     {
       "slug": "white-cyclorama-studio",
       "name": "Белая фотостудия",
-      "description": "Белая циклорама и чистая high-key студия: мягкий свет, светлые кубы, минимализм и аккуратный fashion/editorial-образ.",
+      "description": "Архитектурная белая fashion-студия: циклорама, ivory-арки, travertine-блоки, льняные шторы, хромированные отражатели и мягкий high-key свет.",
       "preview_url": "/studios/white-cyclorama-studio/preview.png",
-      "base_prompt": "inside a premium white photo studio with seamless white cyclorama, matte white floor, ivory posing cubes, professional softboxes, reflectors, light stands, bright high-key fashion portrait set, clean minimal editorial atmosphere",
+      "base_prompt": "inside an architectural white fashion atelier photo studio with seamless white cyclorama, ivory plaster arches, travertine posing blocks, linen curtains, sculptural ivory chair, chrome softboxes and reflectors, bright high-key editorial lighting, refined luxury minimalism",
       "wardrobe_prompt": "white studio wardrobe: clean high-key fashion styling, white, ivory, beige or monochrome outfit, structured blazer, silk blouse, tailored trousers, minimal jewelry, no logos, fully clothed premium editorial look",
       "gallery_urls": [
         "/studios/white-cyclorama-studio/master-wide.png",
@@ -592,9 +592,9 @@
     {
       "slug": "pink-pastel-studio",
       "name": "Розовая фотостудия",
-      "description": "Пастельно-розовая fashion/beauty студия: blush-циклорама, мягкие шторы, кубы, beauty-свет и нежная editorial-атмосфера.",
+      "description": "Blush couture / beauty studio: розовый microcement, curved cyclorama, бархатный диван, мягкие шторы, chrome rail и скульптурный beauty-свет.",
       "preview_url": "/studios/pink-pastel-studio/preview.png",
-      "base_prompt": "inside a premium pastel pink fashion and beauty photo studio with blush pink seamless cyclorama, matte rose floor, sculptural pink posing cubes, sheer curtains, softboxes, reflectors, delicate editorial beauty lighting, clean tasteful studio atmosphere",
+      "base_prompt": "inside a blush pink couture beauty photo studio with rose microcement walls, blush curved cyclorama, rose velvet curved sofa and posing platform, sheer curtains, chrome clothing rail, sculptural flower-like soft light, premium fashion and beauty editorial set, elegant expensive atmosphere",
       "wardrobe_prompt": "pink studio wardrobe: soft beauty editorial styling, pastel pink, cream, white or rose outfit, silk blouse, elegant dress, tailored light suit, delicate accessories, no logos, fully clothed polished fashion look",
       "gallery_urls": [
         "/studios/pink-pastel-studio/master-wide.png",
@@ -611,9 +611,9 @@
     {
       "slug": "powder-blue-studio",
       "name": "Светло-голубая фотостудия",
-      "description": "Светло-голубая студия: powder-blue циклорама, прохладный мягкий свет, минимальные кубы и воздушный clean editorial-образ.",
+      "description": "Powder blue editorial studio: голубая plaster-циклорама, translucent acrylic panels, frosted glass, хром, velvet stool и прохладный fashion-свет.",
       "preview_url": "/studios/powder-blue-studio/preview.png",
-      "base_prompt": "inside a premium light powder blue photo studio with pale blue seamless cyclorama, matte light blue floor, white and blue posing cubes, professional softboxes, reflectors, airy cool daylight, clean minimal fashion portrait set, refined editorial atmosphere",
+      "base_prompt": "inside a powder blue high-fashion editorial photo studio with pale blue plaster cyclorama, translucent acrylic panels, icy chrome details, blue velvet stool, frosted glass blocks, oversized softboxes, clean cool daylight, airy luxury magazine set, modern refined atmosphere",
       "wardrobe_prompt": "powder blue studio wardrobe: airy clean editorial styling, light blue, white, silver, cream or denim accents, tailored separates, silk blouse, elegant dress, minimal accessories, no logos, fully clothed polished studio look",
       "gallery_urls": [
         "/studios/powder-blue-studio/master-wide.png",

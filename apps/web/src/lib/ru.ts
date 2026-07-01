@@ -139,7 +139,7 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
   "black-photo-studio": {
     name: "Black Photo Studio",
     description:
-      "Чёрная циклорама и минималистичная fashion-студия: сильный направленный свет, чистый фон, студийное оборудование и лаконичный editorial-образ.",
+      "Чёрная fashion-gallery студия: глянцевый каменный пол, curved cyclorama, хромированные блоки, вертикальный strip-light и дорогой editorial-свет.",
   },
   "fashion-boutique": {
     name: "Fashion Boutique",
@@ -154,17 +154,17 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
   "white-cyclorama-studio": {
     name: "Белая фотостудия",
     description:
-      "Белая циклорама и чистая high-key студия: мягкий свет, светлые кубы, минимализм и аккуратный fashion/editorial-образ.",
+      "Архитектурная белая fashion-студия: циклорама, ivory-арки, travertine-блоки, льняные шторы, хромированные отражатели и мягкий high-key свет.",
   },
   "pink-pastel-studio": {
     name: "Розовая фотостудия",
     description:
-      "Пастельно-розовая fashion/beauty студия: blush-циклорама, мягкие шторы, кубы, beauty-свет и нежная editorial-атмосфера.",
+      "Blush couture / beauty studio: розовый microcement, curved cyclorama, бархатный диван, мягкие шторы, chrome rail и скульптурный beauty-свет.",
   },
   "powder-blue-studio": {
     name: "Светло-голубая фотостудия",
     description:
-      "Светло-голубая студия: powder-blue циклорама, прохладный мягкий свет, минимальные кубы и воздушный clean editorial-образ.",
+      "Powder blue editorial studio: голубая plaster-циклорама, translucent acrylic panels, frosted glass, хром, velvet stool и прохладный fashion-свет.",
   },
 };
 
