@@ -120,6 +120,8 @@ export default function OutreachPage() {
     setLeadsMessage("");
 
     try {
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 35000);
       const response = await fetch("/api/outreach/send", {
         body: JSON.stringify({ leadId: lead.id }),
         headers: {
@@ -127,7 +129,9 @@ export default function OutreachPage() {
           "x-outreach-token": token,
         },
         method: "POST",
+        signal: controller.signal,
       });
+      window.clearTimeout(timeout);
       const payload = await response.json();
 
       if (!response.ok) {
@@ -143,7 +147,13 @@ export default function OutreachPage() {
       );
       setLeadsMessage(`Письмо отправлено: ${lead.studio_name}.`);
     } catch (error) {
-      setLeadsMessage(error instanceof Error ? error.message : "Не удалось отправить письмо.");
+      setLeadsMessage(
+        error instanceof Error && error.name === "AbortError"
+          ? "Отправка не ответила за 35 секунд. Проверьте SMTP-пароль и Render Logs web-сервиса."
+          : error instanceof Error
+            ? error.message
+            : "Не удалось отправить письмо.",
+      );
     } finally {
       setSendingLeadId(null);
     }

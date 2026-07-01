@@ -9,6 +9,18 @@ import { createSupabaseAdminClient } from "@/lib/supabase";
 import type { OutreachLead } from "@/lib/types";
 
 export async function POST(request: NextRequest) {
+  try {
+    return await sendOutreachEmail(request);
+  } catch (error) {
+    console.error("Outreach email send failed", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Email send failed." },
+      { status: 500 },
+    );
+  }
+}
+
+async function sendOutreachEmail(request: NextRequest) {
   const adminToken = process.env.OUTREACH_ADMIN_TOKEN;
 
   if (!adminToken) {
@@ -62,23 +74,32 @@ export async function POST(request: NextRequest) {
   };
 
   const transporter = nodemailer.createTransport({
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
     host: smtpConfig.host,
     port: smtpConfig.port,
     secure: smtpConfig.secure,
+    socketTimeout: 20000,
     auth: {
       user: smtpConfig.user,
       pass: smtpConfig.pass,
     },
   });
 
-  await transporter.sendMail({
-    from: smtpConfig.from,
-    html: buildOutreachHtml(variables),
-    replyTo: smtpConfig.replyTo,
-    subject: buildOutreachSubject(variables),
-    text: buildOutreachText(variables),
-    to: lead.email,
-  });
+  try {
+    await transporter.verify();
+    await transporter.sendMail({
+      from: smtpConfig.from,
+      html: buildOutreachHtml(variables),
+      replyTo: smtpConfig.replyTo,
+      subject: buildOutreachSubject(variables),
+      text: buildOutreachText(variables),
+      to: lead.email,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "SMTP send failed.";
+    return NextResponse.json({ error: `SMTP error: ${message}` }, { status: 502 });
+  }
 
   const sentAt = new Date().toISOString();
   const { error: updateError } = await supabase
@@ -101,7 +122,7 @@ function getSmtpConfig() {
   const port = Number(process.env.SMTP_PORT ?? "465");
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
-  const from = process.env.SMTP_FROM;
+  const from = normalizeEmailHeader(process.env.SMTP_FROM);
   const secure = (process.env.SMTP_SECURE ?? "true") === "true";
 
   if (!host || !port || !user || !pass || !from) return null;
@@ -111,8 +132,12 @@ function getSmtpConfig() {
     host,
     pass,
     port,
-    replyTo: process.env.SMTP_REPLY_TO || from,
+    replyTo: normalizeEmailHeader(process.env.SMTP_REPLY_TO) || from,
     secure,
     user,
   };
+}
+
+function normalizeEmailHeader(value: string | undefined) {
+  return value?.replace(/\s+/g, " ").trim();
 }
