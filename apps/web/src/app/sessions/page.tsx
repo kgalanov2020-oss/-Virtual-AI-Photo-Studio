@@ -45,7 +45,14 @@ export default function SessionsPage() {
     loadSessions();
   }, []);
 
-  const freeImagesRemaining = profile?.free_images_remaining ?? 0;
+  const remainingImages = useMemo(
+    () =>
+      rows.reduce(
+        (sum, row) => sum + Math.max(0, row.job.target_image_count - row.generatedCount),
+        0,
+      ),
+    [rows],
+  );
 
   async function loadSessions() {
     setIsLoading(true);
@@ -270,8 +277,8 @@ export default function SessionsPage() {
                 <span>готовых фото</span>
               </div>
               <div>
-                <strong>{freeImagesRemaining}</strong>
-                <span>бесплатных фото осталось</span>
+                <strong>{remainingImages}</strong>
+                <span>фото осталось</span>
               </div>
             </div>
 
