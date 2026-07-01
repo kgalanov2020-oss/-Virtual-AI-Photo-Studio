@@ -21,9 +21,9 @@ export const PAYMENT_CURRENCY = (
 export const PHOTO_PACKAGES: PhotoPackage[] = [
   {
     code: "free_1",
-    name: "Промо-фотосессия 20 фото",
-    description: "20 бесплатных фото по промокоду",
-    imageCount: 20,
+    name: "Приветственная фотосессия 5 фото",
+    description: "5 бесплатных приветственных фото",
+    imageCount: 5,
     amountCents: 0,
     isFree: true,
   },

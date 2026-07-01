@@ -69,9 +69,8 @@ export default function UploadPage() {
   const readyCount = selfies.length;
   const isReady = readyCount >= 6;
   const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
-  const promoLaunchSize = getPhotoPackage("free_1").imageCount;
+  const freePackageSize = getPhotoPackage("free_1").imageCount;
   const freeImagesRemaining = profile?.free_images_remaining ?? 0;
-  const availablePromoLaunches = Math.floor(freeImagesRemaining / promoLaunchSize);
   const hasFreeCredits =
     !selectedPackage.isFree ||
     freeImagesRemaining >= selectedPackage.imageCount;
@@ -257,13 +256,8 @@ export default function UploadPage() {
         setSelectedPackageCode("free_1");
       }
       setPromoCode("");
-      const promoLaunchSize = getPhotoPackage("free_1").imageCount;
-      const nextPromoLaunches = Math.floor(
-        (payload.freeImagesRemaining ?? 0) / promoLaunchSize,
-      );
-
       setPromoMessage(
-        `Промокод применён. Доступно промо-запусков по ${promoLaunchSize} фото: ${nextPromoLaunches}.`,
+        `Промокод применён: +${payload.creditsGranted ?? 0} фото. Бесплатный баланс: ${payload.freeImagesRemaining ?? 0} фото.`,
       );
     } catch (error) {
       setPromoError(error instanceof Error ? error.message : "Неизвестная ошибка.");
@@ -468,8 +462,8 @@ export default function UploadPage() {
               <div>
                 <h2>Пакет фотосессии</h2>
                 <p>
-                  Доступно промо-запусков по {promoLaunchSize} фото:{" "}
-                  {availablePromoLaunches}.
+                  Бесплатно доступно {freeImagesRemaining} фото. Приветственный
+                  запуск использует {freePackageSize} фото.
                 </p>
               </div>
             </div>
@@ -499,7 +493,10 @@ export default function UploadPage() {
             <div className="promo-code-panel">
               <div>
                 <strong>Есть промокод?</strong>
-                <span>Введите код, чтобы пополнить бесплатный баланс фото.</span>
+                <span>
+                  Введите код, чтобы пополнить бесплатный баланс на количество фото
+                  по условиям промокода.
+                </span>
               </div>
               <div className="promo-code-form">
                 <input
