@@ -71,25 +71,23 @@ export default function UploadPage() {
   const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
   const freePackageSize = getPhotoPackage("free_1").imageCount;
   const freeImagesRemaining = profile?.free_images_remaining ?? 0;
-  const hasFreeCredits =
-    !selectedPackage.isFree ||
-    freeImagesRemaining >= selectedPackage.imageCount;
+  const hasEnoughPhotoBalance = freeImagesRemaining >= selectedPackage.imageCount;
   const isAuthenticated = Boolean(userId && userEmail && profile);
   const canContinue =
     Boolean(userId && userEmail && profile) &&
     isReady &&
-    (!selectedPackage.isFree || hasFreeCredits);
+    (!selectedPackage.isFree || hasEnoughPhotoBalance);
   const continueHint = useMemo(() => {
     if (!userId || !userEmail) return "Сначала войдите по email.";
     if (!profile) return "Загружаем профиль пользователя.";
     if (!isReady) return "Загрузите минимум 6 фото.";
-    if (selectedPackage.isFree && !hasFreeCredits) {
+    if (selectedPackage.isFree && !hasEnoughPhotoBalance) {
       return `Для бесплатной генерации нужно ${selectedPackage.imageCount} фото на балансе. Введите промокод или выберите платный пакет.`;
     }
 
     return "";
   }, [
-    hasFreeCredits,
+    hasEnoughPhotoBalance,
     isReady,
     profile,
     selectedPackage.imageCount,
@@ -315,7 +313,7 @@ export default function UploadPage() {
         throw new Error("Сначала войдите по email.");
       }
 
-      if (selectedPackage.isFree && !hasFreeCredits) {
+      if (selectedPackage.isFree && !hasEnoughPhotoBalance) {
         throw new Error(
           `Для бесплатной генерации нужно ${selectedPackage.imageCount} фото на балансе.`,
         );
@@ -469,7 +467,8 @@ export default function UploadPage() {
             </div>
             <div className="package-grid">
               {PHOTO_PACKAGES.map((photoPackage) => {
-                const isDisabled = photoPackage.isFree && !hasFreeCredits;
+                const packageCoveredByBalance = freeImagesRemaining >= photoPackage.imageCount;
+                const isDisabled = photoPackage.isFree && !packageCoveredByBalance;
 
                 return (
                   <label
@@ -484,7 +483,9 @@ export default function UploadPage() {
                       type="radio"
                     />
                     <strong>{photoPackage.imageCount} фото</strong>
-                    <span>{formatMoney(photoPackage.amountCents)}</span>
+                    <span>
+                      {packageCoveredByBalance ? "С баланса" : formatMoney(photoPackage.amountCents)}
+                    </span>
                     <em>{photoPackage.description}</em>
                   </label>
                 );

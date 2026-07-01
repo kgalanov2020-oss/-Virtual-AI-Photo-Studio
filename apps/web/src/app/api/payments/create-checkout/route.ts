@@ -29,22 +29,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Не передан jobId." }, { status: 400 });
     }
 
-    const yookassaShopId = process.env.YOOKASSA_SHOP_ID;
-    const yookassaSecretKey = process.env.YOOKASSA_SECRET_KEY;
-    if (!yookassaShopId || !yookassaSecretKey) {
-      return NextResponse.json(
-        {
-          error:
-            "Оплата ещё не настроена: добавьте YOOKASSA_SHOP_ID и YOOKASSA_SECRET_KEY в Render. Можно оставить загрузку и проверку фото, но генерация будет доступна после подключения платежей.",
-        },
-        { status: 501 },
-      );
-    }
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return NextResponse.json({ error: "Введите email для электронного чека." }, { status: 400 });
-    }
-
     const supabase = createSupabaseAdminClient();
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
 
@@ -72,9 +56,53 @@ export async function POST(request: NextRequest) {
     }
 
     const selectedPackage = getPhotoPackage(job.product_code);
+    const { data: profile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("free_images_remaining")
+      .eq("user_id", userId)
+      .single();
 
-    if (selectedPackage.isFree) {
-      return NextResponse.json({ ok: true, paid: true, redirectUrl: `/generation/${jobId}` });
+    if (profileError || !profile) {
+      return NextResponse.json({ error: "Профиль пользователя не найден." }, { status: 400 });
+    }
+
+    if (selectedPackage.isFree && profile.free_images_remaining < selectedPackage.imageCount) {
+      return NextResponse.json(
+        { error: "Бесплатные фото закончились. Выберите платный пакет или примените промокод." },
+        { status: 402 },
+      );
+    }
+
+    if (profile.free_images_remaining >= selectedPackage.imageCount) {
+      await markJobPaidFromPhotoBalance({
+        supabase,
+        jobId,
+        userId,
+        selectedPackage,
+      });
+
+      return NextResponse.json({
+        ok: true,
+        paid: true,
+        redirectUrl: `/generation/${jobId}`,
+        balancePaid: true,
+      });
+    }
+
+    const yookassaShopId = process.env.YOOKASSA_SHOP_ID;
+    const yookassaSecretKey = process.env.YOOKASSA_SECRET_KEY;
+    if (!yookassaShopId || !yookassaSecretKey) {
+      return NextResponse.json(
+        {
+          error:
+            "Оплата ещё не настроена: добавьте YOOKASSA_SHOP_ID и YOOKASSA_SECRET_KEY в Render. Можно оставить загрузку и проверку фото, но генерация будет доступна после подключения платежей.",
+        },
+        { status: 501 },
+      );
+    }
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: "Введите email для электронного чека." }, { status: 400 });
     }
 
     const { data: pendingOrders, error: pendingOrderError } = await supabase
@@ -181,6 +209,40 @@ export async function POST(request: NextRequest) {
       { error: error instanceof Error ? error.message : "Не удалось создать оплату." },
       { status: 500 },
     );
+  }
+}
+
+async function markJobPaidFromPhotoBalance({
+  supabase,
+  jobId,
+  userId,
+  selectedPackage,
+}: {
+  supabase: ReturnType<typeof createSupabaseAdminClient>;
+  jobId: string;
+  userId: string;
+  selectedPackage: ReturnType<typeof getPhotoPackage>;
+}) {
+  const paidAt = new Date().toISOString();
+  const { error: jobError } = await supabase
+    .from("jobs")
+    .update({
+      status: "queued",
+      payment_status: "paid",
+      paid_at: paidAt,
+      amount_cents: 0,
+      currency: PAYMENT_CURRENCY,
+      product_code: selectedPackage.code,
+      target_image_count: selectedPackage.imageCount,
+      progress: 5,
+      queued_at: paidAt,
+      error_message: null,
+    })
+    .eq("id", jobId)
+    .eq("user_id", userId);
+
+  if (jobError) {
+    throw new Error(jobError.message);
   }
 }
 

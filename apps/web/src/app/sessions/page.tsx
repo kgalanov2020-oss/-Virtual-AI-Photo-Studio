@@ -50,7 +50,9 @@ export default function SessionsPage() {
       (profile?.free_images_remaining ?? 0) +
       rows.reduce(
         (sum, row) =>
-          row.job.payment_status === "paid" && row.job.product_code !== "free_1"
+          row.job.payment_status === "paid" &&
+          row.job.product_code !== "free_1" &&
+          row.job.amount_cents > 0
             ? sum + Math.max(0, row.job.target_image_count - row.generatedCount)
             : sum,
         0,

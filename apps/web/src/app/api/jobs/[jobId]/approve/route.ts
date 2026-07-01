@@ -74,8 +74,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
     const selectedPackage = getPhotoPackage(job.product_code);
     const isFreePackage = selectedPackage.isFree;
+    const canUsePhotoBalance = profile.free_images_remaining >= selectedPackage.imageCount;
 
-    if (isFreePackage && profile.free_images_remaining < selectedPackage.imageCount) {
+    if (isFreePackage && !canUsePhotoBalance) {
       return NextResponse.json(
         { error: "Бесплатные фото закончились. Выберите платный пакет." },
         { status: 402 },
@@ -96,7 +97,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const now = new Date().toISOString();
-    const shouldPay = PAYMENTS_ENABLED && !isFreePackage;
+    const shouldPay = PAYMENTS_ENABLED && !canUsePhotoBalance;
 
     const { data: updatedJob, error: updateError } = await supabase
       .from("jobs")
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
         status: shouldPay ? "awaiting_payment" : "queued",
         payment_status: shouldPay ? "unpaid" : "paid",
         paid_at: shouldPay ? null : now,
-        amount_cents: selectedPackage.amountCents,
+        amount_cents: shouldPay ? selectedPackage.amountCents : 0,
         currency: PAYMENT_CURRENCY,
         product_code: selectedPackage.code,
         target_image_count: selectedPackage.imageCount,

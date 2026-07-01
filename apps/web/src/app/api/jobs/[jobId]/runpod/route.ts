@@ -66,6 +66,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     }
 
     const selectedPackage = getPhotoPackage(job.product_code);
+    const shouldDebitPhotoBalance = selectedPackage.isFree || job.amount_cents === 0;
 
     if (!["queued", "running", "failed"].includes(job.status)) {
       return NextResponse.json(
@@ -169,7 +170,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       });
     }
 
-    if (selectedPackage.isFree && completedBefore < totalExpected) {
+    if (shouldDebitPhotoBalance && completedBefore < totalExpected) {
       const { data: profile, error: profileError } = await supabase
         .from("user_profiles")
         .select("free_images_remaining")
@@ -270,7 +271,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       })
       .eq("id", jobId);
 
-    if (selectedPackage.isFree) {
+    if (shouldDebitPhotoBalance) {
       const { data: profile } = await supabase
         .from("user_profiles")
         .select("free_images_remaining")

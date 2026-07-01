@@ -15,6 +15,7 @@ type CheckoutResponse = {
   paid?: boolean;
   checkoutUrl?: string;
   redirectUrl?: string;
+  balancePaid?: boolean;
   error?: string;
 };
 
@@ -31,8 +32,10 @@ export default function CheckoutPage() {
   const [isPaying, setIsPaying] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [photoBalance, setPhotoBalance] = useState(0);
 
   const activePackage = useMemo(() => getPhotoPackage(job?.product_code), [job?.product_code]);
+  const canUsePhotoBalance = photoBalance >= activePackage.imageCount;
   const price = useMemo(
     () => formatMoney(activePackage.amountCents, job?.currency),
     [job?.currency, activePackage.amountCents],
@@ -75,17 +78,24 @@ export default function CheckoutPage() {
       const supabase = createSupabaseBrowserClient();
       const { data: sessionData } = await supabase.auth.getSession();
       const sessionEmail = sessionData.session?.user.email;
-      const { data, error: jobError } = await supabase
+      const [{ data, error: jobError }, { data: profileData }] = await Promise.all([
+        supabase
         .from("jobs")
         .select("id, user_id, studio_id, generation_mode, status, payment_status, paid_at, amount_cents, currency, product_code, target_image_count, progress, error_message, created_at, queued_at, started_at, completed_at")
         .eq("id", jobId)
-        .single();
+          .single(),
+        supabase
+          .from("user_profiles")
+          .select("free_images_remaining")
+          .maybeSingle(),
+      ]);
 
       if (jobError) {
         throw new Error(jobError.message);
       }
 
       setJob(data as Job);
+      setPhotoBalance(profileData?.free_images_remaining ?? 0);
       if (sessionEmail) {
         setCustomerEmail(sessionEmail);
       }
@@ -124,6 +134,10 @@ export default function CheckoutPage() {
 
       if (!response.ok || data.error) {
         throw new Error(data.error ?? "Не удалось создать оплату.");
+      }
+
+      if (data.balancePaid) {
+        setMessage("Заказ оплачен с баланса фото. Переходим к генерации.");
       }
 
       if (data.redirectUrl) {
@@ -186,6 +200,7 @@ export default function CheckoutPage() {
       window.location.href = data.redirectUrl ?? `/generation/${jobId}`;
     } catch (confirmError) {
       if (!options.silent) {
+        setMessage(null);
         setError(confirmError instanceof Error ? confirmError.message : "Ошибка подтверждения оплаты.");
       }
     } finally {
@@ -210,8 +225,8 @@ export default function CheckoutPage() {
           <p className="eyebrow">Шаг оплаты</p>
           <h1>Оплатите генерацию</h1>
           <p className="lead">
-            Фото уже загружены и приняты. После оплаты заказ перейдёт в очередь, и
-            можно будет запустить AI-генерацию.
+            Фото уже загружены и приняты. Если на балансе хватает фото, заказ
+            перейдёт в очередь без оплаты.
           </p>
         </div>
 
@@ -220,6 +235,11 @@ export default function CheckoutPage() {
           <strong>{activePackage.name}</strong>
           <p>{activePackage.description}</p>
           <div className="checkout-price">{price}</div>
+          {job?.payment_status !== "paid" && canUsePhotoBalance ? (
+            <div className="upload-message muted">
+              На балансе {photoBalance} фото. Этот пакет можно запустить без оплаты.
+            </div>
+          ) : null}
           <label className="checkout-field">
             <span>Email для чека</span>
             <input
@@ -240,7 +260,13 @@ export default function CheckoutPage() {
             onClick={startPayment}
             type="button"
           >
-            {isPaying ? "Переходим к оплате..." : "Оплатить и продолжить"}
+            {isPaying
+              ? canUsePhotoBalance
+                ? "Списываем с баланса..."
+                : "Переходим к оплате..."
+              : canUsePhotoBalance
+                ? "Списать с баланса и продолжить"
+                : "Оплатить и продолжить"}
           </button>
           {job?.payment_status === "paid" ? (
             <Link className="button button-secondary" href={`/generation/${jobId}`}>
