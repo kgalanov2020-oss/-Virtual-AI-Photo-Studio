@@ -80,6 +80,67 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         </header>
 
+        <section className="article-showcase" aria-label="Пример AI-фотосессии до и после">
+          <div className="article-showcase-column">
+            <span>До</span>
+            <div className="article-showcase-selfies">
+              <img
+                alt="Обычное селфи анфас до AI-фотосессии"
+                decoding="async"
+                height="1280"
+                loading="lazy"
+                src="/selfie-guide/01-front-neutral.webp"
+                width="960"
+              />
+              <img
+                alt="Обычное селфи в полуоборот до AI-фотосессии"
+                decoding="async"
+                height="1280"
+                loading="lazy"
+                src="/selfie-guide/03-left-three-quarter.webp"
+                width="960"
+              />
+              <img
+                alt="Обычное селфи в профиль до AI-фотосессии"
+                decoding="async"
+                height="1280"
+                loading="lazy"
+                src="/selfie-guide/05-left-profile.webp"
+                width="960"
+              />
+            </div>
+          </div>
+          <div className="article-showcase-column article-showcase-column-after">
+            <span>После</span>
+            <div className="article-showcase-results">
+              <img
+                alt={`Готовое AI-фото для статьи ${article.title}`}
+                decoding="async"
+                height="1280"
+                loading="lazy"
+                src="/before-after/after-luxury-garage-01.webp"
+                width="1024"
+              />
+              <img
+                alt="Портрет после AI-фотосессии в виртуальной студии"
+                decoding="async"
+                height="1280"
+                loading="lazy"
+                src="/before-after/after-luxury-garage-02.webp"
+                width="1024"
+              />
+              <img
+                alt="AI-фотосессия после загрузки селфи"
+                decoding="async"
+                height="1280"
+                loading="lazy"
+                src="/before-after/after-luxury-garage-03.webp"
+                width="1024"
+              />
+            </div>
+          </div>
+        </section>
+
         <div className="article-body">
           {article.sections.map((section) => (
             <section key={section.heading}>
