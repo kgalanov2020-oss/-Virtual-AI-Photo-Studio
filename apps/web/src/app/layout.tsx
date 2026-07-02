@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 const siteUrl = "https://virtualphotostudio.ru";
+const vkPixelId = "3777361";
 const siteDescription =
   "Virtual AI Photo Studio — виртуальная фотостудия с готовыми интерьерами. Выберите локацию, загрузите селфи и получите профессиональную фотосессию в офисе, отеле, яхте, ресторане, городе, на пляже и других пространствах.";
 
@@ -77,7 +79,41 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body>{children}</body>
+      <body>
+        {children}
+        <Script id="vk-ads-pixel" strategy="afterInteractive">
+          {`
+            var _tmr = window._tmr || (window._tmr = []);
+            _tmr.push({ id: "${vkPixelId}", type: "pageView", start: (new Date()).getTime() });
+            (function (d, w, id) {
+              if (d.getElementById(id)) return;
+              var ts = d.createElement("script");
+              ts.type = "text/javascript";
+              ts.async = true;
+              ts.id = id;
+              ts.src = "https://top-fwz1.mail.ru/js/code.js";
+              var f = function () {
+                var s = d.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(ts, s);
+              };
+              if (w.opera == "[object Opera]") {
+                d.addEventListener("DOMContentLoaded", f, false);
+              } else {
+                f();
+              }
+            })(document, window, "tmr-code");
+          `}
+        </Script>
+        <noscript>
+          <div>
+            <img
+              alt="Top.Mail.Ru"
+              src={`https://top-fwz1.mail.ru/counter?id=${vkPixelId};js=na`}
+              style={{ left: "-9999px", position: "absolute" }}
+            />
+          </div>
+        </noscript>
+      </body>
     </html>
   );
 }
