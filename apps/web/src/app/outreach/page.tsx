@@ -208,8 +208,6 @@ export default function OutreachPage() {
         </Link>
         <nav className="topnav" aria-label="Навигация">
           <Link href="/admin">Админ</Link>
-          <Link href="/">Каталог</Link>
-          <Link href="/sessions">Мои фотосессии</Link>
         </nav>
       </header>
 

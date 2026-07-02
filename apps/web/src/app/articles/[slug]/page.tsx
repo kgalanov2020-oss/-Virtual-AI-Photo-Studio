@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AuthNavAction } from "@/app/auth-nav-action";
 import {
   articleMap,
   articles,
@@ -169,9 +168,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           Virtual AI Photo Studio
         </Link>
         <nav className="topnav" aria-label="Навигация">
-          <Link href="/articles">Статьи</Link>
-          <Link href="/upload">Начать фотосессию</Link>
-          <AuthNavAction />
+          <Link href="/admin">Админ</Link>
         </nav>
       </header>
 
@@ -274,13 +271,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </section>
         ) : null}
 
-        <footer className="article-cta">
-          <h2>Попробуйте AI-фотосессию на своих селфи</h2>
-          <p>Выберите интерьер, загрузите фото и получите серию портретов онлайн.</p>
-          <Link className="button button-primary" href="/upload">
-            Начать фотосессию
-          </Link>
-        </footer>
       </article>
     </main>
   );

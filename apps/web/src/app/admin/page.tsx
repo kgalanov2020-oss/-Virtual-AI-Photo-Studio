@@ -13,7 +13,6 @@ export default function AdminPage() {
         <nav className="topnav" aria-label="Админ-навигация">
           <Link href="/outreach">Рассылка</Link>
           <Link href="/articles">Статьи</Link>
-          <Link href="/sessions">Мои фотосессии</Link>
         </nav>
       </header>
 
