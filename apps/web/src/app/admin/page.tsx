@@ -1,24 +1,7 @@
 import Link from "next/link";
 import { articles } from "@/lib/articles";
-
-const promoCodes = [
-  {
-    code: "STUDIO",
-    description: "Партнёрский промокод для фотостудий и outreach-рассылки.",
-  },
-  {
-    code: "START",
-    description: "Стартовый промокод: одна тестовая генерация.",
-  },
-  {
-    code: "WELCOME",
-    description: "Приветственный промокод: две тестовые генерации.",
-  },
-  {
-    code: "FRIEND",
-    description: "Промокод для механики рекомендации другу.",
-  },
-];
+import { ArticlePublicationPanel } from "./article-publication-panel";
+import { PromoCodePanel } from "./promo-code-panel";
 
 export default function AdminPage() {
   return (
@@ -76,21 +59,31 @@ export default function AdminPage() {
 
         <article className="section admin-card admin-card-wide">
           <div>
+            <p className="eyebrow">Публикации статей</p>
+            <h2>Где размещены материалы</h2>
+            <p>
+              Вносите ссылки на Дзен, VC, Telegram, партнёрские сайты и другие
+              площадки, чтобы видеть, какие статьи уже опубликованы вне сайта.
+            </p>
+          </div>
+          <ArticlePublicationPanel
+            articles={articles.map((article) => ({
+              slug: article.slug,
+              title: article.title,
+            }))}
+          />
+        </article>
+
+        <article className="section admin-card admin-card-wide">
+          <div>
             <p className="eyebrow">Промокоды</p>
             <h2>Активные кампании</h2>
             <p>
-              Базовые промокоды заведены в Supabase. Следующий шаг - добавить сюда
-              создание, отключение, лимиты и статистику применений.
+              Создавайте промокоды, задавайте количество фото, общий лимит применений,
+              срок действия и включайте или отключайте кампании.
             </p>
           </div>
-          <div className="admin-promo-list">
-            {promoCodes.map((promoCode) => (
-              <div key={promoCode.code}>
-                <strong>{promoCode.code}</strong>
-                <span>{promoCode.description}</span>
-              </div>
-            ))}
-          </div>
+          <PromoCodePanel />
         </article>
       </section>
     </main>

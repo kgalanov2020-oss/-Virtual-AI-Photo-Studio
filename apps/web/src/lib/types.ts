@@ -112,6 +112,19 @@ export type PromoRedemption = {
   created_at: string;
 };
 
+export type ArticlePublication = {
+  id: string;
+  article_slug: string;
+  article_title: string;
+  platform: string;
+  url: string;
+  status: "planned" | "published" | "archived";
+  published_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type OutreachLead = {
   id: string;
   unique_key: string;
@@ -275,6 +288,16 @@ export type Database = {
           created_at?: string;
         };
         Update: Partial<PromoRedemption>;
+        Relationships: [];
+      };
+      article_publications: {
+        Row: ArticlePublication;
+        Insert: Omit<ArticlePublication, "id" | "created_at" | "updated_at"> & {
+          id?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<ArticlePublication>;
         Relationships: [];
       };
       outreach_leads: {

@@ -2371,6 +2371,115 @@ h1 {
   line-height: 1.45;
 }
 
+.admin-promo-panel,
+.admin-publication-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-token-inline {
+  align-items: end;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.admin-token-inline label,
+.admin-promo-form label,
+.admin-publication-form label {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-token-inline span,
+.admin-promo-form span,
+.admin-publication-form span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-token-inline input,
+.admin-promo-form input,
+.admin-publication-form input,
+.admin-publication-form select {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  font: inherit;
+  min-height: 54px;
+  padding: 0 16px;
+}
+
+.admin-promo-form,
+.admin-publication-form {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 18px;
+}
+
+.admin-promo-form-wide,
+.admin-publication-form-wide {
+  grid-column: span 2;
+}
+
+.admin-promo-checkbox {
+  align-content: center;
+  display: flex !important;
+  gap: 10px !important;
+}
+
+.admin-promo-checkbox input {
+  min-height: auto;
+  width: auto;
+}
+
+.admin-promo-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-promo-table {
+  border-collapse: collapse;
+  min-width: 980px;
+  width: 100%;
+}
+
+.admin-promo-table th,
+.admin-promo-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 14px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-promo-table th {
+  color: var(--muted);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-promo-table strong {
+  display: block;
+  font-size: 20px;
+  margin-bottom: 6px;
+}
+
+.admin-promo-table small {
+  color: var(--muted);
+  display: block;
+  font-size: 14px;
+  line-height: 1.45;
+  max-width: 340px;
+}
+
 .mode-option {
   align-items: flex-start;
   background: var(--panel);
@@ -3090,8 +3199,16 @@ h1 {
   }
 
   .admin-grid,
-  .admin-promo-list {
+  .admin-promo-list,
+  .admin-promo-form,
+  .admin-publication-form,
+  .admin-token-inline {
     grid-template-columns: 1fr;
+  }
+
+  .admin-promo-form-wide,
+  .admin-publication-form-wide {
+    grid-column: auto;
   }
 
   .before-after-results {
