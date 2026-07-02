@@ -16,6 +16,63 @@ type ArticlePageProps = {
   }>;
 };
 
+type ArticleShowcase = {
+  before: string[];
+  after: string[];
+};
+
+const selfieImages = [
+  "/selfie-guide/01-front-neutral.webp",
+  "/selfie-guide/02-front-smile.webp",
+  "/selfie-guide/03-left-three-quarter.webp",
+  "/selfie-guide/04-right-three-quarter.webp",
+  "/selfie-guide/05-left-profile.webp",
+  "/selfie-guide/06-right-profile.webp",
+  "/selfie-guide/07-from-above.webp",
+  "/selfie-guide/08-from-below.webp",
+  "/selfie-guide/09-daylight.webp",
+  "/selfie-guide/10-clean-face.webp",
+];
+
+const beforeSets = [
+  [0, 2, 4],
+  [1, 3, 5],
+  [0, 6, 9],
+  [1, 7, 8],
+  [2, 5, 9],
+  [3, 4, 8],
+  [0, 3, 7],
+  [1, 4, 6],
+  [2, 6, 8],
+  [5, 7, 9],
+  [0, 5, 8],
+  [1, 2, 7],
+  [3, 6, 9],
+  [4, 7, 8],
+  [0, 1, 5],
+  [2, 3, 9],
+  [4, 5, 6],
+  [0, 7, 8],
+  [1, 6, 9],
+  [2, 4, 7],
+];
+
+const articleShowcases = new Map<string, ArticleShowcase>(
+  articles.map((article, index) => {
+    const imageStart = index * 3 + 1;
+
+    return [
+      article.slug,
+      {
+        before: beforeSets[index].map((imageIndex) => selfieImages[imageIndex]),
+        after: [0, 1, 2].map(
+          (offset) => `/article-showcases/after-${String(imageStart + offset).padStart(2, "0")}.webp`,
+        ),
+      },
+    ];
+  }),
+);
+
 export function generateStaticParams() {
   return articles.map((article) => ({ slug: article.slug }));
 }
@@ -41,6 +98,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   const articleJsonLd = createArticleJsonLd(article);
   const faqJsonLd = createArticleFaqJsonLd(article);
+  const showcase = articleShowcases.get(article.slug);
 
   return (
     <main className="page article-page">
@@ -80,66 +138,42 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         </header>
 
-        <section className="article-showcase" aria-label="Пример AI-фотосессии до и после">
-          <div className="article-showcase-column">
-            <span>До</span>
-            <div className="article-showcase-selfies">
-              <img
-                alt="Обычное селфи анфас до AI-фотосессии"
-                decoding="async"
-                height="1280"
-                loading="lazy"
-                src="/selfie-guide/01-front-neutral.webp"
-                width="960"
-              />
-              <img
-                alt="Обычное селфи в полуоборот до AI-фотосессии"
-                decoding="async"
-                height="1280"
-                loading="lazy"
-                src="/selfie-guide/03-left-three-quarter.webp"
-                width="960"
-              />
-              <img
-                alt="Обычное селфи в профиль до AI-фотосессии"
-                decoding="async"
-                height="1280"
-                loading="lazy"
-                src="/selfie-guide/05-left-profile.webp"
-                width="960"
-              />
+        {showcase ? (
+          <section className="article-showcase" aria-label="Пример AI-фотосессии до и после">
+            <div className="article-showcase-column">
+              <span>До</span>
+              <div className="article-showcase-selfies">
+                {showcase.before.map((image, index) => (
+                  <img
+                    alt={`Исходное селфи ${index + 1} до AI-фотосессии`}
+                    decoding="async"
+                    height="1280"
+                    key={image}
+                    loading="lazy"
+                    src={image}
+                    width="960"
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="article-showcase-column article-showcase-column-after">
-            <span>После</span>
-            <div className="article-showcase-results">
-              <img
-                alt={`Готовое AI-фото для статьи ${article.title}`}
-                decoding="async"
-                height="1280"
-                loading="lazy"
-                src="/before-after/after-luxury-garage-01.webp"
-                width="1024"
-              />
-              <img
-                alt="Портрет после AI-фотосессии в виртуальной студии"
-                decoding="async"
-                height="1280"
-                loading="lazy"
-                src="/before-after/after-luxury-garage-02.webp"
-                width="1024"
-              />
-              <img
-                alt="AI-фотосессия после загрузки селфи"
-                decoding="async"
-                height="1280"
-                loading="lazy"
-                src="/before-after/after-luxury-garage-03.webp"
-                width="1024"
-              />
+            <div className="article-showcase-column article-showcase-column-after">
+              <span>После</span>
+              <div className="article-showcase-results">
+                {showcase.after.map((image, index) => (
+                  <img
+                    alt={`Готовое AI-фото ${index + 1} для статьи ${article.title}`}
+                    decoding="async"
+                    height="1280"
+                    key={image}
+                    loading="lazy"
+                    src={image}
+                    width="1024"
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ) : null}
 
         <div className="article-body">
           {article.sections.map((section) => (
