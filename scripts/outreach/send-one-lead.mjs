@@ -4,6 +4,7 @@ const supabase = createSupabaseConfig();
 const smtp = createSmtpConfig();
 const promoCode = process.env.OUTREACH_PROMO_CODE ?? "STUDIO";
 const autoSendEnabled = (process.env.OUTREACH_AUTO_SEND_ENABLED ?? "true") === "true";
+const sendLimit = getSendLimit();
 
 if (!autoSendEnabled) {
   console.log("Outreach auto send is disabled.");
@@ -18,40 +19,44 @@ if (!smtp) {
   throw new Error("Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS and SMTP_FROM.");
 }
 
-const lead = await findNextLead();
+const leads = await findNextLeads(sendLimit);
 
-if (!lead) {
+if (leads.length === 0) {
   console.log("No outreach leads ready for automatic email.");
   process.exit(0);
 }
 
-console.log(`Sending outreach email to ${lead.email} (${lead.studio_name})`);
+console.log(`Outreach send limit for this run: ${sendLimit}. Leads loaded: ${leads.length}.`);
 
-try {
-  await sendEmail(lead);
-  await updateLead(lead.id, {
-    last_contacted_at: new Date().toISOString(),
-    status: "sent",
-    raw: {
-      ...(lead.raw ?? {}),
-      last_auto_send_at: new Date().toISOString(),
-    },
-  });
-  console.log(`Sent outreach email to ${lead.email}`);
-} catch (error) {
-  const message = error instanceof Error ? error.message : "Unknown SMTP error.";
-  await updateLead(lead.id, {
-    status: "needs_review",
-    raw: {
-      ...(lead.raw ?? {}),
-      last_send_error: message,
-      last_send_error_at: new Date().toISOString(),
-    },
-  });
-  throw error;
+for (const lead of leads) {
+  console.log(`Sending outreach email to ${lead.email} (${lead.studio_name})`);
+
+  try {
+    await sendEmail(lead);
+    await updateLead(lead.id, {
+      last_contacted_at: new Date().toISOString(),
+      status: "sent",
+      raw: {
+        ...(lead.raw ?? {}),
+        last_auto_send_at: new Date().toISOString(),
+      },
+    });
+    console.log(`Sent outreach email to ${lead.email}`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown SMTP error.";
+    await updateLead(lead.id, {
+      status: "needs_review",
+      raw: {
+        ...(lead.raw ?? {}),
+        last_send_error: message,
+        last_send_error_at: new Date().toISOString(),
+      },
+    });
+    throw error;
+  }
 }
 
-async function findNextLead() {
+async function findNextLeads(limit) {
   const params = new URLSearchParams();
   params.set(
     "select",
@@ -61,7 +66,7 @@ async function findNextLead() {
   params.append("email", "not.is.null");
   params.append("email", "neq.");
   params.set("order", "last_contacted_at.asc.nullsfirst,created_at.asc");
-  params.set("limit", "1");
+  params.set("limit", String(limit));
 
   const response = await fetch(`${supabase.restUrl}/outreach_leads?${params}`, {
     headers: supabaseHeaders(),
@@ -71,8 +76,7 @@ async function findNextLead() {
     throw new Error(`Could not load outreach lead: ${await response.text()}`);
   }
 
-  const leads = await response.json();
-  return leads?.[0] ?? null;
+  return (await response.json()) ?? [];
 }
 
 async function sendEmail(lead) {
@@ -164,6 +168,29 @@ function createSmtpConfig() {
 
 function normalizeEmailHeader(value) {
   return value?.replace(/\s+/g, " ").trim();
+}
+
+function getSendLimit() {
+  const explicitLimit = Number(process.env.OUTREACH_SENDS_PER_RUN ?? "");
+  if (Number.isInteger(explicitLimit) && explicitLimit > 0) {
+    return Math.min(explicitLimit, getMaxSendLimit());
+  }
+
+  const startedAt = Date.parse(process.env.OUTREACH_RAMP_STARTED_AT ?? "");
+  const campaignAgeDays = Number.isFinite(startedAt)
+    ? Math.floor((Date.now() - startedAt) / 86_400_000)
+    : 0;
+
+  const rampStepDays = Math.max(1, Number(process.env.OUTREACH_RAMP_STEP_DAYS ?? "3"));
+  const rampStepSize = Math.max(1, Number(process.env.OUTREACH_RAMP_STEP_SIZE ?? "1"));
+  const rampBase = Math.max(1, Number(process.env.OUTREACH_RAMP_BASE ?? "1"));
+  const rampLimit = rampBase + Math.floor(campaignAgeDays / rampStepDays) * rampStepSize;
+
+  return Math.min(rampLimit, getMaxSendLimit());
+}
+
+function getMaxSendLimit() {
+  return Math.max(1, Number(process.env.OUTREACH_MAX_SENDS_PER_RUN ?? "3"));
 }
 
 function buildOutreachSubject(variables) {

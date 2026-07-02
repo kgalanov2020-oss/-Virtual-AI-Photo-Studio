@@ -119,3 +119,13 @@ services:
         value: true
       - key: OUTREACH_PROMO_CODE
         value: STUDIO
+      - key: OUTREACH_RAMP_STARTED_AT
+        value: "2026-07-02T00:00:00.000Z"
+      - key: OUTREACH_RAMP_BASE
+        value: 1
+      - key: OUTREACH_RAMP_STEP_DAYS
+        value: 3
+      - key: OUTREACH_RAMP_STEP_SIZE
+        value: 1
+      - key: OUTREACH_MAX_SENDS_PER_RUN
+        value: 3
