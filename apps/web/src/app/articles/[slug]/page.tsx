@@ -194,7 +194,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             <div className="article-showcase-column">
               <span>До</span>
               <div className="article-showcase-selfies">
-                {showcase.before.map((image, index) => (
+                {showcase.before.slice(0, 1).map((image, index) => (
                   <img
                     alt={`Исходное селфи ${index + 1} до AI-фотосессии`}
                     decoding="async"
