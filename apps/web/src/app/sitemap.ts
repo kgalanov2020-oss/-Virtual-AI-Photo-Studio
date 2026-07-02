@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import catalog from "@/lib/studio-catalog.json";
+import { articles } from "@/lib/articles";
 import { seoPages } from "@/lib/seo-pages";
 
 const siteUrl = "https://virtualphotostudio.ru";
@@ -9,6 +10,7 @@ const staticRoutes = [
   "/login",
   "/sessions",
   "/upload",
+  "/articles",
   "/oferta",
   "/privacy",
   "/personal-data-consent",
@@ -28,6 +30,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${siteUrl}/${page.slug}`,
     lastModified: now,
   }));
+  const articlePages = articles.map((article) => ({
+    url: `${siteUrl}/articles/${article.slug}`,
+    lastModified: new Date(article.date),
+  }));
 
-  return [...staticPages, ...seoLandingPages, ...studioPages];
+  return [...staticPages, ...seoLandingPages, ...articlePages, ...studioPages];
 }

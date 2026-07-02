@@ -850,6 +850,156 @@ a {
   max-width: 680px;
 }
 
+.articles-page,
+.article-page {
+  background: var(--bg);
+}
+
+.articles-hero {
+  padding: clamp(46px, 7vw, 92px) clamp(20px, 5vw, 72px) clamp(24px, 4vw, 48px);
+}
+
+.articles-hero h1 {
+  max-width: 980px;
+}
+
+.articles-grid-section {
+  padding-top: 0;
+}
+
+.articles-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.article-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  min-height: 300px;
+  padding: 26px;
+  transition:
+    border-color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.article-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.article-card span,
+.article-meta,
+.article-back-link {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.article-card h2 {
+  font-size: clamp(25px, 2.3vw, 34px);
+  line-height: 1.05;
+  margin: 0;
+}
+
+.article-card p {
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.article-card em {
+  align-self: end;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.article-shell {
+  margin: 0 auto;
+  max-width: 980px;
+  padding: clamp(38px, 6vw, 82px) clamp(20px, 5vw, 72px);
+}
+
+.article-header {
+  display: grid;
+  gap: 18px;
+  margin-bottom: clamp(34px, 5vw, 64px);
+}
+
+.article-header h1 {
+  max-width: 980px;
+}
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.article-body {
+  display: grid;
+  gap: 34px;
+}
+
+.article-body section,
+.article-faq,
+.article-cta {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 16px;
+  padding: clamp(22px, 4vw, 34px);
+}
+
+.article-body h2,
+.article-faq h2,
+.article-cta h2 {
+  font-size: clamp(28px, 3vw, 42px);
+  line-height: 1.08;
+  margin: 0;
+}
+
+.article-body p,
+.article-faq p,
+.article-cta p {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.72;
+  margin: 0;
+}
+
+.article-faq {
+  margin-top: 34px;
+}
+
+.article-faq article {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 8px;
+  padding-top: 16px;
+}
+
+.article-faq h3 {
+  font-size: 22px;
+  margin: 0;
+}
+
+.article-cta {
+  align-items: start;
+  margin-top: 34px;
+}
+
+.article-cta .button {
+  width: fit-content;
+}
+
 .landing-nav {
   align-items: center;
   display: flex;
@@ -2693,7 +2843,8 @@ h1 {
   .landing-intro,
   .result-section,
   .seo-hero,
-  .seo-split-section {
+  .seo-split-section,
+  .articles-grid {
     grid-template-columns: 1fr;
   }
 
