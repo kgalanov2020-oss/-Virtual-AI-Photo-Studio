@@ -2240,6 +2240,50 @@ h1 {
   font-weight: 800;
 }
 
+.outreach-leads-table small {
+  color: var(--muted);
+  display: block;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.outreach-status-pill {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.2;
+  padding: 8px 10px;
+}
+
+.outreach-status-pill.is-auto {
+  background: #edf7ef;
+  border-color: #bfe1c7;
+  color: #2c6b3e;
+}
+
+.outreach-status-pill.is-manual,
+.outreach-status-pill.is-sent {
+  background: #f1ece6;
+  border-color: #d7cabd;
+  color: var(--accent);
+}
+
+.outreach-status-pill.is-warning {
+  background: #fff6df;
+  border-color: #ead39b;
+  color: #8a5d12;
+}
+
+.outreach-status-pill.is-stop {
+  background: #f7e5e2;
+  border-color: #e5b5ad;
+  color: #8b2f24;
+}
+
 .outreach-row-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2269,6 +2313,62 @@ h1 {
   background: #d8d2ca;
   color: #82786e;
   cursor: not-allowed;
+}
+
+.admin-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-card {
+  align-content: space-between;
+  display: grid;
+  gap: 24px;
+  min-height: 300px;
+}
+
+.admin-card h2 {
+  font-size: clamp(32px, 4vw, 58px);
+  line-height: 1.02;
+  margin: 0 0 18px;
+}
+
+.admin-card p {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.admin-card-wide {
+  grid-column: 1 / -1;
+  min-height: auto;
+}
+
+.admin-promo-list {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.admin-promo-list div {
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+}
+
+.admin-promo-list strong {
+  font-size: 22px;
+}
+
+.admin-promo-list span {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.45;
 }
 
 .mode-option {
@@ -2986,6 +3086,11 @@ h1 {
   }
 
   .outreach-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-grid,
+  .admin-promo-list {
     grid-template-columns: 1fr;
   }
 

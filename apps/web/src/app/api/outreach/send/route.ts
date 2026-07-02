@@ -51,7 +51,7 @@ async function sendOutreachEmail(request: NextRequest) {
   const supabase = createSupabaseAdminClient();
   const { data: lead, error } = await supabase
     .from("outreach_leads")
-    .select("id,studio_name,city,email,promo_code,status")
+    .select("id,studio_name,city,email,promo_code,status,raw")
     .eq("id", body.leadId)
     .single();
 
@@ -106,6 +106,10 @@ async function sendOutreachEmail(request: NextRequest) {
     .from("outreach_leads")
     .update({
       last_contacted_at: sentAt,
+      raw: {
+        ...((lead.raw as Record<string, unknown> | null) ?? {}),
+        last_manual_send_at: sentAt,
+      },
       status: "sent" satisfies OutreachLead["status"],
     })
     .eq("id", lead.id);
@@ -114,7 +118,17 @@ async function sendOutreachEmail(request: NextRequest) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ lead: { ...lead, last_contacted_at: sentAt, status: "sent" } });
+  return NextResponse.json({
+    lead: {
+      ...lead,
+      last_contacted_at: sentAt,
+      raw: {
+        ...((lead.raw as Record<string, unknown> | null) ?? {}),
+        last_manual_send_at: sentAt,
+      },
+      status: "sent",
+    },
+  });
 }
 
 function getSmtpConfig() {

@@ -14,6 +14,7 @@ type OutreachLead = {
   promo_code: string;
   status: string;
   last_contacted_at: string | null;
+  raw: Record<string, unknown> | null;
   created_at: string;
 };
 
@@ -141,7 +142,12 @@ export default function OutreachPage() {
       setLeads((current) =>
         current.map((item) =>
           item.id === lead.id
-            ? { ...item, last_contacted_at: payload.lead.last_contacted_at, status: "sent" }
+            ? {
+                ...item,
+                last_contacted_at: payload.lead.last_contacted_at,
+                raw: payload.lead.raw ?? item.raw,
+                status: "sent",
+              }
             : item,
         ),
       );
@@ -201,6 +207,7 @@ export default function OutreachPage() {
           Virtual AI Photo Studio
         </Link>
         <nav className="topnav" aria-label="Навигация">
+          <Link href="/admin">Админ</Link>
           <Link href="/">Каталог</Link>
           <Link href="/sessions">Мои фотосессии</Link>
         </nav>
@@ -375,19 +382,26 @@ export default function OutreachPage() {
                         "-"
                       )}
                     </td>
-                    <td>{lead.status}</td>
+                    <td>
+                      <span className={`outreach-status-pill ${getLeadStatusClass(lead)}`}>
+                        {getLeadStatusLabel(lead)}
+                      </span>
+                      {lead.last_contacted_at ? (
+                        <small>{formatDateTime(lead.last_contacted_at)}</small>
+                      ) : null}
+                    </td>
                     <td>{lead.promo_code}</td>
                     <td>
                       <div className="outreach-row-actions">
                         <button
                           className="outreach-send-button"
-                          disabled={!lead.email || lead.status === "sent" || sendingLeadId === lead.id}
+                          disabled={!lead.email || isLeadSent(lead) || sendingLeadId === lead.id}
                           onClick={() => sendLead(lead)}
                           type="button"
                         >
                           {sendingLeadId === lead.id
                             ? "Отправка..."
-                            : lead.status === "sent"
+                            : isLeadSent(lead)
                               ? "Отправлено"
                               : "Отправить"}
                         </button>
@@ -421,6 +435,56 @@ function renderTemplate(template: string, variables: Record<string, string>) {
     (result, [key, value]) => result.replaceAll(`{{${key}}}`, value),
     template,
   );
+}
+
+function isLeadSent(lead: OutreachLead) {
+  return lead.status === "sent";
+}
+
+function getLeadStatusLabel(lead: OutreachLead) {
+  if (lead.status === "sent" && hasRawDate(lead, "last_auto_send_at")) {
+    return "Направлено автоматически";
+  }
+
+  if (lead.status === "sent" && hasRawDate(lead, "last_manual_send_at")) {
+    return "Отправлено вручную";
+  }
+
+  const labels: Record<string, string> = {
+    approved: "Одобрен",
+    bad_email: "Плохой email",
+    duplicate: "Дубликат",
+    needs_manual_email: "Нужен email",
+    needs_review: "Проверить",
+    new: "Новый",
+    replied: "Ответили",
+    sent: "Отправлено",
+    stop: "Стоп",
+  };
+
+  return labels[lead.status] ?? lead.status;
+}
+
+function getLeadStatusClass(lead: OutreachLead) {
+  if (lead.status === "sent" && hasRawDate(lead, "last_auto_send_at")) return "is-auto";
+  if (lead.status === "sent" && hasRawDate(lead, "last_manual_send_at")) return "is-manual";
+  if (lead.status === "sent") return "is-sent";
+  if (lead.status === "needs_review" || lead.status === "bad_email") return "is-warning";
+  if (lead.status === "stop") return "is-stop";
+  return "";
+}
+
+function hasRawDate(lead: OutreachLead, key: string) {
+  return typeof lead.raw?.[key] === "string" && Boolean(lead.raw[key]);
+}
+
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    month: "2-digit",
+  }).format(new Date(value));
 }
 
 function buildHtmlEmail(textBody: string, promoCode: string) {
