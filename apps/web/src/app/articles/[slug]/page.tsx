@@ -149,6 +149,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const faqJsonLd = createArticleFaqJsonLd(article);
   const showcase = articleShowcases.get(article.slug);
   const examples = articleExampleImages.get(article.slug) ?? [];
+  const publicationText = buildArticlePublicationText(article);
 
   return (
     <main className="page article-page">
@@ -248,6 +249,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           </section>
         ) : null}
 
+        <section className="article-copy-section" aria-label="Текст статьи для публикации">
+          <span>Текст для публикации</span>
+          <textarea readOnly value={publicationText} />
+        </section>
+
         <div className="article-body">
           {article.sections.map((section) => (
             <section key={section.heading}>
@@ -274,4 +280,31 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       </article>
     </main>
   );
+}
+
+function buildArticlePublicationText(article: (typeof articles)[number]) {
+  const sections = article.sections.flatMap((section) => [
+    section.heading,
+    ...section.paragraphs,
+  ]);
+  const faq = article.faq?.length
+    ? [
+        "Частые вопросы",
+        ...article.faq.flatMap((item) => [item.question, item.answer]),
+      ]
+    : [];
+
+  return [
+    article.title,
+    "",
+    article.intro,
+    "",
+    ...sections.flatMap((item) => [item, ""]),
+    ...faq.flatMap((item) => [item, ""]),
+    "Сервис: Virtual AI Photo Studio",
+    "https://virtualphotostudio.ru",
+  ]
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
