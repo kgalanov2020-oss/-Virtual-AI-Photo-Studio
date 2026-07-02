@@ -996,7 +996,14 @@ a {
   display: block;
   height: 100%;
   object-fit: cover;
+  object-position: top;
   width: 100%;
+}
+
+.article-showcase-selfies img {
+  aspect-ratio: 3 / 4;
+  background: #eeeae3;
+  object-fit: contain;
 }
 
 .article-showcase-results img {
