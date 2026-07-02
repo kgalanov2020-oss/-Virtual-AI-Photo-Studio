@@ -987,7 +987,7 @@ a {
 }
 
 .article-showcase-results {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .article-showcase img {
@@ -997,6 +997,10 @@ a {
   height: 100%;
   object-fit: cover;
   width: 100%;
+}
+
+.article-showcase-results img {
+  max-height: 560px;
 }
 
 .article-body section,

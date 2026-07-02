@@ -59,15 +59,11 @@ const beforeSets = [
 
 const articleShowcases = new Map<string, ArticleShowcase>(
   articles.map((article, index) => {
-    const imageStart = index * 3 + 1;
-
     return [
       article.slug,
       {
         before: beforeSets[index].map((imageIndex) => selfieImages[imageIndex]),
-        after: [0, 1, 2].map(
-          (offset) => `/article-showcases/after-${String(imageStart + offset).padStart(2, "0")}.webp`,
-        ),
+        after: [`/article-showcases/after-${String(index + 1).padStart(2, "0")}.webp`],
       },
     ];
   }),
