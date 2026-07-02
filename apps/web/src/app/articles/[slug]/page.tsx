@@ -21,6 +21,11 @@ type ArticleShowcase = {
   after: string[];
 };
 
+type ArticleExampleImage = {
+  alt: string;
+  src: string;
+};
+
 const selfieImages = [
   "/selfie-guide/01-front-neutral.webp",
   "/selfie-guide/02-front-smile.webp",
@@ -69,6 +74,55 @@ const articleShowcases = new Map<string, ArticleShowcase>(
   }),
 );
 
+const exampleGroups: ArticleExampleImage[][] = [
+  [
+    { src: "/article-location-examples/yacht-01.webp", alt: "AI-фото на яхте у причала" },
+    { src: "/article-location-examples/yacht-02.webp", alt: "AI-фото в морской локации" },
+    { src: "/article-location-examples/villa-01.webp", alt: "AI-фото у бассейна на вилле" },
+    { src: "/article-location-examples/villa-02.webp", alt: "AI-фото в светлой курортной локации" },
+  ],
+  [
+    { src: "/article-location-examples/restaurant-01.webp", alt: "AI-фото в ресторане fine dining" },
+    { src: "/article-location-examples/restaurant-02.webp", alt: "AI-фото за столом в премиальном ресторане" },
+    { src: "/article-location-examples/pink-studio-01.webp", alt: "AI-фото в современной розовой студии" },
+    { src: "/article-location-examples/pink-studio-02.webp", alt: "AI-фото в fashion-студии с мягким светом" },
+  ],
+  [
+    { src: "/article-location-examples/desert-01.webp", alt: "AI-фото в пустынной локации" },
+    { src: "/article-location-examples/desert-02.webp", alt: "AI-фото на фоне песчаных дюн" },
+    { src: "/article-location-examples/riad-01.webp", alt: "AI-фото в марокканском riad" },
+    { src: "/article-location-examples/riad-02.webp", alt: "AI-фото у каменной арки" },
+  ],
+  [
+    { src: "/article-location-examples/jet-01.webp", alt: "AI-фото в бизнес-джете" },
+    { src: "/article-location-examples/jet-02.webp", alt: "AI-фото в салоне частного самолёта" },
+    { src: "/article-location-examples/yacht-03.webp", alt: "AI-фото на палубе яхты" },
+    { src: "/article-location-examples/villa-03.webp", alt: "AI-фото на вилле у моря" },
+  ],
+  [
+    { src: "/article-location-examples/pink-studio-03.webp", alt: "AI-фото в розовой циклораме" },
+    { src: "/article-location-examples/pink-studio-04.webp", alt: "AI-фото в стильной пастельной студии" },
+    { src: "/article-location-examples/restaurant-03.webp", alt: "AI-фото в вечернем ресторане" },
+    { src: "/article-location-examples/riad-03.webp", alt: "AI-фото в тёплой архитектурной локации" },
+  ],
+  [
+    { src: "/article-location-examples/desert-03.webp", alt: "AI-фото в luxury travel стиле" },
+    { src: "/article-location-examples/desert-04.webp", alt: "AI-фото на закате в пустыне" },
+    { src: "/article-location-examples/jet-03.webp", alt: "AI-фото в приватной деловой локации" },
+    { src: "/article-location-examples/jet-04.webp", alt: "AI-фото в кресле бизнес-джета" },
+  ],
+  [
+    { src: "/article-location-examples/villa-04.webp", alt: "AI-фото у бассейна на курорте" },
+    { src: "/article-location-examples/yacht-04.webp", alt: "AI-фото на яхте в отпускном стиле" },
+    { src: "/article-location-examples/riad-04.webp", alt: "AI-фото в южной вилле с арками" },
+    { src: "/article-location-examples/restaurant-04.webp", alt: "AI-фото в камерном ресторане" },
+  ],
+];
+
+const articleExampleImages = new Map<string, ArticleExampleImage[]>(
+  articles.map((article, index) => [article.slug, exampleGroups[index % exampleGroups.length]]),
+);
+
 export function generateStaticParams() {
   return articles.map((article) => ({ slug: article.slug }));
 }
@@ -95,6 +149,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const articleJsonLd = createArticleJsonLd(article);
   const faqJsonLd = createArticleFaqJsonLd(article);
   const showcase = articleShowcases.get(article.slug);
+  const examples = articleExampleImages.get(article.slug) ?? [];
 
   return (
     <main className="page article-page">
@@ -167,6 +222,31 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
                   />
                 ))}
               </div>
+            </div>
+          </section>
+        ) : null}
+
+        {examples.length ? (
+          <section className="article-example-strip" aria-label="Дополнительные примеры AI-фотосессий">
+            <div className="article-example-strip-copy">
+              <span>Ещё примеры результата</span>
+              <p>
+                Эти кадры показывают, как один и тот же подход работает в разных локациях:
+                яхта, вилла, ресторан, студия, riad, пустыня и бизнес-джет.
+              </p>
+            </div>
+            <div className="article-example-grid">
+              {examples.map((image) => (
+                <img
+                  alt={image.alt}
+                  decoding="async"
+                  height="1280"
+                  key={image.src}
+                  loading="lazy"
+                  src={image.src}
+                  width="960"
+                />
+              ))}
             </div>
           </section>
         ) : null}
