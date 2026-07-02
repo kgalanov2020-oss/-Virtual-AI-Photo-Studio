@@ -21,6 +21,7 @@ export default function ArticlesPage() {
         </Link>
         <nav className="topnav" aria-label="Навигация">
           <Link href="/">Каталог</Link>
+          <Link href="/karta-sayta">Оглавление</Link>
           <Link href="/upload">Начать фотосессию</Link>
           <AuthNavAction />
         </nav>
@@ -34,6 +35,11 @@ export default function ArticlesPage() {
           чем виртуальная фотостудия отличается от обычной и как такой формат
           может помогать бизнесу.
         </p>
+        <div className="actions">
+          <Link className="button button-secondary" href="/karta-sayta">
+            Открыть оглавление сайта
+          </Link>
+        </div>
       </section>
 
       <section className="section articles-grid-section">

@@ -166,6 +166,8 @@ export default async function Home() {
           Virtual AI Photo Studio
         </a>
         <nav aria-label="Юридическая информация">
+          <a href="/articles">Статьи</a>
+          <a href="/karta-sayta">Оглавление</a>
           <a href="/oferta">Пользовательское соглашение</a>
           <a href="/privacy">Политика конфиденциальности</a>
           <a href="/personal-data-consent">Согласие на обработку персональных данных</a>

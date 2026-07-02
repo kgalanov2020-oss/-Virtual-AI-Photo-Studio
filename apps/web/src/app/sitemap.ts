@@ -11,6 +11,7 @@ const staticRoutes = [
   "/sessions",
   "/upload",
   "/articles",
+  "/karta-sayta",
   "/oferta",
   "/privacy",
   "/personal-data-consent",
