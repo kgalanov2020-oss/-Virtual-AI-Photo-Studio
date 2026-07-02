@@ -155,6 +155,25 @@ export function PromoCodePanel() {
 
   return (
     <div className="admin-promo-panel">
+      <div className="admin-promo-list" aria-label="Действующие промокампании">
+        <div>
+          <strong>STUDIO</strong>
+          <span>Партнёрский промокод для фотостудий и outreach-рассылки.</span>
+        </div>
+        <div>
+          <strong>START</strong>
+          <span>Стартовый промокод: одна тестовая генерация.</span>
+        </div>
+        <div>
+          <strong>WELCOME</strong>
+          <span>Приветственный промокод: две тестовые генерации.</span>
+        </div>
+        <div>
+          <strong>FRIEND</strong>
+          <span>Промокод для механики рекомендации другу.</span>
+        </div>
+      </div>
+
       <div className="admin-token-inline">
         <label>
           <span>Админ-токен</span>

@@ -33,6 +33,9 @@ export function AuthNavAction() {
   if (isLoggedIn) {
     return (
       <span className="auth-nav-actions">
+        <Link className="nav-auth-link" href="/admin">
+          Админ
+        </Link>
         <Link className="nav-auth-link" href="/sessions">
           Мои фотосессии
         </Link>
@@ -44,8 +47,13 @@ export function AuthNavAction() {
   }
 
   return (
-    <Link className="nav-auth-link" href="/login">
-      Регистрация/Войти
-    </Link>
+    <span className="auth-nav-actions">
+      <Link className="nav-auth-link" href="/admin">
+        Админ
+      </Link>
+      <Link className="nav-auth-link" href="/login">
+        Регистрация/Войти
+      </Link>
+    </span>
   );
 }
