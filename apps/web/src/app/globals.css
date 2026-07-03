@@ -2383,7 +2383,7 @@ h1 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.admin-promo-list div {
+.admin-promo-list > div {
   background: var(--soft);
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -2396,10 +2396,28 @@ h1 {
   font-size: 22px;
 }
 
+.admin-promo-card-head {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.admin-promo-list b {
+  color: var(--ink);
+  font-size: 18px;
+}
+
 .admin-promo-list span {
   color: var(--muted);
   font-size: 15px;
   line-height: 1.45;
+}
+
+.admin-promo-list small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
 }
 
 .admin-promo-panel,

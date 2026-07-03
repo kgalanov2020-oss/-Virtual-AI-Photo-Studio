@@ -24,6 +24,33 @@ const initialForm: PromoFormState = {
   starts_at: "",
 };
 
+const featuredCampaigns = [
+  {
+    code: "STUDIO",
+    fallbackCreditAmount: 40,
+    fallbackDescription: "Outreach для фотостудий: две промо-генерации по 20 фото.",
+    fallbackMaxRedemptions: 300,
+  },
+  {
+    code: "START",
+    fallbackCreditAmount: 20,
+    fallbackDescription: "Стартовый промокод: одна промо-генерация на 20 фото.",
+    fallbackMaxRedemptions: 100,
+  },
+  {
+    code: "WELCOME",
+    fallbackCreditAmount: 40,
+    fallbackDescription: "Приветственный промокод: две промо-генерации по 20 фото.",
+    fallbackMaxRedemptions: 100,
+  },
+  {
+    code: "FRIEND",
+    fallbackCreditAmount: 60,
+    fallbackDescription: "Приведи друга: три промо-генерации по 20 фото.",
+    fallbackMaxRedemptions: null,
+  },
+] as const;
+
 export function PromoCodePanel() {
   const [adminToken, setAdminToken] = useState("");
   const [form, setForm] = useState<PromoFormState>(initialForm);
@@ -33,11 +60,16 @@ export function PromoCodePanel() {
   const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
 
   useEffect(() => {
-    setAdminToken(window.localStorage.getItem("outreach_admin_token") ?? "");
+    const savedToken = window.localStorage.getItem("outreach_admin_token") ?? "";
+    setAdminToken(savedToken);
+    if (savedToken) {
+      void loadPromoCodes(savedToken);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function loadPromoCodes() {
-    const token = adminToken.trim();
+  async function loadPromoCodes(tokenOverride?: string) {
+    const token = (tokenOverride ?? adminToken).trim();
     if (!token) {
       setMessage("Введите админ-токен.");
       return;
@@ -156,22 +188,37 @@ export function PromoCodePanel() {
   return (
     <div className="admin-promo-panel">
       <div className="admin-promo-list" aria-label="Действующие промокампании">
-        <div>
-          <strong>STUDIO</strong>
-          <span>Партнёрский промокод для фотостудий и outreach-рассылки.</span>
-        </div>
-        <div>
-          <strong>START</strong>
-          <span>Стартовый промокод: одна тестовая генерация.</span>
-        </div>
-        <div>
-          <strong>WELCOME</strong>
-          <span>Приветственный промокод: две тестовые генерации.</span>
-        </div>
-        <div>
-          <strong>FRIEND</strong>
-          <span>Промокод для механики рекомендации другу.</span>
-        </div>
+        {featuredCampaigns.map((campaign) => {
+          const promoCode = promoCodes.find((item) => item.code === campaign.code);
+          const creditAmount = promoCode?.credit_amount ?? campaign.fallbackCreditAmount;
+          const maxRedemptions = promoCode?.max_redemptions ?? campaign.fallbackMaxRedemptions;
+          const redeemedCount = promoCode?.redeemed_count ?? 0;
+          const isLoaded = Boolean(promoCode);
+
+          return (
+            <div key={campaign.code}>
+              <div className="admin-promo-card-head">
+                <strong>{campaign.code}</strong>
+                <span
+                  className={
+                    promoCode?.is_active === false
+                      ? "outreach-status-pill is-stop"
+                      : "outreach-status-pill is-auto"
+                  }
+                >
+                  {promoCode?.is_active === false ? "Отключён" : "Активен"}
+                </span>
+              </div>
+              <b>{creditAmount} фото начисляет</b>
+              <span>{promoCode?.description ?? campaign.fallbackDescription}</span>
+              <small>
+                Применения: {isLoaded ? redeemedCount : "0"}
+                {maxRedemptions ? ` / ${maxRedemptions}` : " / без общего лимита"}
+              </small>
+              {promoCode ? <small>Период: {formatPromoPeriod(promoCode)}</small> : null}
+            </div>
+          );
+        })}
       </div>
 
       <div className="admin-token-inline">
@@ -184,7 +231,7 @@ export function PromoCodePanel() {
             value={adminToken}
           />
         </label>
-        <button className="button button-secondary" disabled={isLoading} onClick={loadPromoCodes}>
+        <button className="button button-secondary" disabled={isLoading} onClick={() => loadPromoCodes()}>
           {isLoading ? "Загрузка..." : "Загрузить промокоды"}
         </button>
       </div>

@@ -416,7 +416,7 @@ function buildPositivePrompt(
   wardrobePrompt?: string,
 ) {
   if (generationMode === "child_safe") {
-    return buildChildSafePositivePrompt(shot, variationIndex);
+    return buildChildSafePositivePrompt(shot, variationIndex, wardrobePrompt);
   }
 
   const scene = buildScenePrompt(shot);
@@ -461,7 +461,7 @@ function buildNegativePrompt(shot: StudioShot, generationMode: GenerationMode) {
     return [
       ...baseNegative,
       "adult business executive, mature professional, corporate leader, CEO, founder, office romance, nightlife, glamour, makeup-heavy look",
-      "formal suit that makes the child look adult, high heels, luxury adult styling, provocative expression, swimsuit",
+      "formal suit that makes the child look adult, high heels, luxury adult styling, provocative expression, revealing swimwear, underwear",
     ].join(", ");
   }
 
@@ -498,48 +498,30 @@ function buildGenerationSettings(shot: StudioShot, generationMode: GenerationMod
   };
 }
 
-function buildChildSafePositivePrompt(shot: StudioShot, variationIndex: number) {
-  const scene = buildChildSafeScenePrompt(shot);
+function buildChildSafePositivePrompt(
+  shot: StudioShot,
+  variationIndex: number,
+  wardrobePrompt?: string,
+) {
+  const scene = buildScenePrompt(shot);
   const framing = buildChildSafeFramingPrompt(shot, variationIndex);
 
   return [
     "safe age-appropriate portrait of the exact same child from the reference photo",
     "preserve child identity, same age range, same face shape, same eyes, same hair, natural child expression",
-    "fully clothed child, modest everyday clothes or neat school-style outfit, no exposed torso, no revealing clothing",
-    "safe school photo or kids editorial portrait, natural daylight, warm friendly expression",
+    "fully clothed child, modest age-appropriate clothes, no exposed torso, no revealing clothing",
+    "safe kids editorial portrait, natural daylight, warm friendly expression",
+    "the selected location is mandatory and must not be replaced by a school, classroom, home, office or generic studio unless that is the selected location",
     "realistic DSLR photo, natural skin texture, believable child face, not cartoon, not CGI",
     framing,
     `safe scene must match: ${scene}`,
+    `selected location details must stay visible: ${shot.prompt}`,
+    wardrobePrompt
+      ? `child-safe wardrobe must match the selected location: adapt this wardrobe direction for a modest age-appropriate child outfit, ${wardrobePrompt}`
+      : "",
     "pose must be natural for a child: relaxed, calm, friendly, playful but not exaggerated",
     "do not make the child look like an adult professional, executive, founder, model, romantic subject or glamour portrait",
-  ].join(", ");
-}
-
-function buildChildSafeScenePrompt(shot: StudioShot) {
-  const scenes: Record<string, string> = {
-    "window-portrait":
-      "standing near a bright window in a clean home or school-like room, soft daylight, simple background",
-    "executive-desk":
-      "sitting at a study desk with books, notebook, pencils or a laptop for homework, both hands visible",
-    "arms-crossed":
-      "standing in a neat school-style portrait with arms relaxed or gently crossed, friendly confidence",
-    "startup-founder":
-      "creative child portrait at a tidy craft or study table with books and school supplies",
-    "presentation-moment":
-      "standing beside a classroom board or simple presentation poster, pointing naturally in a school project scene",
-    "lounge-chair":
-      "sitting comfortably in a simple reading chair with a book nearby, calm and fully clothed",
-    "black-background":
-      "classic child studio portrait on a neutral charcoal background with soft light and modest clothing",
-    "walking-office":
-      "walking naturally through a bright school hallway or clean modern corridor with safe everyday styling",
-    "close-up-editorial":
-      "close child portrait with soft light, natural expression, shoulders visible, modest clothing",
-    "coffee-workspace":
-      "sitting at a study table with a cup of juice or water, books and notebook visible, safe homework moment",
-  };
-
-  return scenes[shot.slug] ?? "safe child portrait in a bright, clean, age-appropriate setting";
+  ].filter(Boolean).join(", ");
 }
 
 function buildChildSafeFramingPrompt(shot: StudioShot, variationIndex: number) {
