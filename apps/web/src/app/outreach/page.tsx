@@ -440,6 +440,10 @@ function isLeadSent(lead: OutreachLead) {
 }
 
 function getLeadStatusLabel(lead: OutreachLead) {
+  if (lead.status === "needs_review" && lead.raw?.last_send_rejected_status === "rejected_spam") {
+    return "Отклонено почтой";
+  }
+
   if (lead.status === "sent" && hasRawDate(lead, "last_auto_send_at")) {
     return "Направлено автоматически";
   }
