@@ -9,6 +9,7 @@ import {
 } from "@/lib/pricing";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { Job } from "@/lib/types";
+import { trackVkGoal } from "@/lib/vk-pixel";
 
 type CheckoutResponse = {
   ok?: boolean;
@@ -138,6 +139,17 @@ export default function CheckoutPage() {
 
       if (data.balancePaid) {
         setMessage("Заказ оплачен с баланса фото. Переходим к генерации.");
+        trackCheckoutGoalOnce("purchase", "balance", {
+          product_code: activePackage.code,
+          image_count: activePackage.imageCount,
+          payment_method: "balance",
+          value: 0,
+        });
+        trackCheckoutGoalOnce("generation_started", "balance", {
+          product_code: activePackage.code,
+          image_count: activePackage.imageCount,
+          payment_method: "balance",
+        });
       }
 
       if (data.redirectUrl) {
@@ -148,6 +160,13 @@ export default function CheckoutPage() {
       if (!data.checkoutUrl) {
         throw new Error("Платёжная система не вернула ссылку на оплату.");
       }
+
+      trackCheckoutGoalOnce("payment_started", "yookassa", {
+        product_code: activePackage.code,
+        image_count: activePackage.imageCount,
+        payment_method: "yookassa",
+        value: activePackage.amountCents / 100,
+      });
 
       window.location.href = data.checkoutUrl;
     } catch (paymentError) {
@@ -197,6 +216,12 @@ export default function CheckoutPage() {
       }
 
       setMessage("Оплата подтверждена. Переходим к генерации.");
+      trackCheckoutGoalOnce("purchase", activeSessionId ?? "latest", {
+        product_code: activePackage.code,
+        image_count: activePackage.imageCount,
+        payment_method: canUsePhotoBalance ? "balance" : "yookassa",
+        value: canUsePhotoBalance ? 0 : activePackage.amountCents / 100,
+      });
       window.location.href = data.redirectUrl ?? `/generation/${jobId}`;
     } catch (confirmError) {
       if (!options.silent) {
@@ -209,6 +234,18 @@ export default function CheckoutPage() {
       }
       await loadCheckout();
     }
+  }
+
+  function trackCheckoutGoalOnce(
+    goal: string,
+    marker: string,
+    params: Parameters<typeof trackVkGoal>[1],
+  ) {
+    const key = `vk-goal:${goal}:${jobId}:${marker}`;
+    if (window.sessionStorage.getItem(key)) return;
+
+    trackVkGoal(goal, params);
+    window.sessionStorage.setItem(key, "1");
   }
 
   return (

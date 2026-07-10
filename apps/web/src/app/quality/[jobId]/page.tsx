@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { GenerationMode, UploadedSelfie } from "@/lib/types";
+import { trackVkGoal } from "@/lib/vk-pixel";
 
 type QualityPhoto = UploadedSelfie & {
   signedUrl: string | null;
@@ -119,6 +120,10 @@ export default function QualityPage({ params }: QualityPageProps) {
         throw new Error(data.error ?? "Не удалось принять фото.");
       }
 
+      trackVkGoal("selfies_approved", {
+        generation_mode: generationMode,
+      });
+
       setPhotos((current) =>
         current.map((photo) => ({
           ...photo,
@@ -131,6 +136,11 @@ export default function QualityPage({ params }: QualityPageProps) {
         router.push(`/checkout/${jobId}`);
         return;
       }
+
+      trackVkGoal("generation_started", {
+        generation_mode: generationMode,
+        payment_method: "balance",
+      });
 
       setMessage("Фото приняты. Переходим к генерации фотосессии.");
       router.push(`/generation/${jobId}`);

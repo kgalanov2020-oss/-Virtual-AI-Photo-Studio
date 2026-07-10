@@ -7,6 +7,7 @@ import { AuthNavAction } from "@/app/auth-nav-action";
 import { formatMoney, getPhotoPackage, PHOTO_PACKAGES, type PhotoPackageCode } from "@/lib/pricing";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { GenerationMode, UserProfile } from "@/lib/types";
+import { trackVkGoal } from "@/lib/vk-pixel";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 
 type SelectedSelfie = {
@@ -374,6 +375,13 @@ export default function UploadPage() {
       if (selfiesError) {
         throw new Error(selfiesError.message);
       }
+
+      trackVkGoal("selfies_uploaded", {
+        studio_slug: selectedStudioSlug,
+        generation_mode: generationMode,
+        product_code: selectedPackage.code,
+        image_count: selectedPackage.imageCount,
+      });
 
       setUploadResult(`Job создан: ${job.id}. Загружено фото: ${uploadedRows.length}.`);
       router.push(`/quality/${job.id}`);
