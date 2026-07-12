@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { MarketingAttributionTracker } from "@/app/marketing-attribution-tracker";
 import "./globals.css";
 
 const siteUrl = "https://virtualphotostudio.ru";
@@ -97,6 +98,7 @@ _tmr.push({id: "${vkPixelId}", type: "pageView", start: (new Date()).getTime()})
         />
       </head>
       <body>
+        <MarketingAttributionTracker />
         {children}
         <noscript>
           <div>

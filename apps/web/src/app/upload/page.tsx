@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { AuthNavAction } from "@/app/auth-nav-action";
+import { getStoredMarketingAttribution } from "@/lib/marketing-attribution";
 import { formatMoney, getPhotoPackage, PHOTO_PACKAGES, type PhotoPackageCode } from "@/lib/pricing";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { GenerationMode, UserProfile } from "@/lib/types";
@@ -306,6 +307,22 @@ export default function UploadPage() {
 
       if (!activeUserId || !activeEmail) {
         throw new Error("Сначала войдите по email.");
+      }
+
+      const attribution = getStoredMarketingAttribution();
+      if (attribution) {
+        const existingMetadata = sessionData.session?.user.user_metadata ?? {};
+        const { error: attributionError } = await supabase.auth.updateUser({
+          data: {
+            marketing_attribution_first:
+              existingMetadata.marketing_attribution_first ?? attribution.first,
+            marketing_attribution_last: attribution.last,
+          },
+        });
+
+        if (attributionError) {
+          console.warn("Marketing attribution was not saved", attributionError.message);
+        }
       }
 
       if (selectedPackage.isFree && !hasEnoughPhotoBalance) {

@@ -4,8 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { AuthNavAction } from "@/app/auth-nav-action";
+import { getStoredMarketingAttribution } from "@/lib/marketing-attribution";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { UserProfile } from "@/lib/types";
+import { trackVkGoal } from "@/lib/vk-pixel";
 
 function sanitizeNext(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return "/upload";
@@ -147,15 +149,30 @@ export default function LoginPage() {
 
     try {
       const supabase = createSupabaseBrowserClient();
+      const attribution = getStoredMarketingAttribution();
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/login?next=${encodeURIComponent(nextPath)}`,
+          data: attribution
+            ? {
+                marketing_attribution_first: attribution.first,
+                marketing_attribution_last: attribution.last,
+              }
+            : undefined,
         },
       });
 
       if (signUpError) throw signUpError;
+
+      if (data.user) {
+        const registrationKey = `vaps_registration_${data.user.id}`;
+        if (!window.sessionStorage.getItem(registrationKey)) {
+          trackVkGoal("registration");
+          window.sessionStorage.setItem(registrationKey, "1");
+        }
+      }
 
       if (data.session?.user) {
         await saveProfileConsents(data.session.user);
