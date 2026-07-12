@@ -59,6 +59,12 @@ export default async function Home() {
         </a>
         <nav aria-label="Главная навигация">
           <a href="#studios">Каталог</a>
+          <a
+            href="https://avatar-app-vcer.onrender.com/app?utm_source=virtualphotostudio&utm_medium=product_crosslink&utm_campaign=ecosystem"
+            rel="noreferrer"
+          >
+            Видео-аватары
+          </a>
           <AuthNavAction />
         </nav>
       </header>
@@ -159,6 +165,25 @@ export default async function Home() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="atelier-section atelier-avatar-bridge">
+        <div>
+          <p className="eyebrow">Следующий шаг</p>
+          <h2>Оживите готовый портрет</h2>
+          <p>
+            Выберите понравившееся фото из готовой серии и создайте из него
+            говорящее видео: поздравление, обращение или короткий ролик для
+            социальных сетей.
+          </p>
+        </div>
+        <a
+          className="atelier-button atelier-button-dark"
+          href="https://avatar-app-vcer.onrender.com/app?utm_source=virtualphotostudio&utm_medium=product_crosslink&utm_campaign=ecosystem"
+          rel="noreferrer"
+        >
+          Создать видео-аватар
+        </a>
       </section>
 
       <footer className="atelier-footer">
