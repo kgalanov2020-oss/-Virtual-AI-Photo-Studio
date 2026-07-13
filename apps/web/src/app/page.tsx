@@ -180,17 +180,17 @@ export default async function Home() {
             avatar-app-vcer.onrender.com/app ↗
           </a>
         </div>
-        <a aria-label="Открыть Avatar App" className="atelier-avatar-example" href="https://avatar-app-vcer.onrender.com/app?utm_source=virtualphotostudio&utm_medium=product_crosslink&utm_campaign=ecosystem" rel="noreferrer" target="_blank">
-          <img alt="Портрет для создания говорящего аватара" src="/avatar-showcase/blogger.png" />
-          <span className="atelier-avatar-example-label">Создать говорящее видео в Avatar App ↗</span>
-        </a>
-        <a
-          className="atelier-button atelier-button-dark"
-          href="https://avatar-app-vcer.onrender.com/app?utm_source=virtualphotostudio&utm_medium=product_crosslink&utm_campaign=ecosystem"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Открыть Avatar App ↗
+        <a aria-label="Открыть Avatar App" className="atelier-avatar-transition" href="https://avatar-app-vcer.onrender.com/app?utm_source=virtualphotostudio&utm_medium=product_crosslink&utm_campaign=ecosystem" rel="noreferrer" target="_blank">
+          <span className="atelier-avatar-frame">
+            <img alt="Готовый AI-портрет для Avatar App" src="/avatar-showcase/avatar-woman.png" />
+            <span>Фото</span>
+          </span>
+          <span className="atelier-avatar-arrow" aria-hidden="true">→</span>
+          <span className="atelier-avatar-frame atelier-avatar-frame-video">
+            <video autoPlay loop muted playsInline poster="/avatar-showcase/avatar-woman.png" src="/avatar-showcase/avatar-result-taurus.mp4" />
+            <span>Говорящее видео</span>
+          </span>
+          <strong>Создать видео в Avatar App ↗</strong>
         </a>
       </section>
 

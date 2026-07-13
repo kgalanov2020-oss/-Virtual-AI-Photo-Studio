@@ -413,17 +413,17 @@ a {
 .atelier-avatar-bridge {
   align-items: center;
   background:
-    linear-gradient(90deg, rgba(28, 27, 24, 0.98), rgba(28, 27, 24, 0.78)),
-    url("/avatar-showcase/blogger.png") center 35% / cover;
+    linear-gradient(90deg, rgba(28, 27, 24, 0.96) 0%, rgba(28, 27, 24, 0.78) 48%, rgba(28, 27, 24, 0.62) 100%),
+    url("/studios/modern-office/master-wide.webp") center / cover;
   color: var(--background);
   display: grid;
   gap: clamp(24px, 4vw, 64px);
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 340px) auto;
+  grid-template-columns: minmax(0, 0.9fr) minmax(320px, 640px);
   padding-block: clamp(48px, 7vw, 96px);
 }
 
 .atelier-avatar-bridge h2 {
-  color: inherit;
+  color: #fff;
   font-size: clamp(38px, 5vw, 76px);
   line-height: 0.98;
   margin: 12px 0 22px;
@@ -438,12 +438,6 @@ a {
   max-width: 850px;
 }
 
-.atelier-avatar-bridge .atelier-button {
-  background: var(--background);
-  color: var(--text);
-  white-space: nowrap;
-}
-
 .atelier-avatar-text-link {
   color: #fff;
   display: inline-block;
@@ -454,16 +448,36 @@ a {
   text-underline-offset: 5px;
 }
 
-.atelier-avatar-example {
+.atelier-avatar-transition {
+  align-items: center;
+  backdrop-filter: blur(10px);
+  background: rgba(24, 22, 19, 0.52);
   border: 1px solid rgba(255, 255, 255, 0.38);
-  border-radius: 20px;
+  border-radius: 24px;
+  color: #fff;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  padding: clamp(14px, 2vw, 20px);
+  position: relative;
+  text-decoration: none;
+}
+
+.atelier-avatar-transition:hover {
+  border-color: rgba(255, 255, 255, 0.68);
+}
+
+.atelier-avatar-frame {
+  aspect-ratio: 4 / 5;
+  background: #221f1b;
+  border-radius: 18px;
   display: block;
-  min-height: 300px;
   overflow: hidden;
   position: relative;
 }
 
-.atelier-avatar-example img {
+.atelier-avatar-frame img,
+.atelier-avatar-frame video {
   height: 100%;
   inset: 0;
   object-fit: cover;
@@ -472,11 +486,12 @@ a {
   width: 100%;
 }
 
-.atelier-avatar-example:hover img {
+.atelier-avatar-transition:hover img,
+.atelier-avatar-transition:hover video {
   transform: scale(1.035);
 }
 
-.atelier-avatar-example-label {
+.atelier-avatar-frame span {
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.84));
   bottom: 0;
   color: #fff;
@@ -486,6 +501,30 @@ a {
   padding: 48px 18px 17px;
   position: absolute;
   right: 0;
+}
+
+.atelier-avatar-arrow {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 22px;
+  font-weight: 900;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.atelier-avatar-transition > strong {
+  color: #fff;
+  font-size: 15px;
+  grid-column: 1 / -1;
+  justify-self: center;
+  line-height: 1.2;
+  left: 50%;
+  text-align: center;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.72);
 }
 
 .atelier-footer-brand {
@@ -3904,10 +3943,18 @@ h1 {
     grid-template-columns: 1fr;
   }
 
-  .atelier-avatar-bridge .atelier-button {
-    text-align: center;
-    white-space: normal;
+  .atelier-avatar-transition {
+    grid-template-columns: 1fr;
     width: 100%;
+  }
+
+  .atelier-avatar-frame {
+    aspect-ratio: 16 / 11;
+  }
+
+  .atelier-avatar-arrow {
+    justify-self: center;
+    transform: rotate(90deg);
   }
 
   .atelier-footer nav {
