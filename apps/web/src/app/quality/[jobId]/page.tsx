@@ -142,7 +142,7 @@ export default function QualityPage({ params }: QualityPageProps) {
         payment_method: "balance",
       });
 
-      setMessage("Фото приняты. Переходим к генерации фотосессии.");
+      setMessage("Фото приняты. Запускаем генерацию фотосессии.");
       router.push(`/generation/${jobId}`);
     } catch (approveError) {
       setError(approveError instanceof Error ? approveError.message : "Неизвестная ошибка.");
@@ -163,8 +163,11 @@ export default function QualityPage({ params }: QualityPageProps) {
       <section className="quality-hero">
         <div>
           <p className="eyebrow">Шаг 2 из 3</p>
-          <h1>Проверка качества</h1>
-          <p className="lead">Проверьте загруженные фото перед запуском фотосессии.</p>
+          <h1>Подтвердите фото</h1>
+          <p className="lead">
+            Это не автоматическая проверка. Просмотрите фото и нажмите кнопку
+            «Всё подходит — продолжить».
+          </p>
         </div>
         <div className="quality-summary">
           <strong>{approvedCount}/{photos.length} принято</strong>
@@ -177,7 +180,10 @@ export default function QualityPage({ params }: QualityPageProps) {
         <div className="section-header">
           <div>
             <h2>Загруженные фото</h2>
-            <p>Для генерации нужно минимум 6 подходящих фото.</p>
+            <p>
+              Для генерации нужно минимум 6 фото. Если все изображения ваши, лицо
+              хорошо видно и фото не дублируются, подтвердите их кнопкой справа.
+            </p>
           </div>
           <button
             className="button button-primary"
@@ -185,7 +191,7 @@ export default function QualityPage({ params }: QualityPageProps) {
             onClick={approveAll}
             type="button"
           >
-            {isApproving ? "Принимаем..." : "Принять фото и перейти к генерации"}
+            {isApproving ? "Подтверждаем..." : "Всё подходит — продолжить"}
           </button>
         </div>
 
@@ -215,7 +221,7 @@ export default function QualityPage({ params }: QualityPageProps) {
                 <div className="quality-card-body">
                   <strong>Фото {index + 1}</strong>
                   <span className={photo.is_approved ? "badge ok" : "badge pending"}>
-                    {photo.is_approved ? "Принято" : "Ожидает проверки"}
+                    {photo.is_approved ? "Подтверждено" : "Готово к подтверждению"}
                   </span>
                   <p>{photo.file_url.split("/").pop()}</p>
                 </div>

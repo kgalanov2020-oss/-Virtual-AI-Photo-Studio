@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getTargetShots, getTargetVariationCount, isTargetVariation } from "@/lib/generation";
 import { translateShot } from "@/lib/ru";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
@@ -47,6 +47,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
   const [isUpdatingMode, setIsUpdatingMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const autoStartJobIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     params.then(({ jobId: resolvedJobId }) => {
@@ -54,6 +55,13 @@ export default function GenerationPage({ params }: GenerationPageProps) {
       loadGeneration(resolvedJobId);
     });
   }, [params]);
+
+  useEffect(() => {
+    if (!jobId || job?.status !== "queued" || autoStartJobIdRef.current === jobId) return;
+
+    autoStartJobIdRef.current = jobId;
+    void startGeneration();
+  }, [job?.status, jobId]);
 
   const visibleShotTargets = useMemo(
     () => getVisibleShotTargets(shots, job?.target_image_count ?? 40),
@@ -343,7 +351,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
             onClick={startGeneration}
             type="button"
           >
-            {isStartingGeneration ? "Идёт генерация..." : "Запустить генерацию"}
+            {isStartingGeneration ? "Идёт генерация..." : "Продолжить генерацию"}
           </button>
         </div>
 
