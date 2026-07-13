@@ -168,7 +168,7 @@ export default async function Home() {
       </section>
 
       <section className="atelier-section atelier-avatar-bridge">
-        <div>
+        <div className="atelier-avatar-copy">
           <p className="eyebrow">Следующий шаг</p>
           <h2>Оживите готовый портрет</h2>
           <p>
@@ -176,13 +176,29 @@ export default async function Home() {
             говорящее видео: поздравление, обращение или короткий ролик для
             социальных сетей.
           </p>
+          <a className="atelier-avatar-text-link" href="https://avatar-app-vcer.onrender.com/app?utm_source=virtualphotostudio&utm_medium=product_crosslink&utm_campaign=ecosystem" rel="noreferrer" target="_blank">
+            avatar-app-vcer.onrender.com/app ↗
+          </a>
         </div>
+        <a aria-label="Открыть Avatar App" className="atelier-avatar-example" href="https://avatar-app-vcer.onrender.com/app?utm_source=virtualphotostudio&utm_medium=product_crosslink&utm_campaign=ecosystem" rel="noreferrer" target="_blank">
+          <video
+            aria-label="Пример говорящего видео, созданного из портрета"
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster="/avatar-showcase/blogger.png"
+            src="/avatar-showcase/talking-avatar.mp4"
+          />
+          <span className="atelier-avatar-example-label">Пример результата · открыть Avatar App ↗</span>
+        </a>
         <a
           className="atelier-button atelier-button-dark"
           href="https://avatar-app-vcer.onrender.com/app?utm_source=virtualphotostudio&utm_medium=product_crosslink&utm_campaign=ecosystem"
           rel="noreferrer"
+          target="_blank"
         >
-          Создать видео-аватар
+          Открыть Avatar App ↗
         </a>
       </section>
 
