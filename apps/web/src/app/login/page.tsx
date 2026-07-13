@@ -37,8 +37,7 @@ function formatAuthError(error: unknown) {
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [acceptedLegal, setAcceptedLegal] = useState(false);
-  const [acceptedPhotoRights, setAcceptedPhotoRights] = useState(false);
+  const [consentsAccepted, setConsentsAccepted] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [nextPath, setNextPath] = useState("/upload");
@@ -46,7 +45,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const consentsAccepted = acceptedLegal && acceptedPhotoRights;
   const storedConsentsAccepted = Boolean(
     profile?.legal_terms_accepted_at &&
       profile.privacy_accepted_at &&
@@ -210,8 +208,20 @@ export default function LoginPage() {
       if (!data.user) throw new Error("Supabase не вернул пользователя.");
 
       setUser(data.user);
-      await loadProfile(data.user);
-      redirectToNext();
+      const nextProfile = await loadProfile(data.user);
+      const hasStoredConsents = Boolean(
+        nextProfile?.legal_terms_accepted_at &&
+          nextProfile.privacy_accepted_at &&
+          nextProfile.personal_data_accepted_at &&
+          nextProfile.photo_rights_accepted_at,
+      );
+
+      if (hasStoredConsents) {
+        redirectToNext();
+        return;
+      }
+
+      setMessage("Перед входом подтвердите согласия и права на фото.");
     } catch (authError) {
       setError(`Не удалось выполнить вход: ${formatAuthError(authError)}`);
     } finally {
@@ -336,9 +346,9 @@ export default function LoginPage() {
 
             <label className="consent-option">
               <input
-                checked={acceptedLegal}
+                checked={consentsAccepted}
                 disabled={isSubmitting}
-                onChange={(event) => setAcceptedLegal(event.target.checked)}
+                onChange={(event) => setConsentsAccepted(event.target.checked)}
                 type="checkbox"
               />
               <span>
@@ -354,19 +364,7 @@ export default function LoginPage() {
                 <Link href="/personal-data-consent" target="_blank">
                   согласие на обработку персональных данных
                 </Link>
-                .
-              </span>
-            </label>
-
-            <label className="consent-option">
-              <input
-                checked={acceptedPhotoRights}
-                disabled={isSubmitting}
-                onChange={(event) => setAcceptedPhotoRights(event.target.checked)}
-                type="checkbox"
-              />
-              <span>
-                Я подтверждаю, что мне исполнилось 18 лет, я имею право использовать
+                , а также подтверждаю, что мне исполнилось 18 лет, я имею право использовать
                 загруженные изображения, не загружаю чужие фото без согласия и не создаю
                 незаконный или запрещённый контент. Если на фото ребёнок, я являюсь
                 родителем/законным представителем или имею согласие на использование
@@ -394,7 +392,7 @@ export default function LoginPage() {
             </button>
             <button
               className="button button-secondary"
-              disabled={isSubmitting || !email.trim() || !password.trim()}
+              disabled={isSubmitting || !email.trim() || !password.trim() || !consentsAccepted}
               onClick={login}
               type="button"
             >

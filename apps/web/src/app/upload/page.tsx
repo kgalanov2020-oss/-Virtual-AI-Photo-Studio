@@ -192,6 +192,21 @@ export default function UploadPage() {
     }
 
     const nextProfile = data as UserProfile;
+
+    const hasRequiredConsents = Boolean(
+      nextProfile.legal_terms_accepted_at &&
+        nextProfile.privacy_accepted_at &&
+        nextProfile.personal_data_accepted_at &&
+        nextProfile.photo_rights_accepted_at,
+    );
+
+    if (!hasRequiredConsents) {
+      setProfile(null);
+      setAuthMessage("Перед загрузкой фото нужно подтвердить согласия.");
+      redirectToLogin();
+      return;
+    }
+
     setAuthError(null);
     setProfile(nextProfile);
   }
