@@ -60,7 +60,7 @@ export default function UploadPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [generationMode, setGenerationMode] = useState<GenerationMode>("standard");
-  const [selectedStudioSlug, setSelectedStudioSlug] = useState("modern-office");
+  const [selectedStudioSlug, setSelectedStudioSlug] = useState<string | null>(null);
   const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("studio_5");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
@@ -77,11 +77,13 @@ export default function UploadPage() {
   const isAuthenticated = Boolean(userId && userEmail && profile);
   const canContinue =
     Boolean(userId && userEmail && profile) &&
+    Boolean(selectedStudioSlug) &&
     isReady &&
     (!selectedPackage.isFree || hasEnoughPhotoBalance);
   const continueHint = useMemo(() => {
     if (!userId || !userEmail) return "Сначала войдите по email.";
     if (!profile) return "Загружаем профиль пользователя.";
+    if (!selectedStudioSlug) return "Сначала выберите интерьер.";
     if (!isReady) return "Загрузите минимум 6 фото.";
     if (selectedPackage.isFree && !hasEnoughPhotoBalance) {
       return `Для бесплатной генерации нужно ${selectedPackage.imageCount} фото на балансе. Введите промокод или выберите платный пакет.`;
@@ -92,6 +94,7 @@ export default function UploadPage() {
     hasEnoughPhotoBalance,
     isReady,
     profile,
+    selectedStudioSlug,
     selectedPackage.imageCount,
     selectedPackage.isFree,
     userEmail,
@@ -104,9 +107,14 @@ export default function UploadPage() {
   }, [readyCount]);
 
   useEffect(() => {
-    setSelectedStudioSlug(
-      new URLSearchParams(window.location.search).get("studio") ?? "modern-office",
-    );
+    const studioSlug = new URLSearchParams(window.location.search).get("studio");
+
+    if (!studioSlug) {
+      window.location.replace("/#studios");
+      return;
+    }
+
+    setSelectedStudioSlug(studioSlug);
   }, []);
 
   useEffect(() => {
@@ -346,6 +354,10 @@ export default function UploadPage() {
         );
       }
 
+      if (!selectedStudioSlug) {
+        throw new Error("Сначала выберите интерьер.");
+      }
+
       const { data: studio, error: studioError } = await supabase
         .from("studios")
         .select("id")
@@ -454,7 +466,9 @@ export default function UploadPage() {
             </div>
             <Link
               className="button button-primary"
-              href={`/login?next=${encodeURIComponent(`/upload?studio=${selectedStudioSlug}`)}`}
+              href={`/login?next=${encodeURIComponent(
+                selectedStudioSlug ? `/upload?studio=${selectedStudioSlug}` : "/#studios",
+              )}`}
             >
               Регистрация/Войти
             </Link>

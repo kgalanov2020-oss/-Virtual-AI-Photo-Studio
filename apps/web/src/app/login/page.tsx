@@ -9,8 +9,17 @@ import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { UserProfile } from "@/lib/types";
 import { trackVkGoal } from "@/lib/vk-pixel";
 
+const defaultNextPath = "/#studios";
+
 function sanitizeNext(value: string | null) {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) return "/upload";
+  if (!value || !value.startsWith("/") || value.startsWith("//")) return defaultNextPath;
+
+  const [pathAndQuery] = value.split("#");
+  const [path, queryString = ""] = pathAndQuery.split("?");
+  const params = new URLSearchParams(queryString);
+
+  if (path === "/upload" && !params.get("studio")) return defaultNextPath;
+
   return value;
 }
 
@@ -40,7 +49,7 @@ export default function LoginPage() {
   const [consentsAccepted, setConsentsAccepted] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [nextPath, setNextPath] = useState("/upload");
+  const [nextPath, setNextPath] = useState(defaultNextPath);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);

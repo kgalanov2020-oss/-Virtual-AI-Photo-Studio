@@ -316,7 +316,7 @@ export default function SessionsPage() {
                     </button>
                     <Link
                       className="button button-primary"
-                      href={`/upload?studio=${row.studio?.slug ?? ""}`}
+                      href={row.studio?.slug ? `/upload?studio=${row.studio.slug}` : "/#studios"}
                     >
                       Повторить
                     </Link>

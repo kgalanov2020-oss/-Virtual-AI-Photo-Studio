@@ -27,7 +27,7 @@ export function SeoLandingPage({ page }: { page: SeoPage }) {
         </Link>
         <nav className="topnav" aria-label="Навигация">
           <Link href="/">Каталог</Link>
-          <Link href="/upload">Начать фотосессию</Link>
+          <Link href="/#studios">Начать фотосессию</Link>
           <AuthNavAction />
         </nav>
       </header>
@@ -38,7 +38,7 @@ export function SeoLandingPage({ page }: { page: SeoPage }) {
           <h1>{page.h1}</h1>
           <p className="lead">{page.lead}</p>
           <div className="actions">
-            <Link className="button button-primary" href="/upload">
+            <Link className="button button-primary" href="/#studios">
               Начать фотосессию
             </Link>
             <Link className="button button-secondary" href="/#studios">
@@ -122,7 +122,7 @@ export function SeoLandingPage({ page }: { page: SeoPage }) {
       <section className="section seo-final-cta">
         <h2>Попробуйте Virtual AI Photo Studio</h2>
         <p>Выберите локацию, загрузите селфи и получите готовую AI-фотосессию онлайн.</p>
-        <Link className="button button-primary" href="/upload">
+        <Link className="button button-primary" href="/#studios">
           Создать фотосессию
         </Link>
       </section>

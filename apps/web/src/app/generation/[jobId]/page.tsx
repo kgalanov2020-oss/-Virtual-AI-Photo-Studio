@@ -334,7 +334,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
           >
             {generationMode === "child_safe" ? "Стандартный режим" : "Детский режим"}
           </button>
-          <Link className="button button-secondary" href="/upload">
+          <Link className="button button-secondary" href="/#studios">
             Новая фотосессия
           </Link>
           <button

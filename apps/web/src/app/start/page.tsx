@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   },
 };
 
-const signupHref = "/login?next=%2Fupload";
+const signupHref = "/login?next=%2F%23studios";
 
 export default function AdStartPage() {
   return (
