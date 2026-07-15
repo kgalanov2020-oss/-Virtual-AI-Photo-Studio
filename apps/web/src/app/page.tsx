@@ -194,6 +194,25 @@ export default async function Home() {
         </a>
       </section>
 
+      <section className="atelier-section atelier-translator-promo">
+        <div>
+          <p className="eyebrow">Полезный бонус</p>
+          <h2>Для пользователей нашего сервиса — бесплатный AI‑переводчик</h2>
+          <p>
+            Работает быстро в любой стране — через веб‑интерфейс и как бот в
+            Telegram. Переводит текст, голосовые сообщения и текст на
+            изображениях.
+          </p>
+        </div>
+        <a
+          href="https://t.me/voxa_translate_bot?start=virtualphotostudio"
+          rel="noreferrer"
+          target="_blank"
+        >
+          Открыть в Telegram ↗
+        </a>
+      </section>
+
       <footer className="atelier-footer">
         <a className="atelier-footer-brand" href="#top">
           Virtual AI Photo Studio
