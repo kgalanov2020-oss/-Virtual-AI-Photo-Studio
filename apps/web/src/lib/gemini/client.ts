@@ -300,6 +300,7 @@ function buildImagePrompt(prompt: GeminiStudioPrompt, attempt: number) {
 
   return [
     "Use the attached selfie only as a visual reference for face shape, hair, age range and general appearance.",
+    "If the Scene request contains a MANDATORY TARGET BODY PROFILE, follow it exactly. The reference image controls identity only and must not override the requested height, weight, BMI or body shape.",
     "Create a new photorealistic editorial lifestyle photo, like a real DSLR magazine photoshoot.",
     "Do not create a cartoon, CGI render, waxy AI portrait, painted image, avatar, over-sharpened image or plastic skin.",
     "Keep natural skin texture, believable eyes, normal face, realistic hands and realistic body proportions.",

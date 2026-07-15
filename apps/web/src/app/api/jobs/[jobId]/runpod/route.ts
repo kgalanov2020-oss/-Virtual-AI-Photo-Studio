@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import catalog from "@/lib/studio-catalog.json";
-import { getBodyBuildPrompt } from "@/lib/body-profile";
+import {
+  calculateBodyProfile,
+  getBodyProfileNegativePrompt,
+  getBodyProfilePrompt,
+} from "@/lib/body-profile";
 import { generateBusinessPortrait } from "@/lib/comfy/client";
 import { getTargetShots, getTargetVariationCount, isTargetVariation } from "@/lib/generation";
 import { generateGeminiStudioPhoto } from "@/lib/gemini/client";
 import { PAYMENTS_ENABLED } from "@/lib/payments";
 import { createSupabaseAdminClient } from "@/lib/supabase";
-import type { BodyBuild, BodyProfile } from "@/lib/body-profile";
+import type { BodyProfile } from "@/lib/body-profile";
 import type { GenerationMode, Job, StudioShot, UploadedSelfie } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -33,7 +37,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
   let lastKnownTotal = 0;
   let activeGenerationMode: GenerationMode = "standard";
   const requestBody = await readRequestBody(request);
-  const bodyBuildOverride = requestBody.bodyProfile?.bodyBuild ?? null;
+  const bodyProfileOverride = requestBody.bodyProfile;
 
   try {
     const token = readBearerToken(request);
@@ -222,9 +226,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
         variationIndex,
         generationMode,
         wardrobePrompt,
-        bodyBuildOverride,
+        bodyProfileOverride,
       ),
-      negativePrompt: buildNegativePrompt(shot, generationMode),
+      negativePrompt: buildNegativePrompt(shot, generationMode, bodyProfileOverride),
       fileNamePrefix: `ai-photo-studio/${jobId}/${shot.slug}-${variationIndex}`,
       ...buildGenerationSettings(shot, generationMode),
     };
@@ -422,37 +426,13 @@ function readBearerToken(request: NextRequest) {
 async function readRequestBody(request: NextRequest): Promise<{ bodyProfile: BodyProfile | null }> {
   try {
     const body = (await request.json()) as { bodyProfile?: Partial<BodyProfile> | null };
-    const bodyBuild = body.bodyProfile?.bodyBuild;
+    const heightCm = Number(body.bodyProfile?.heightCm);
+    const weightKg = Number(body.bodyProfile?.weightKg);
 
-    if (!isKnownBodyBuild(bodyBuild)) {
-      return { bodyProfile: null };
-    }
-
-    return {
-      bodyProfile: {
-        heightCm: Number(body.bodyProfile?.heightCm),
-        weightKg: Number(body.bodyProfile?.weightKg),
-        bmi: Number(body.bodyProfile?.bmi),
-        bodyBuild,
-      },
-    };
+    return { bodyProfile: calculateBodyProfile(heightCm, weightKg) };
   } catch {
     return { bodyProfile: null };
   }
-}
-
-function isKnownBodyBuild(value: unknown): value is BodyBuild {
-  return (
-    value === "very_thin" ||
-    value === "thin" ||
-    value === "fitness" ||
-    value === "normal" ||
-    value === "athletic" ||
-    value === "solid" ||
-    value === "large" ||
-    value === "full" ||
-    value === "very_full"
-  );
 }
 
 function buildPositivePrompt(
@@ -460,22 +440,22 @@ function buildPositivePrompt(
   variationIndex: number,
   generationMode: GenerationMode,
   wardrobePrompt?: string,
-  bodyBuild?: BodyBuild | null,
+  bodyProfile?: BodyProfile | null,
 ) {
   if (generationMode === "child_safe") {
-    return buildChildSafePositivePrompt(shot, variationIndex, wardrobePrompt, bodyBuild);
+    return buildChildSafePositivePrompt(shot, variationIndex, wardrobePrompt, bodyProfile);
   }
 
   const scene = buildScenePrompt(shot);
   const framing = buildFramingPrompt(shot, variationIndex);
   const gaze = buildGazePrompt(shot, variationIndex);
-  const bodyBuildPrompt = getBodyBuildPrompt(bodyBuild);
+  const bodyProfilePrompt = getBodyProfilePrompt(bodyProfile);
 
   return [
     "raw natural realistic premium photo of the exact same person from the reference selfie",
     "preserve facial identity, same gender, same age, same eyes, same nose, same lips, normal human face",
-    bodyBuildPrompt
-      ? `body silhouette must match the selected body profile: ${bodyBuildPrompt}`
+    bodyProfilePrompt
+      ? bodyProfilePrompt
       : "",
     "real DSLR photo, premium editorial lifestyle photography, not a render, not AI-looking, not cartoon",
     "natural skin texture, realistic pores, clean skin without stains, believable human expression",
@@ -483,6 +463,9 @@ function buildPositivePrompt(
     isSceneShot(shot)
       ? "compose as a real environmental scene, face likeness is secondary to believable body pose, hands, objects and place, do not make a passport headshot"
       : "natural premium portrait, realistic face and expression, not overprocessed",
+    bodyProfilePrompt
+      ? "compose the frame so the target torso and waist are readable whenever the requested crop allows; do not hide the body under oversized outerwear"
+      : "",
     framing,
     gaze,
     `scene must match exactly: ${scene}`,
@@ -490,10 +473,15 @@ function buildPositivePrompt(
     wardrobePrompt ? `wardrobe must match the selected interior: ${wardrobePrompt}` : "",
     `camera and crop: ${shot.camera_angle}, ${shot.crop}`,
     shot.prompt,
+    bodyProfilePrompt ? `FINAL BODY-SHAPE CHECK: ${bodyProfilePrompt}` : "",
   ].filter(Boolean).join(", ");
 }
 
-function buildNegativePrompt(shot: StudioShot, generationMode: GenerationMode) {
+function buildNegativePrompt(
+  shot: StudioShot,
+  generationMode: GenerationMode,
+  bodyProfile?: BodyProfile | null,
+) {
   const baseNegative = [
     "nsfw, nude, naked, porn, erotic",
     "sexualized child, seductive pose, adult romantic context, revealing clothes, underwear, bare torso, exposed chest, exposed belly",
@@ -506,6 +494,7 @@ function buildNegativePrompt(shot: StudioShot, generationMode: GenerationMode) {
       ? "tight headshot, passport photo, only face visible, face-only portrait, cropped shoulders, missing hands, missing arms, static ID photo"
       : "full body, distorted shoulders",
     shot.negative_prompt,
+    getBodyProfileNegativePrompt(bodyProfile),
   ];
 
   if (generationMode === "child_safe") {
@@ -553,17 +542,17 @@ function buildChildSafePositivePrompt(
   shot: StudioShot,
   variationIndex: number,
   wardrobePrompt?: string,
-  bodyBuild?: BodyBuild | null,
+  bodyProfile?: BodyProfile | null,
 ) {
   const scene = buildScenePrompt(shot);
   const framing = buildChildSafeFramingPrompt(shot, variationIndex);
-  const bodyBuildPrompt = getBodyBuildPrompt(bodyBuild);
+  const bodyProfilePrompt = getBodyProfilePrompt(bodyProfile);
 
   return [
     "safe age-appropriate portrait of the exact same child from the reference photo",
     "preserve child identity, same age range, same face shape, same eyes, same hair, natural child expression",
-    bodyBuildPrompt
-      ? `child body silhouette must match the selected body profile: ${bodyBuildPrompt}`
+    bodyProfilePrompt
+      ? bodyProfilePrompt
       : "",
     "fully clothed child, modest age-appropriate clothes, no exposed torso, no revealing clothing",
     "safe kids editorial portrait, natural daylight, warm friendly expression",

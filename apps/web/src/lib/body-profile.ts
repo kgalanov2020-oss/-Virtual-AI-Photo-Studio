@@ -30,16 +30,33 @@ export const BODY_BUILD_LABELS: Record<BodyBuild, string> = {
 
 const BODY_BUILD_PROMPTS: Record<BodyBuild, string> = {
   very_thin:
-    "very thin underweight body build, narrow frame, realistic natural proportions, do not exaggerate",
-  thin: "thin body build, slim narrow silhouette, realistic natural proportions",
-  fitness: "lean fitness body build, slim toned silhouette, realistic natural proportions",
-  normal: "average normal body build, natural balanced silhouette, realistic proportions",
-  athletic: "athletic strong body build, toned solid silhouette, realistic proportions",
-  solid: "solid sturdy body build, slightly dense silhouette, realistic natural proportions",
-  large: "large body build, broad frame, realistic natural proportions",
-  full: "plus-size full body build, realistic natural proportions, respectful flattering styling",
+    "visibly very thin underweight body, very narrow frame, small waist, slender arms and legs, realistic natural proportions",
+  thin: "visibly thin slim body, narrow frame and waist, slender arms and legs, realistic natural proportions",
+  fitness: "lean fitness body, slim toned waist, lightly defined arms and legs, realistic natural proportions",
+  normal:
+    "average normal-size body, medium frame and waist, proportionate torso, neither thin nor heavyset, realistic proportions",
+  athletic:
+    "athletic strong body, developed shoulders and limbs, toned solid silhouette, realistic proportions",
+  solid:
+    "solid sturdy body, broad torso, moderately substantial waist and limbs, realistic natural proportions",
+  large:
+    "visibly large heavyset body, broad torso, substantial waist and abdomen, fuller arms and legs, realistic natural proportions",
+  full:
+    "visibly plus-size full body, wide torso, pronounced waist and abdomen, full arms and legs, realistic natural proportions, respectful flattering styling",
   very_full:
-    "very plus-size full body build, realistic natural proportions, respectful flattering styling",
+    "visibly very plus-size heavy body, very wide torso, large waist and abdomen, very full arms and legs, realistic natural proportions, respectful flattering styling",
+};
+
+const BODY_BUILD_NEGATIVE_PROMPTS: Record<BodyBuild, string> = {
+  very_thin: "plus-size, heavyset, broad thick torso, large waist, full arms, full legs",
+  thin: "plus-size, heavyset, broad thick torso, large waist, full arms, full legs",
+  fitness: "plus-size, heavyset, large abdomen, very bulky body, bodybuilder physique",
+  normal: "underweight, extremely thin, plus-size, heavyset, large abdomen, bodybuilder physique",
+  athletic: "underweight, frail body, plus-size, large abdomen, soft untoned silhouette",
+  solid: "underweight, very thin, narrow frame, very large abdomen, extremely plus-size",
+  large: "underweight, thin, slim, lean narrow frame, flat narrow waist, athletic bodybuilder",
+  full: "underweight, thin, slim, lean narrow frame, flat waist, athletic bodybuilder",
+  very_full: "underweight, thin, slim, lean narrow frame, flat waist, athletic bodybuilder",
 };
 
 export function calculateBodyProfile(heightCm: number, weightKg: number): BodyProfile | null {
@@ -60,6 +77,22 @@ export function calculateBodyProfile(heightCm: number, weightKg: number): BodyPr
 
 export function getBodyBuildPrompt(bodyBuild?: BodyBuild | null) {
   return bodyBuild ? BODY_BUILD_PROMPTS[bodyBuild] ?? "" : "";
+}
+
+export function getBodyProfilePrompt(bodyProfile?: BodyProfile | null) {
+  if (!bodyProfile) return "";
+
+  return [
+    `MANDATORY TARGET BODY PROFILE: target subject height ${bodyProfile.heightCm} cm, weight ${bodyProfile.weightKg} kg, BMI ${bodyProfile.bmi}`,
+    getBodyBuildPrompt(bodyProfile.bodyBuild),
+    "show this target body size clearly in the torso, waist, abdomen, shoulders, arms and legs",
+    "use the reference selfie for face, hair and identity only; do not copy or infer body size from the reference selfie",
+    "clothing must naturally fit the target body and must not conceal or visually slim the body",
+  ].join("; ");
+}
+
+export function getBodyProfileNegativePrompt(bodyProfile?: BodyProfile | null) {
+  return bodyProfile ? BODY_BUILD_NEGATIVE_PROMPTS[bodyProfile.bodyBuild] ?? "" : "";
 }
 
 export function isValidHeight(heightCm: number) {
