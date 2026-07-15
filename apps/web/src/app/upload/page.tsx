@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { AuthNavAction } from "@/app/auth-nav-action";
+import { BODY_BUILD_LABELS, calculateBodyProfile } from "@/lib/body-profile";
 import { getStoredMarketingAttribution } from "@/lib/marketing-attribution";
 import { formatMoney, getPhotoPackage, PHOTO_PACKAGES, type PhotoPackageCode } from "@/lib/pricing";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
@@ -60,6 +61,8 @@ export default function UploadPage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [generationMode, setGenerationMode] = useState<GenerationMode>("standard");
+  const [heightCm, setHeightCm] = useState("");
+  const [weightKg, setWeightKg] = useState("");
   const [selectedStudioSlug, setSelectedStudioSlug] = useState<string | null>(null);
   const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("studio_5");
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -72,6 +75,16 @@ export default function UploadPage() {
   const readyCount = selfies.length;
   const isReady = readyCount >= 6;
   const selectedPackage = useMemo(() => getPhotoPackage(selectedPackageCode), [selectedPackageCode]);
+  const parsedHeightCm = useMemo(() => parseOptionalNumber(heightCm), [heightCm]);
+  const parsedWeightKg = useMemo(() => parseOptionalNumber(weightKg), [weightKg]);
+  const bodyProfile = useMemo(
+    () =>
+      parsedHeightCm !== null && parsedWeightKg !== null
+        ? calculateBodyProfile(parsedHeightCm, parsedWeightKg)
+        : null,
+    [parsedHeightCm, parsedWeightKg],
+  );
+  const hasPartialBodyProfile = Boolean(heightCm.trim() || weightKg.trim()) && !bodyProfile;
   const freeImagesRemaining = profile?.free_images_remaining ?? 0;
   const hasEnoughPhotoBalance = freeImagesRemaining >= selectedPackage.imageCount;
   const isAuthenticated = Boolean(userId && userEmail && profile);
@@ -420,6 +433,8 @@ export default function UploadPage() {
         throw new Error(selfiesError.message);
       }
 
+      storeBodyProfileForJob(job.id, bodyProfile);
+
       trackVkGoal("selfies_uploaded", {
         studio_slug: selectedStudioSlug,
         generation_mode: generationMode,
@@ -577,6 +592,48 @@ export default function UploadPage() {
           </section>
 
           <section className="section child-mode-section">
+            <div className="body-profile-panel">
+              <div>
+                <h2>Телосложение</h2>
+                <p>
+                  Необязательно. Если заполнить рост и вес, система сама рассчитает
+                  ИМТ и подстроит силуэт. Если не заполнять, генерация пойдёт как
+                  раньше.
+                </p>
+              </div>
+              <div className="body-profile-fields">
+                <label>
+                  <span>Рост, см</span>
+                  <input
+                    inputMode="decimal"
+                    onChange={(event) => setHeightCm(event.target.value)}
+                    placeholder="Например, 168"
+                    type="text"
+                    value={heightCm}
+                  />
+                </label>
+                <label>
+                  <span>Вес, кг</span>
+                  <input
+                    inputMode="decimal"
+                    onChange={(event) => setWeightKg(event.target.value)}
+                    placeholder="Например, 62"
+                    type="text"
+                    value={weightKg}
+                  />
+                </label>
+              </div>
+              {bodyProfile ? (
+                <div className="upload-message success">
+                  ИМТ {bodyProfile.bmi}: {BODY_BUILD_LABELS[bodyProfile.bodyBuild]}.
+                </div>
+              ) : hasPartialBodyProfile ? (
+                <div className="upload-message muted">
+                  Заполните оба поля корректно: рост 120–230 см, вес 30–250 кг.
+                  Иначе параметр телосложения не будет применён.
+                </div>
+              ) : null}
+            </div>
             <label className="mode-option">
               <input
                 checked={generationMode === "child_safe"}
@@ -680,4 +737,27 @@ function isAcceptedImage(file: File) {
   if (file.type.startsWith("image/")) return true;
   const extension = file.name.split(".").pop()?.toLowerCase();
   return extension ? acceptedImageExtensions.has(extension) : false;
+}
+
+function parseOptionalNumber(value: string) {
+  const normalizedValue = value.trim().replace(",", ".");
+
+  if (!normalizedValue) return null;
+
+  const parsedValue = Number(normalizedValue);
+
+  return Number.isFinite(parsedValue) ? parsedValue : null;
+}
+
+function storeBodyProfileForJob(jobId: string, bodyProfile: ReturnType<typeof calculateBodyProfile>) {
+  if (typeof window === "undefined") return;
+
+  const key = `virtual-photo-studio:body-profile:${jobId}`;
+
+  if (!bodyProfile) {
+    window.localStorage.removeItem(key);
+    return;
+  }
+
+  window.localStorage.setItem(key, JSON.stringify(bodyProfile));
 }

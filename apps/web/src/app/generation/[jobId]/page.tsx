@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getTargetShots, getTargetVariationCount, isTargetVariation } from "@/lib/generation";
 import { translateShot } from "@/lib/ru";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
+import type { BodyProfile } from "@/lib/body-profile";
 import type { GeneratedImage, GenerationMode, Job, StudioShot } from "@/lib/types";
 
 type GenerationPageProps = {
@@ -175,7 +176,9 @@ export default function GenerationPage({ params }: GenerationPageProps) {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({ bodyProfile: readStoredBodyProfile(jobId) }),
         });
 
         const data = (await response.json()) as GenerationResponse;
@@ -431,6 +434,30 @@ function getVisibleShotTargets(shots: GenerationShot[], targetImageCount: number
   }
 
   return targets.slice(0, Math.max(1, Math.min(40, targetImageCount)));
+}
+
+function readStoredBodyProfile(jobId: string): BodyProfile | null {
+  if (typeof window === "undefined") return null;
+
+  const storedValue = window.localStorage.getItem(`virtual-photo-studio:body-profile:${jobId}`);
+  if (!storedValue) return null;
+
+  try {
+    const parsedValue = JSON.parse(storedValue) as Partial<BodyProfile>;
+
+    if (
+      typeof parsedValue.heightCm !== "number" ||
+      typeof parsedValue.weightKg !== "number" ||
+      typeof parsedValue.bmi !== "number" ||
+      typeof parsedValue.bodyBuild !== "string"
+    ) {
+      return null;
+    }
+
+    return parsedValue as BodyProfile;
+  } catch {
+    return null;
+  }
 }
 
 function slugify(value: string) {

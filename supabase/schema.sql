@@ -35,6 +35,23 @@ create table if not exists public.jobs (
   studio_id uuid not null references public.studios(id),
   generation_mode text not null default 'standard'
     check (generation_mode in ('standard', 'child_safe')),
+  height_cm integer check (height_cm is null or height_cm between 120 and 230),
+  weight_kg numeric(5, 1) check (weight_kg is null or weight_kg between 30 and 250),
+  body_bmi numeric(4, 1) check (body_bmi is null or body_bmi between 10 and 80),
+  body_build text check (
+    body_build is null
+    or body_build in (
+      'very_thin',
+      'thin',
+      'fitness',
+      'normal',
+      'athletic',
+      'solid',
+      'large',
+      'full',
+      'very_full'
+    )
+  ),
   status text not null default 'draft'
     check (status in ('draft', 'awaiting_payment', 'queued', 'running', 'completed', 'failed', 'cancelled')),
   payment_status text not null default 'unpaid'

@@ -2290,6 +2290,59 @@ h1 {
   width: 100%;
 }
 
+.body-profile-panel {
+  background: var(--panel-soft);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: grid;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 18px;
+}
+
+.body-profile-panel h2 {
+  margin: 0 0 6px;
+}
+
+.body-profile-panel p {
+  color: var(--muted);
+  line-height: 1.45;
+  margin: 0;
+  max-width: 760px;
+}
+
+.body-profile-fields {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 220px));
+}
+
+.body-profile-fields label {
+  display: grid;
+  gap: 8px;
+}
+
+.body-profile-fields span {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.body-profile-fields input {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--text);
+  font: inherit;
+  min-height: 48px;
+  padding: 0 16px;
+}
+
+.body-profile-fields input::placeholder {
+  color: var(--muted);
+  opacity: 0.72;
+}
+
 .auth-inline {
   display: grid;
   gap: 12px;
