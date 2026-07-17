@@ -34,14 +34,33 @@ https://virtualphotostudio.ru
 
 Если предложение неактуально, ответьте "стоп", и мы больше не будем писать.`;
 
+const manufacturerBody = `Здравствуйте, {{studio_name}}!
+
+Мы развиваем Virtual AI Photo Studio — сервис, который превращает обычные селфи пользователя в готовую серию профессиональных портретов с выбранным интерьером, одеждой, светом и позами.
+
+Предлагаем обсудить интеграцию сервиса в ваши фотокабины как дополнительный программный модуль. Пользователь сможет сделать или загрузить фото, выбрать стиль и получить AI-фотосессию прямо через интерфейс кабины. Это может дать владельцам кабин новый платный сценарий, увеличить средний чек и выделить оборудование среди обычных решений для печати фото.
+
+Для пилота можем предоставить API или веб-модуль, адаптировать интерфейс под экран кабины и подготовить демонстрационный сценарий без изменений в основной механике оборудования.
+
+Будем рады коротко показать рабочий сервис и обсудить тестовую интеграцию.
+
+С уважением,
+Virtual AI Photo Studio
+https://virtualphotostudio.ru
+
+Если предложение неактуально, ответьте "стоп", и мы больше не будем писать.`;
+
 export default function OutreachPage() {
-  const [studioName, setStudioName] = useState("Название студии");
-  const [city, setCity] = useState("Москва");
-  const [promoCode, setPromoCode] = useState("STUDIO");
-  const [subjectTemplate, setSubjectTemplate] = useState(
-    "{{studio_name}}, новый формат AI-фотосессий для ваших клиентов",
+  const [segment, setSegment] = useState<"photo_studio" | "photo_booth_manufacturer">(
+    "photo_booth_manufacturer",
   );
-  const [bodyTemplate, setBodyTemplate] = useState(defaultBody);
+  const [studioName, setStudioName] = useState("Название компании");
+  const [city, setCity] = useState("Москва");
+  const [promoCode, setPromoCode] = useState("CABIN");
+  const [subjectTemplate, setSubjectTemplate] = useState(
+    "{{studio_name}}, AI-фотостудия как новый модуль для фотокабин",
+  );
+  const [bodyTemplate, setBodyTemplate] = useState(manufacturerBody);
   const [copyMessage, setCopyMessage] = useState("");
   const [adminToken, setAdminToken] = useState("");
   const [leads, setLeads] = useState<OutreachLead[]>([]);
@@ -54,10 +73,12 @@ export default function OutreachPage() {
   const variables = useMemo(
     () => ({
       city,
-      promo_code: promoCode.trim().toUpperCase() || "STUDIO",
+      promo_code:
+        promoCode.trim().toUpperCase() ||
+        (segment === "photo_booth_manufacturer" ? "CABIN" : "STUDIO"),
       studio_name: studioName.trim() || "коллеги",
     }),
-    [city, promoCode, studioName],
+    [city, promoCode, segment, studioName],
   );
 
   const subject = renderTemplate(subjectTemplate, variables);
@@ -89,6 +110,7 @@ export default function OutreachPage() {
       const params = new URLSearchParams({
         emailOnly: String(emailOnly),
         limit: "10000",
+        segment,
       });
       const response = await fetch(`/api/outreach/leads?${params}`, {
         headers: {
@@ -102,7 +124,7 @@ export default function OutreachPage() {
       }
 
       setLeads(payload.leads ?? []);
-      setLeadsMessage(`Загружено студий: ${(payload.leads ?? []).length}.`);
+      setLeadsMessage(`Загружено компаний: ${(payload.leads ?? []).length}.`);
     } catch (error) {
       setLeadsMessage(error instanceof Error ? error.message : "Не удалось загрузить лиды.");
     } finally {
@@ -214,10 +236,10 @@ export default function OutreachPage() {
       <section className="upload-layout">
         <div className="upload-copy">
           <p className="eyebrow">Партнёрская рассылка</p>
-          <h1>Письмо для фотостудий</h1>
+          <h1>Письма партнёрам</h1>
           <p>
-            Подставьте название студии, город и промокод, проверьте текст и
-            скопируйте готовое письмо для n8n или ручной отправки.
+            Выберите сегмент, проверьте компанию и текст. Отправка выполняется только
+            вручную для выбранного лида.
           </p>
         </div>
       </section>
@@ -232,6 +254,32 @@ export default function OutreachPage() {
           </div>
 
           <div className="outreach-fields">
+            <label>
+              <span>Сегмент</span>
+              <select
+                onChange={(event) => {
+                  const nextSegment = event.target.value as typeof segment;
+                  setSegment(nextSegment);
+                  if (nextSegment === "photo_booth_manufacturer") {
+                    setPromoCode("CABIN");
+                    setSubjectTemplate(
+                      "{{studio_name}}, AI-фотостудия как новый модуль для фотокабин",
+                    );
+                    setBodyTemplate(manufacturerBody);
+                  } else {
+                    setPromoCode("STUDIO");
+                    setSubjectTemplate(
+                      "{{studio_name}}, новый формат AI-фотосессий для ваших клиентов",
+                    );
+                    setBodyTemplate(defaultBody);
+                  }
+                }}
+                value={segment}
+              >
+                <option value="photo_booth_manufacturer">Производители фотокабин</option>
+                <option value="photo_studio">Фотостудии</option>
+              </select>
+            </label>
             <label>
               <span>Название студии</span>
               <input
@@ -319,8 +367,8 @@ export default function OutreachPage() {
       <section className="section outreach-leads-section">
         <div className="section-header">
           <div>
-            <h2>Найденные студии</h2>
-            <p>Список появляется после запуска сборщика на Render Cron или локально.</p>
+            <h2>Найденные компании</h2>
+            <p>Список пополняется сборщиком и разделён по сегментам.</p>
           </div>
         </div>
 
@@ -343,7 +391,7 @@ export default function OutreachPage() {
             <span>Только с email</span>
           </label>
           <button className="button button-primary" disabled={isLoadingLeads} onClick={loadLeads}>
-            {isLoadingLeads ? "Загрузка..." : "Показать студии"}
+            {isLoadingLeads ? "Загрузка..." : "Показать компании"}
           </button>
         </div>
 
@@ -353,7 +401,7 @@ export default function OutreachPage() {
           <table className="outreach-leads-table">
             <thead>
               <tr>
-                <th>Студия</th>
+                <th>Компания</th>
                 <th>Город</th>
                 <th>Email</th>
                 <th>Телефон</th>

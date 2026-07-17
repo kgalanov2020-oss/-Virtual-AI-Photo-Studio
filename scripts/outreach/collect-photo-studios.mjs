@@ -4,21 +4,34 @@ import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const outputDir = path.join(root, "tmp", "outreach");
-const outputPath = path.join(outputDir, "photo-studio-leads.csv");
+const segment = normalizeSegment(process.env.OUTREACH_SEGMENT);
+const outputPath = path.join(
+  outputDir,
+  segment === "photo_booth_manufacturer" ? "photo-booth-manufacturers.csv" : "photo-studio-leads.csv",
+);
 const defaultCitiesPath = path.join(root, "docs", "outreach", "russia-cities.txt");
 
 const apiKey = process.env.GOOGLE_PLACES_API_KEY;
 const cities = readCities();
 const baseQueries = splitEnv(
   "OUTREACH_QUERIES",
-  "фотостудия,аренда фотостудии,интерьерная фотостудия,photo studio",
+  segment === "photo_booth_manufacturer"
+    ? "производитель фотокабин,производство фотобудок,интерактивные фотостойки,фототерминалы производство,photo booth manufacturer"
+    : "фотостудия,аренда фотостудии,интерьерная фотостудия,photo studio",
+);
+const seedUrls = splitEnv(
+  "OUTREACH_SEED_URLS",
+  segment === "photo_booth_manufacturer"
+    ? "https://photostarpro.ru/,https://videochef.ru/proizvodstvo/klassika,https://artkamera.ru/proizvodstvo,https://fotobudkasale.ru/lprice_1,https://www.interactive-photo.ru/,https://expressvend.ru/fotobooth/"
+    : "",
 );
 const leadLimit = Number(process.env.OUTREACH_LIMIT ?? "1000");
-const promoCode = process.env.OUTREACH_PROMO_CODE ?? "STUDIO";
+const promoCode =
+  process.env.OUTREACH_PROMO_CODE ?? (segment === "photo_booth_manufacturer" ? "CABIN" : "STUDIO");
 const supabase = createSupabaseConfig();
 
-if (!apiKey) {
-  throw new Error("Set GOOGLE_PLACES_API_KEY before running this script.");
+if (!apiKey && seedUrls.length === 0) {
+  throw new Error("Set GOOGLE_PLACES_API_KEY or OUTREACH_SEED_URLS before running this script.");
 }
 
 fs.mkdirSync(outputDir, { recursive: true });
@@ -38,7 +51,19 @@ if (fs.existsSync(outputPath) && process.env.OUTREACH_RESUME !== "false") {
 
 await preloadSupabaseKeys();
 
-for (const city of cities) {
+for (const website of seedUrls) {
+  if (leads.length >= leadLimit) break;
+  const lead = await buildSeedLead(website);
+  const leadKey = buildLeadKey(lead);
+  if (!leadKey || seenLeadKeys.has(leadKey)) continue;
+  seenLeadKeys.add(leadKey);
+  leads.push({ ...lead, raw: JSON.stringify(lead.raw), unique_key: leadKey });
+  await upsertSupabaseLead(lead, leadKey);
+  fs.writeFileSync(outputPath, toCsv(leads), "utf8");
+  console.log(`${leads.length}/${leadLimit}: ${lead.studio_name} (seed)`);
+}
+
+for (const city of apiKey ? cities : []) {
   for (const baseQuery of baseQueries) {
     if (leads.length >= leadLimit) break;
     const query = `${baseQuery} ${city}`;
@@ -66,6 +91,7 @@ for (const city of cities) {
           google_place_id: place.place_id,
           google_query: query,
           email_count: emails.length,
+          segment,
         },
       };
       const leadKey = buildLeadKey(lead);
@@ -82,6 +108,56 @@ for (const city of cities) {
       await sleep(350);
     }
   }
+}
+
+async function buildSeedLead(website) {
+  const normalizedWebsite = new URL(website).toString();
+  const page = await fetchWebsitePage(normalizedWebsite);
+  const emails = page ? extractEmails(page.html) : [];
+  const title = page ? extractCompanyName(page.html, page.url) : new URL(website).hostname;
+
+  return {
+    studio_name: title,
+    city: "",
+    website: normalizedWebsite,
+    email: emails[0] ?? "",
+    phone: page ? extractPhone(page.html) : "",
+    source: "seed_website",
+    promo_code: promoCode,
+    status: emails.length > 0 ? "needs_review" : "needs_manual_email",
+    last_contacted_at: "",
+    raw: { segment, seed_url: normalizedWebsite, email_count: emails.length },
+  };
+}
+
+async function fetchWebsitePage(website) {
+  for (const url of buildContactUrls(website)) {
+    try {
+      const response = await fetch(url, {
+        headers: { "user-agent": "VirtualAIPhotoStudio partner research" },
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!response.ok) continue;
+      return { html: await response.text(), url };
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
+
+function extractCompanyName(html, url) {
+  const ogTitle = html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)/i)?.[1];
+  const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1];
+  return decodeHtml(ogTitle || title || new URL(url).hostname).split(/[|—–]/)[0].trim();
+}
+
+function extractPhone(html) {
+  return html.match(/(?:\+7|8)[\s(-]*\d{3}[\s)-]*\d{3}[\s-]*\d{2}[\s-]*\d{2}/)?.[0] ?? "";
+}
+
+function decodeHtml(value) {
+  return value.replaceAll("&quot;", '"').replaceAll("&amp;", "&").replaceAll("&nbsp;", " ");
 }
 
 fs.writeFileSync(outputPath, toCsv(leads), "utf8");
@@ -322,6 +398,10 @@ function splitEnv(name, fallback) {
     .split(",")
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function normalizeSegment(value) {
+  return value === "photo_booth_manufacturer" ? value : "photo_studio";
 }
 
 function readCities() {

@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
   const limit = Math.min(Number(request.nextUrl.searchParams.get("limit") ?? "1000"), 10000);
   const status = request.nextUrl.searchParams.get("status");
   const emailOnly = request.nextUrl.searchParams.get("emailOnly") !== "false";
+  const segment = request.nextUrl.searchParams.get("segment");
   const supabase = createSupabaseAdminClient();
   const leads: OutreachLead[] = [];
   const pageSize = 1000;
@@ -43,6 +44,10 @@ export async function GET(request: NextRequest) {
 
     if (emailOnly) {
       query = query.not("email", "is", null).neq("email", "");
+    }
+
+    if (segment === "photo_booth_manufacturer" || segment === "photo_studio") {
+      query = query.contains("raw", { segment });
     }
 
     const { data, error } = await query;

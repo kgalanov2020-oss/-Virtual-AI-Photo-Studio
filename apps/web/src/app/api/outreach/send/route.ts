@@ -70,6 +70,10 @@ async function sendOutreachEmail(request: NextRequest) {
   const variables = {
     city: lead.city ?? "",
     promo_code: lead.promo_code || process.env.OUTREACH_PROMO_CODE || "STUDIO",
+    segment:
+      (lead.raw as Record<string, unknown> | null)?.segment === "photo_booth_manufacturer"
+        ? ("photo_booth_manufacturer" as const)
+        : ("photo_studio" as const),
     studio_name: lead.studio_name || "коллеги",
   };
 

@@ -2551,6 +2551,7 @@ h1 {
 }
 
 .outreach-fields input,
+.outreach-fields select,
 .outreach-textarea-label input,
 .outreach-textarea-label textarea {
   background: white;
