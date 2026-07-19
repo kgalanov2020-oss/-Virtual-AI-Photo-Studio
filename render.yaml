@@ -122,7 +122,7 @@ services:
       - key: PNPM_VERSION
         value: 10.18.3
       - key: OUTREACH_AUTO_SEND_ENABLED
-        value: false
+        value: true
       - key: OUTREACH_PROMO_CODE
         value: STUDIO
       - key: OUTREACH_RAMP_STARTED_AT
@@ -134,4 +134,6 @@ services:
       - key: OUTREACH_RAMP_STEP_SIZE
         value: 1
       - key: OUTREACH_MAX_SENDS_PER_RUN
-        value: 3
+        value: 1
+      - key: OUTREACH_SENDS_PER_RUN
+        value: 1
