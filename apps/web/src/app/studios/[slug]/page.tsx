@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { AuthNavAction } from "@/app/auth-nav-action";
 import { getStudioSession } from "@/lib/studios";
 
@@ -55,11 +56,11 @@ export default async function StudioPage({ params }: StudioPageProps) {
         </div>
 
         {studio.preview_url ? (
-          <img
+          <StudioImage
             alt={studio.name}
             className="studio-detail-cover"
-            decoding="async"
-            fetchPriority="high"
+            priority
+            sizes="(max-width: 1100px) 100vw, 55vw"
             src={studio.preview_url}
           />
         ) : null}
@@ -74,11 +75,10 @@ export default async function StudioPage({ params }: StudioPageProps) {
 
         <div className="interior-gallery">
           {galleryUrls.map((url, index) => (
-            <img
+            <StudioImage
               alt={`${studio.name} ракурс ${index + 1}`}
-              decoding="async"
               key={`${url}-${index}`}
-              loading={index < 2 ? "eager" : "lazy"}
+              sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 33vw"
               src={url}
             />
           ))}
@@ -95,6 +95,45 @@ export default async function StudioPage({ params }: StudioPageProps) {
         </div>
       </section>
     </main>
+  );
+}
+
+function StudioImage({
+  alt,
+  className,
+  priority = false,
+  sizes,
+  src,
+}: {
+  alt: string;
+  className?: string;
+  priority?: boolean;
+  sizes: string;
+  src: string;
+}) {
+  if (!src.startsWith("/")) {
+    return (
+      <img
+        alt={alt}
+        className={className}
+        decoding="async"
+        fetchPriority={priority ? "high" : "auto"}
+        loading={priority ? "eager" : "lazy"}
+        src={src}
+      />
+    );
+  }
+
+  return (
+    <Image
+      alt={alt}
+      className={className}
+      height={900}
+      priority={priority}
+      sizes={sizes}
+      src={src}
+      width={1200}
+    />
   );
 }
 

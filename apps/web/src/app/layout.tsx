@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { MarketingAttributionTracker } from "@/app/marketing-attribution-tracker";
+import {
+  buildYandexMetrikaInitScript,
+  normalizeYandexMetrikaId,
+} from "@/lib/yandex-metrika-core.mjs";
 import "./globals.css";
 
 const siteUrl = "https://virtualphotostudio.ru";
 const vkPixelId = "3777361";
+const yandexMetrikaId = normalizeYandexMetrikaId(
+  process.env.NEXT_PUBLIC_YANDEX_METRIKA_ID,
+);
+const yandexMetrikaScript = buildYandexMetrikaInitScript(yandexMetrikaId);
 const siteDescription =
   "Virtual AI Photo Studio — виртуальная фотостудия с готовыми интерьерами. Выберите локацию, загрузите селфи и получите профессиональную фотосессию в офисе, отеле, яхте, ресторане, городе, на пляже и других пространствах.";
 
@@ -98,6 +107,13 @@ _tmr.push({id: "${vkPixelId}", type: "pageView", start: (new Date()).getTime()})
         />
       </head>
       <body>
+        {yandexMetrikaId && yandexMetrikaScript ? (
+          <Script
+            dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }}
+            id="yandex-metrika"
+            strategy="afterInteractive"
+          />
+        ) : null}
         <MarketingAttributionTracker />
         {children}
         <noscript>
@@ -109,6 +125,17 @@ _tmr.push({id: "${vkPixelId}", type: "pageView", start: (new Date()).getTime()})
             />
           </div>
         </noscript>
+        {yandexMetrikaId ? (
+          <noscript>
+            <div>
+              <img
+                alt="Яндекс Метрика"
+                src={`https://mc.yandex.ru/watch/${yandexMetrikaId}`}
+                style={{ left: "-9999px", position: "absolute" }}
+              />
+            </div>
+          </noscript>
+        ) : null}
       </body>
     </html>
   );

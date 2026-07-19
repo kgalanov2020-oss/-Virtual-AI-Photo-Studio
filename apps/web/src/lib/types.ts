@@ -81,6 +81,22 @@ export type Order = {
   updated_at: string;
 };
 
+export type PaymentConversionEvent = {
+  id: string;
+  goal: "payment_success";
+  provider: "yookassa";
+  provider_payment_id: string;
+  order_id: string;
+  job_id: string;
+  user_id: string;
+  amount_cents: number;
+  currency: string;
+  product_code: string;
+  target_image_count: number;
+  created_at: string;
+  delivered_at: string | null;
+};
+
 export type UserProfile = {
   user_id: string;
   email: string;
@@ -263,6 +279,17 @@ export type Database = {
         Update: Partial<Order>;
         Relationships: [];
       };
+      payment_conversion_events: {
+        Row: PaymentConversionEvent;
+        Insert: Omit<PaymentConversionEvent, "id" | "goal" | "created_at" | "delivered_at"> & {
+          id?: string;
+          goal?: "payment_success";
+          created_at?: string;
+          delivered_at?: string | null;
+        };
+        Update: Partial<PaymentConversionEvent>;
+        Relationships: [];
+      };
       user_profiles: {
         Row: UserProfile;
         Insert: Omit<
@@ -404,6 +431,31 @@ export type Database = {
           p_target_image_count: number;
         };
         Returns: "processed" | "already_processed" | "duplicate_payment_credited";
+      };
+      claim_payment_success_conversion: {
+        Args: {
+          p_provider_payment_id: string;
+          p_job_id: string;
+          p_user_id: string;
+        };
+        Returns:
+          | { should_track: false }
+          | {
+              should_track: true;
+              conversion_id: string;
+              amount_cents: number;
+              currency: string;
+              product_code: string;
+              target_image_count: number;
+            };
+      };
+      ack_payment_success_conversion: {
+        Args: {
+          p_conversion_id: string;
+          p_job_id: string;
+          p_user_id: string;
+        };
+        Returns: boolean;
       };
       consume_user_photo_credit: {
         Args: {

@@ -144,5 +144,9 @@ test("duplicate succeeded payments surface the credited reconciliation result", 
     settlePayment: async () => "duplicate_payment_credited",
   });
 
-  assert.deepEqual(result, { kind: "paid", settlement: "duplicate_payment_credited" });
+  assert.deepEqual(result, {
+    kind: "paid",
+    providerPaymentId: "duplicate-payment",
+    settlement: "duplicate_payment_credited",
+  });
 });

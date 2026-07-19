@@ -35,6 +35,8 @@ services:
         value: rub
       - key: NEXT_PUBLIC_PAYMENTS_ENABLED
         value: true
+      - key: NEXT_PUBLIC_YANDEX_METRIKA_ID
+        sync: false
       - key: YOOKASSA_SHOP_ID
         sync: false
       - key: YOOKASSA_SECRET_KEY

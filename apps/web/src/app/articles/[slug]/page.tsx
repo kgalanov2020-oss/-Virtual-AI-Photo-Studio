@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -193,14 +194,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <span>До</span>
               <div className="article-showcase-selfies">
                 {showcase.before.slice(0, 1).map((image, index) => (
-                  <img
+                  <Image
                     alt={`Исходное селфи ${index + 1} до AI-фотосессии`}
-                    decoding="async"
-                    height="1280"
+                    height={1280}
                     key={image}
                     loading="lazy"
+                    sizes="(max-width: 900px) 100vw, 32vw"
                     src={image}
-                    width="960"
+                    width={960}
                   />
                 ))}
               </div>
@@ -209,14 +210,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               <span>После</span>
               <div className="article-showcase-results">
                 {showcase.after.map((image, index) => (
-                  <img
+                  <Image
                     alt={`Готовое AI-фото ${index + 1} для статьи ${article.title}`}
-                    decoding="async"
-                    height="1280"
+                    height={1280}
                     key={image}
                     loading="lazy"
+                    sizes="(max-width: 640px) 46vw, (max-width: 900px) 31vw, 16vw"
                     src={image}
-                    width="1024"
+                    width={1024}
                   />
                 ))}
               </div>
@@ -235,14 +236,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             </div>
             <div className="article-example-grid">
               {examples.map((image) => (
-                <img
+                <Image
                   alt={image.alt}
-                  decoding="async"
-                  height="1280"
+                  height={1280}
                   key={image.src}
                   loading="lazy"
+                  sizes="(max-width: 640px) 46vw, (max-width: 900px) 31vw, 16vw"
                   src={image.src}
-                  width="960"
+                  width={960}
                 />
               ))}
             </div>

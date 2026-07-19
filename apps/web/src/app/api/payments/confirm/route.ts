@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { claimPaymentSuccessGoalBestEffort } from "@/lib/payment-conversion";
 import { settleVerifiedYooKassaPayment } from "@/lib/payment-settlement";
 import { createSupabaseAdminClient } from "@/lib/supabase";
 import {
@@ -95,10 +96,7 @@ export async function POST(request: NextRequest) {
     }
 
     const orderedCandidates = sessionId
-      ? [
-          ...paymentOrders.filter((order) => order.provider_session_id === sessionId),
-          ...paymentOrders.filter((order) => order.provider_session_id !== sessionId),
-        ]
+      ? paymentOrders.filter((order) => order.provider_session_id === sessionId)
       : paymentOrders;
 
     let lastCheckedPayment: YooKassaPayment | null = null;
@@ -124,11 +122,18 @@ export async function POST(request: NextRequest) {
         order,
         job,
       });
+      const paymentSuccessGoal = await claimPaymentSuccessGoalBestEffort({
+        supabase,
+        providerPaymentId: payment.id,
+        jobId: order.job_id,
+        userId: order.user_id,
+      });
 
       return NextResponse.json({
         ok: true,
         redirectUrl: `/generation/${jobId}`,
         duplicatePaymentCredited: settlement === "duplicate_payment_credited",
+        paymentSuccessGoal,
       });
     }
 
@@ -138,6 +143,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
+        code:
+          lastCheckedPayment?.status === "canceled"
+            ? "PAYMENT_CANCELED"
+            : "PAYMENT_PENDING",
         error:
           lastCheckedPayment?.status === "canceled"
             ? "Платёж отменён платёжной системой."

@@ -1,6 +1,9 @@
 import { PRODUCT_IMAGES_PER_STUDIO, TARGET_SHOTS_PER_STUDIO } from "@/lib/generation";
 import { getActiveStudios } from "@/lib/studios";
+import { versionPublicAsset } from "@/lib/static-assets-core.mjs";
+import Image from "next/image";
 import { AuthNavAction } from "./auth-nav-action";
+import { LazyAutoplayVideo } from "./lazy-autoplay-video";
 
 export const dynamic = "force-dynamic";
 
@@ -107,19 +110,68 @@ export default async function Home() {
           <div className="before-after-column">
             <span>До</span>
             <div className="before-after-selfies">
-              <img alt="Селфи анфас" decoding="async" src="/selfie-guide/01-front-neutral.webp" />
-              <img alt="Селфи полуоборот" decoding="async" src="/selfie-guide/03-left-three-quarter.webp" />
-              <img alt="Селфи профиль" decoding="async" src="/selfie-guide/05-left-profile.webp" />
+              <Image
+                alt="Селфи анфас"
+                height={960}
+                loading="lazy"
+                sizes="(max-width: 640px) 28vw, (max-width: 1100px) 30vw, 13vw"
+                src="/selfie-guide/01-front-neutral.webp"
+                width={720}
+              />
+              <Image
+                alt="Селфи полуоборот"
+                height={960}
+                loading="lazy"
+                sizes="(max-width: 640px) 28vw, (max-width: 1100px) 30vw, 13vw"
+                src="/selfie-guide/03-left-three-quarter.webp"
+                width={720}
+              />
+              <Image
+                alt="Селфи профиль"
+                height={960}
+                loading="lazy"
+                sizes="(max-width: 640px) 28vw, (max-width: 1100px) 30vw, 13vw"
+                src="/selfie-guide/05-left-profile.webp"
+                width={720}
+              />
             </div>
           </div>
 
           <div className="before-after-column before-after-column-featured">
             <span>После</span>
             <div className="before-after-results">
-              <img alt="AI-фотосессия в luxury garage" decoding="async" src="/before-after/after-luxury-garage-01.webp" />
-              <img alt="AI-фотосессия у автомобиля" decoding="async" src="/before-after/after-luxury-garage-02.webp" />
-              <img alt="AI-фотосессия в премиальном гараже" decoding="async" src="/before-after/after-luxury-garage-03.webp" />
-              <img alt="AI-портрет в luxury garage" decoding="async" src="/before-after/after-luxury-garage-04.webp" />
+              <Image
+                alt="AI-фотосессия в luxury garage"
+                height={1280}
+                loading="lazy"
+                sizes="(max-width: 640px) 42vw, (max-width: 1100px) 45vw, 18vw"
+                src="/before-after/after-luxury-garage-01.webp"
+                width={1024}
+              />
+              <Image
+                alt="AI-фотосессия у автомобиля"
+                height={1280}
+                loading="lazy"
+                sizes="(max-width: 640px) 42vw, (max-width: 1100px) 45vw, 18vw"
+                src="/before-after/after-luxury-garage-02.webp"
+                width={1024}
+              />
+              <Image
+                alt="AI-фотосессия в премиальном гараже"
+                height={1280}
+                loading="lazy"
+                sizes="(max-width: 640px) 42vw, (max-width: 1100px) 45vw, 18vw"
+                src="/before-after/after-luxury-garage-03.webp"
+                width={1024}
+              />
+              <Image
+                alt="AI-портрет в luxury garage"
+                height={1280}
+                loading="lazy"
+                sizes="(max-width: 640px) 42vw, (max-width: 1100px) 45vw, 18vw"
+                src="/before-after/after-luxury-garage-04.webp"
+                width={1024}
+              />
             </div>
           </div>
         </div>
@@ -147,13 +199,7 @@ export default async function Home() {
           {studios.map((studio, index) => (
             <article className="atelier-studio-tile" key={studio.id}>
               {studio.preview_url ? (
-                <img
-                  alt={studio.name}
-                  decoding="async"
-                  fetchPriority={index < 3 ? "high" : "auto"}
-                  loading={index < 3 ? "eager" : "lazy"}
-                  src={studio.preview_url}
-                />
+                <StudioPreview alt={studio.name} src={studio.preview_url} />
               ) : null}
               <a href={`/studios/${studio.slug}`}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
@@ -182,12 +228,28 @@ export default async function Home() {
         </div>
         <a aria-label="Открыть Avatar App" className="atelier-avatar-transition" href="https://avatar-app-vcer.onrender.com/app?utm_source=virtualphotostudio&utm_medium=product_crosslink&utm_campaign=ecosystem" rel="noreferrer" target="_blank">
           <span className="atelier-avatar-frame">
-            <img alt="Готовый AI-портрет для Avatar App" src="/avatar-showcase/avatar-woman.png" />
+            <Image
+              alt="Готовый AI-портрет для Avatar App"
+              fill
+              loading="lazy"
+              sizes="(max-width: 1100px) 42vw, 280px"
+              src="/avatar-showcase/avatar-woman.png"
+            />
             <span>Фото</span>
           </span>
           <span className="atelier-avatar-arrow" aria-hidden="true">→</span>
           <span className="atelier-avatar-frame atelier-avatar-frame-video">
-            <video autoPlay loop muted playsInline poster="/avatar-showcase/avatar-woman.png" src="/avatar-showcase/avatar-result-taurus.mp4" />
+            <Image
+              alt=""
+              aria-hidden="true"
+              fill
+              loading="lazy"
+              sizes="(max-width: 1100px) 42vw, 280px"
+              src="/avatar-showcase/avatar-woman.png"
+            />
+            <LazyAutoplayVideo
+              src={versionPublicAsset("/avatar-showcase/avatar-result-taurus.mp4")}
+            />
             <span>Говорящее видео</span>
           </span>
           <strong>Создать видео в Avatar App ↗</strong>
@@ -224,6 +286,22 @@ export default async function Home() {
         </nav>
       </footer>
     </main>
+  );
+}
+
+function StudioPreview({ alt, src }: { alt: string; src: string }) {
+  if (!src.startsWith("/")) {
+    return <img alt={alt} decoding="async" loading="lazy" src={src} />;
+  }
+
+  return (
+    <Image
+      alt={alt}
+      fill
+      loading="lazy"
+      sizes="(max-width: 1100px) 50vw, 33vw"
+      src={src}
+    />
   );
 }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { AuthNavAction } from "@/app/auth-nav-action";
@@ -498,7 +499,15 @@ export default function UploadPage() {
             <div className="guide-grid">
               {selfieGuide.map((item, index) => (
                 <article className="guide-card" key={item.title}>
-                  <img className="guide-photo" alt={item.title} src={item.image} />
+                  <Image
+                    className="guide-photo"
+                    alt={item.title}
+                    height={900}
+                    loading="lazy"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 20vw"
+                    src={item.image}
+                    width={720}
+                  />
                   <span>{String(index + 1).padStart(2, "0")}</span>
                   <strong>{item.title}</strong>
                 </article>

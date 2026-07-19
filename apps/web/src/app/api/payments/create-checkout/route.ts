@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { resolveYooKassaPaymentAttempt } from "@/lib/payment-attempt-orchestrator.mjs";
+import { claimPaymentSuccessGoalBestEffort } from "@/lib/payment-conversion";
 import { formatMoney, getPhotoPackage, PAYMENT_CURRENCY } from "@/lib/pricing";
 import { settleVerifiedYooKassaPayment } from "@/lib/payment-settlement";
 import { createSupabaseAdminClient } from "@/lib/supabase";
@@ -161,11 +162,19 @@ export async function POST(request: NextRequest) {
     });
 
     if (result.kind === "paid") {
+      const paymentSuccessGoal = await claimPaymentSuccessGoalBestEffort({
+        supabase,
+        providerPaymentId: result.providerPaymentId,
+        jobId,
+        userId,
+      });
+
       return NextResponse.json({
         ok: true,
         paid: true,
         redirectUrl: `/generation/${jobId}`,
         duplicatePaymentCredited: result.settlement === "duplicate_payment_credited",
+        paymentSuccessGoal,
       });
     }
 

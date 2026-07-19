@@ -10,6 +10,10 @@ const migration0014Url = new URL(
   "../../../../supabase/migrations/0014_harden_client_write_permissions.sql",
   import.meta.url,
 );
+const migration0015Url = new URL(
+  "../../../../supabase/migrations/0015_payment_success_conversion_outbox.sql",
+  import.meta.url,
+);
 const checkoutRouteUrl = new URL(
   "../app/api/payments/create-checkout/route.ts",
   import.meta.url,
@@ -24,6 +28,7 @@ const runpodRouteUrl = new URL("../app/api/jobs/[jobId]/runpod/route.ts", import
 const paymentSettlementUrl = new URL("payment-settlement.ts", import.meta.url);
 const confirmRouteUrl = new URL("../app/api/payments/confirm/route.ts", import.meta.url);
 const webhookRouteUrl = new URL("../app/api/payments/yookassa-webhook/route.ts", import.meta.url);
+const checkoutPageUrl = new URL("../app/checkout/[jobId]/page.tsx", import.meta.url);
 
 function extractSqlFunction(sql, functionName) {
   const start = sql.indexOf(`create or replace function public.${functionName}`);
@@ -65,6 +70,31 @@ test("settlement and photo-credit updates are atomic database operations", async
   );
   assert.match(sql, /from public, anon, authenticated/);
   assert.match(sql, /to service_role/);
+});
+
+test("a confirmed provider payment exposes one durable analytics conversion", async () => {
+  const [sql, confirmRoute, checkoutRoute, checkoutPage] = await Promise.all([
+    readFile(migration0015Url, "utf8"),
+    readFile(confirmRouteUrl, "utf8"),
+    readFile(checkoutRouteUrl, "utf8"),
+    readFile(checkoutPageUrl, "utf8"),
+  ]);
+
+  assert.match(sql, /create table if not exists public\.payment_conversion_events/);
+  assert.match(sql, /unique \(goal, provider, provider_payment_id\)/);
+  assert.match(sql, /after update of status, provider_payment_id on public\.orders/);
+  assert.match(sql, /old\.status is distinct from 'paid'/);
+  assert.match(sql, /and delivered_at is null/);
+  assert.match(sql, /create or replace function public\.ack_payment_success_conversion/);
+  assert.match(sql, /revoke all on public\.payment_conversion_events from public, anon, authenticated/);
+  assert.match(sql, /grant execute on function public\.claim_payment_success_conversion[\s\S]*to service_role/);
+  assert.match(sql, /grant execute on function public\.ack_payment_success_conversion[\s\S]*to service_role/);
+  assert.match(confirmRoute, /claimPaymentSuccessGoalBestEffort/);
+  assert.match(checkoutRoute, /claimPaymentSuccessGoalBestEffort/);
+  assert.match(checkoutPage, /trackYandexGoal\("payment_success"/);
+  assert.match(checkoutPage, /order_price: goal\.value/);
+  assert.match(checkoutPage, /acknowledgePaymentSuccessGoal/);
+  assert.match(checkoutPage, /pollPaymentReturn/);
 });
 
 test("payment paths lock job before order and preserve late provider money", async () => {

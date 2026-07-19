@@ -1,3 +1,10 @@
+import {
+  normalizeMarketingCampaign,
+  normalizeMarketingMedium,
+  normalizeMarketingSource,
+  normalizeNullableMarketingValue,
+} from "@/lib/marketing-attribution-core.mjs";
+
 const STORAGE_KEY = "vaps_marketing_attribution";
 
 export type MarketingAttribution = {
@@ -30,18 +37,29 @@ export function captureMarketingAttribution(): MarketingAttributionStore | null 
     "utm_content",
     "utm_term",
     "vk_click_id",
+    "yclid",
     "click_id",
   ].some((key) => url.searchParams.has(key));
 
   if (existing && !hasCampaignParams && !referrer) return existing;
 
   const current: MarketingAttribution = {
-    source: url.searchParams.get("utm_source") || getReferrerHost(referrer) || "direct",
-    medium: url.searchParams.get("utm_medium") || (referrer ? "referral" : "none"),
-    campaign: url.searchParams.get("utm_campaign"),
-    content: url.searchParams.get("utm_content"),
-    term: url.searchParams.get("utm_term"),
-    click_id: url.searchParams.get("vk_click_id") || url.searchParams.get("click_id"),
+    source:
+      normalizeMarketingSource(
+        url.searchParams.get("utm_source") || getReferrerHost(referrer) || "direct",
+      ) ?? "direct",
+    medium:
+      normalizeMarketingMedium(
+        url.searchParams.get("utm_medium") || (referrer ? "referral" : "none"),
+      ) ?? "none",
+    campaign: normalizeMarketingCampaign(url.searchParams.get("utm_campaign")),
+    content: normalizeNullableMarketingValue(url.searchParams.get("utm_content")),
+    term: normalizeNullableMarketingValue(url.searchParams.get("utm_term")),
+    click_id: normalizeNullableMarketingValue(
+      url.searchParams.get("vk_click_id") ||
+        url.searchParams.get("yclid") ||
+        url.searchParams.get("click_id"),
+    ),
     landing_page: `${url.pathname}${url.search}`,
     referrer,
     captured_at: new Date().toISOString(),
@@ -70,10 +88,25 @@ export function getStoredMarketingAttribution(): MarketingAttributionStore | nul
 
     const parsed = JSON.parse(raw) as MarketingAttributionStore;
     if (!parsed?.first?.source || !parsed?.last?.source) return null;
-    return parsed;
+    return {
+      first: normalizeAttribution(parsed.first),
+      last: normalizeAttribution(parsed.last),
+    };
   } catch {
     return null;
   }
+}
+
+function normalizeAttribution(attribution: MarketingAttribution): MarketingAttribution {
+  return {
+    ...attribution,
+    source: normalizeMarketingSource(attribution.source) ?? "direct",
+    medium: normalizeMarketingMedium(attribution.medium) ?? "none",
+    campaign: normalizeMarketingCampaign(attribution.campaign),
+    content: normalizeNullableMarketingValue(attribution.content),
+    term: normalizeNullableMarketingValue(attribution.term),
+    click_id: normalizeNullableMarketingValue(attribution.click_id),
+  };
 }
 
 function getExternalReferrer() {

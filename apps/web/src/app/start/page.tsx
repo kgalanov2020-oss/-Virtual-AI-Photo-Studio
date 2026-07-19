@@ -47,7 +47,8 @@ export default function AdStartPage() {
               src="/selfie-guide/03-left-three-quarter.webp"
               width={640}
               height={854}
-              priority
+              loading="lazy"
+              sizes="(max-width: 820px) 48vw, 28vw"
             />
             <figcaption>До</figcaption>
           </figure>
@@ -58,6 +59,7 @@ export default function AdStartPage() {
               width={1024}
               height={1365}
               priority
+              sizes="(max-width: 820px) 48vw, 28vw"
             />
             <figcaption>После</figcaption>
           </figure>
@@ -107,6 +109,8 @@ export default function AdStartPage() {
               src={`/before-after/after-luxury-garage-0${number}.webp`}
               width={720}
               height={960}
+              loading="lazy"
+              sizes="(max-width: 820px) 48vw, 24vw"
             />
           ))}
         </div>

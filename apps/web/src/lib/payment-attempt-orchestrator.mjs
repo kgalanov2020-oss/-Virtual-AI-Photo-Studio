@@ -20,6 +20,7 @@ export async function resolveYooKassaPaymentAttempt({
     if (payment.status === "succeeded" && payment.paid === true) {
       return {
         kind: "paid",
+        providerPaymentId: payment.id,
         settlement: await settlePayment(attempt, payment),
       };
     }

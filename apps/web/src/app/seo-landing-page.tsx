@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { AuthNavAction } from "@/app/auth-nav-action";
 import {
   createFaqJsonLd,
@@ -47,8 +48,22 @@ export function SeoLandingPage({ page }: { page: SeoPage }) {
           </div>
         </div>
         <div className="seo-hero-media" aria-label="Пример AI-фотосессии до и после">
-          <img alt="Селфи до AI-фотосессии" src="/selfie-guide/01-front-neutral.webp" />
-          <img alt="Профессиональный AI-портрет после обработки" src="/before-after/after-luxury-garage-01.webp" />
+          <Image
+            alt="Селфи до AI-фотосессии"
+            height={960}
+            priority
+            sizes="(max-width: 900px) 46vw, 24vw"
+            src="/selfie-guide/01-front-neutral.webp"
+            width={720}
+          />
+          <Image
+            alt="Профессиональный AI-портрет после обработки"
+            height={1280}
+            priority
+            sizes="(max-width: 900px) 46vw, 24vw"
+            src="/before-after/after-luxury-garage-01.webp"
+            width={1024}
+          />
         </div>
       </section>
 

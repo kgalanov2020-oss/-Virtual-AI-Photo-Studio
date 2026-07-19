@@ -8,6 +8,7 @@ import { getStoredMarketingAttribution } from "@/lib/marketing-attribution";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { UserProfile } from "@/lib/types";
 import { trackVkGoal } from "@/lib/vk-pixel";
+import { trackYandexGoal } from "@/lib/yandex-metrika";
 
 const defaultNextPath = "/#studios";
 
@@ -174,10 +175,11 @@ export default function LoginPage() {
 
       if (signUpError) throw signUpError;
 
-      if (data.user) {
+      if (data.user?.identities?.length) {
         const registrationKey = `vaps_registration_${data.user.id}`;
         if (!window.sessionStorage.getItem(registrationKey)) {
           trackVkGoal("registration");
+          trackYandexRegistrationOnce(data.user.id);
           window.sessionStorage.setItem(registrationKey, "1");
         }
       }
@@ -416,4 +418,17 @@ export default function LoginPage() {
       </section>
     </main>
   );
+}
+
+function trackYandexRegistrationOnce(userId: string) {
+  const key = `yandex-goal:registration_success:${userId}`;
+
+  try {
+    if (window.localStorage.getItem(key)) return;
+    if (trackYandexGoal("registration_success")) {
+      window.localStorage.setItem(key, "1");
+    }
+  } catch {
+    trackYandexGoal("registration_success");
+  }
 }

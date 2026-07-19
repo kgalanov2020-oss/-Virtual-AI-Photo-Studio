@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import type { PaymentSuccessGoalPayload } from "@/lib/payment-conversion";
+import { pollPaymentReturn } from "@/lib/payment-return-polling.mjs";
 import {
   formatMoney,
   getPhotoPackage,
@@ -10,6 +12,7 @@ import {
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { Job } from "@/lib/types";
 import { trackVkGoal } from "@/lib/vk-pixel";
+import { trackYandexGoal } from "@/lib/yandex-metrika";
 
 type CheckoutResponse = {
   ok?: boolean;
@@ -17,8 +20,18 @@ type CheckoutResponse = {
   checkoutUrl?: string;
   redirectUrl?: string;
   balancePaid?: boolean;
+  paymentSuccessGoal?: PaymentSuccessGoalPayload | null;
+  code?: "PAYMENT_PENDING" | "PAYMENT_CANCELED";
   error?: string;
 };
+
+type ConfirmationResult =
+  | { kind: "confirmed" }
+  | { kind: "pending" }
+  | { kind: "fatal"; error: string }
+  | { kind: "aborted" };
+
+const trackedCheckoutGoals = new Set<string>();
 
 export default function CheckoutPage() {
   const params = useParams<{ jobId: string }>();
@@ -48,28 +61,60 @@ export default function CheckoutPage() {
   }, [jobId]);
 
   useEffect(() => {
-    if (sessionId) {
-      confirmPayment(sessionId);
-    } else if (paymentReturn) {
-      confirmLatestPendingPayment();
-    } else if (cancelled) {
+    if (cancelled) {
       setMessage("Оплата отменена. Можно попробовать ещё раз.");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionId, paymentReturn, cancelled]);
-
-  useEffect(() => {
-    if (job?.payment_status !== "pending") {
       return;
     }
 
-    const interval = window.setInterval(() => {
-      void confirmLatestPendingPayment({ silent: true });
-    }, 5000);
+    if (!sessionId && !paymentReturn) {
+      return;
+    }
 
-    return () => window.clearInterval(interval);
+    const controller = new AbortController();
+    setIsPaying(true);
+    setError(null);
+    setMessage("Проверяем оплату...");
+
+    void pollPaymentReturn({
+      signal: controller.signal,
+      confirm: () =>
+        confirmPayment(sessionId ?? undefined, {
+          polling: true,
+          signal: controller.signal,
+          silent: true,
+        }),
+    })
+      .then(async (result) => {
+        if (controller.signal.aborted || result.kind === "confirmed") return;
+
+        setIsPaying(false);
+        await loadCheckout();
+        if (controller.signal.aborted) return;
+
+        if (result.kind === "timeout") {
+          setMessage(null);
+          setError(
+            "Платёж ещё обрабатывается. Нажмите «Проверить оплату» через минуту — повторно платить не нужно.",
+          );
+        } else if (result.kind === "fatal") {
+          setMessage(null);
+          setError(result.error);
+        }
+      })
+      .catch((pollError) => {
+        if (controller.signal.aborted) return;
+        setIsPaying(false);
+        setMessage(null);
+        setError(
+          pollError instanceof Error
+            ? pollError.message
+            : "Не удалось проверить оплату. Повторно платить не нужно.",
+        );
+      });
+
+    return () => controller.abort();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [job?.payment_status, jobId]);
+  }, [sessionId, paymentReturn, cancelled, jobId]);
 
   async function loadCheckout() {
     setIsLoading(true);
@@ -152,6 +197,10 @@ export default function CheckoutPage() {
         });
       }
 
+      if (data.paymentSuccessGoal) {
+        await trackConfirmedPaymentGoals(data.paymentSuccessGoal, token);
+      }
+
       if (data.redirectUrl) {
         window.location.href = data.redirectUrl;
         return;
@@ -181,8 +230,12 @@ export default function CheckoutPage() {
 
   async function confirmPayment(
     activeSessionId?: string,
-    options: { silent?: boolean } = {},
-  ) {
+    options: {
+      polling?: boolean;
+      signal?: AbortSignal;
+      silent?: boolean;
+    } = {},
+  ): Promise<ConfirmationResult> {
     if (!options.silent) {
       setIsPaying(true);
       setError(null);
@@ -200,6 +253,7 @@ export default function CheckoutPage() {
 
       const response = await fetch("/api/payments/confirm", {
         method: "POST",
+        signal: options.signal,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -209,30 +263,106 @@ export default function CheckoutPage() {
       const data = (await response.json()) as CheckoutResponse;
 
       if (!response.ok || data.error) {
-        if (options.silent) {
-          return;
+        if (
+          options.polling &&
+          response.status === 409 &&
+          data.code === "PAYMENT_PENDING"
+        ) {
+          return { kind: "pending" };
         }
         throw new Error(data.error ?? "Не удалось подтвердить оплату.");
       }
 
+      if (data.paymentSuccessGoal) {
+        await trackConfirmedPaymentGoals(data.paymentSuccessGoal, token);
+      }
+
       setMessage("Оплата подтверждена. Переходим к генерации.");
-      trackCheckoutGoalOnce("purchase", activeSessionId ?? "latest", {
-        product_code: activePackage.code,
-        image_count: activePackage.imageCount,
-        payment_method: canUsePhotoBalance ? "balance" : "yookassa",
-        value: canUsePhotoBalance ? 0 : activePackage.amountCents / 100,
-      });
       window.location.href = data.redirectUrl ?? `/generation/${jobId}`;
+      return { kind: "confirmed" };
     } catch (confirmError) {
+      if (options.signal?.aborted || isAbortError(confirmError)) {
+        return { kind: "aborted" };
+      }
+
+      const errorMessage =
+        confirmError instanceof Error ? confirmError.message : "Ошибка подтверждения оплаты.";
+
       if (!options.silent) {
         setMessage(null);
-        setError(confirmError instanceof Error ? confirmError.message : "Ошибка подтверждения оплаты.");
+        setError(errorMessage);
       }
+      return { kind: "fatal", error: errorMessage };
     } finally {
-      if (!options.silent) {
+      if (!options.silent && !options.signal?.aborted) {
         setIsPaying(false);
       }
-      await loadCheckout();
+    }
+  }
+
+  async function trackConfirmedPaymentGoals(
+    goal: PaymentSuccessGoalPayload,
+    token: string,
+  ) {
+    trackCheckoutGoalOnce("purchase", goal.conversionId, {
+      product_code: goal.productCode,
+      image_count: goal.imageCount,
+      payment_method: "yookassa",
+      value: goal.value,
+    });
+
+    const storageKey = `yandex-goal:payment_success:${goal.conversionId}`;
+    let alreadyTracked = false;
+
+    try {
+      alreadyTracked = window.localStorage.getItem(storageKey) === "1";
+    } catch {
+      // Analytics storage must never affect the paid user flow.
+    }
+
+    if (alreadyTracked) {
+      await acknowledgePaymentSuccessGoal(goal.conversionId, token);
+      return;
+    }
+
+    let dispatched = false;
+    try {
+      dispatched = trackYandexGoal("payment_success", {
+        currency: goal.currency,
+        image_count: goal.imageCount,
+        order_price: goal.value,
+        payment_method: "yookassa",
+        product_code: goal.productCode,
+        value: goal.value,
+      });
+    } catch {
+      // Analytics must never affect the paid user flow.
+    }
+
+    if (!dispatched) return;
+
+    try {
+      window.localStorage.setItem(storageKey, "1");
+    } catch {
+      // The goal was dispatched; do not retry it in this call.
+    }
+
+    await acknowledgePaymentSuccessGoal(goal.conversionId, token);
+  }
+
+  async function acknowledgePaymentSuccessGoal(conversionId: string, token: string) {
+    try {
+      await fetch("/api/payments/ack-conversion", {
+        method: "POST",
+        keepalive: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ conversionId, jobId }),
+      });
+    } catch {
+      // The outbox remains undelivered and can be retried safely later.
     }
   }
 
@@ -242,10 +372,29 @@ export default function CheckoutPage() {
     params: Parameters<typeof trackVkGoal>[1],
   ) {
     const key = `vk-goal:${goal}:${jobId}:${marker}`;
-    if (window.sessionStorage.getItem(key)) return;
+    if (trackedCheckoutGoals.has(key)) return;
 
-    trackVkGoal(goal, params);
-    window.sessionStorage.setItem(key, "1");
+    try {
+      if (window.localStorage.getItem(key)) {
+        trackedCheckoutGoals.add(key);
+        return;
+      }
+    } catch {
+      // Fall back to the in-memory guard below.
+    }
+
+    try {
+      trackVkGoal(goal, params);
+    } catch {
+      return;
+    }
+
+    trackedCheckoutGoals.add(key);
+    try {
+      window.localStorage.setItem(key, "1");
+    } catch {
+      // Analytics storage must never affect navigation.
+    }
   }
 
   return (
@@ -335,4 +484,8 @@ export default function CheckoutPage() {
       </section>
     </main>
   );
+}
+
+function isAbortError(error: unknown) {
+  return error instanceof DOMException && error.name === "AbortError";
 }

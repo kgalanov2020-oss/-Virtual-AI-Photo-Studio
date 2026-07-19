@@ -26,6 +26,10 @@ export function resolveYooKassaPaymentAttempt<TAttempt extends YooKassaPaymentAt
   ) => Promise<PaymentSettlementResult>;
   maxAttempts?: number;
 }): Promise<
-  | { kind: "paid"; settlement: PaymentSettlementResult }
+  | {
+      kind: "paid";
+      providerPaymentId: string;
+      settlement: PaymentSettlementResult;
+    }
   | { kind: "checkout"; checkoutUrl: string }
 >;
