@@ -7,15 +7,20 @@ type RedeemPromoBody = {
   code?: string;
 };
 
+type RedeemPromoResult = {
+  credits_granted: number;
+  free_images_remaining: number;
+};
+
 export async function POST(request: NextRequest) {
   try {
     const token = readBearerToken(request);
-    const { code } = (await request.json()) as RedeemPromoBody;
-    const normalizedCode = normalizePromoCode(code);
-
     if (!token) {
       return NextResponse.json({ error: "Сначала войдите в аккаунт." }, { status: 401 });
     }
+
+    const { code } = (await request.json()) as RedeemPromoBody;
+    const normalizedCode = normalizePromoCode(code);
 
     if (!normalizedCode) {
       return NextResponse.json({ error: "Введите промокод." }, { status: 400 });
@@ -30,96 +35,27 @@ export async function POST(request: NextRequest) {
 
     const userId = userData.user.id;
     const email = userData.user.email;
-    const now = new Date().toISOString();
-
-    const { data: promoCode, error: promoError } = await supabase
-      .from("promo_codes")
-      .select("*")
-      .eq("code", normalizedCode)
-      .single();
-
-    if (promoError || !promoCode) {
-      return NextResponse.json({ error: "Промокод не найден." }, { status: 404 });
-    }
-
-    if (!promoCode.is_active) {
-      return NextResponse.json({ error: "Промокод уже не активен." }, { status: 400 });
-    }
-
-    if (promoCode.starts_at && promoCode.starts_at > now) {
-      return NextResponse.json({ error: "Промокод ещё не активен." }, { status: 400 });
-    }
-
-    if (promoCode.expires_at && promoCode.expires_at < now) {
-      return NextResponse.json({ error: "Срок действия промокода истёк." }, { status: 400 });
-    }
-
-    if (
-      promoCode.max_redemptions !== null &&
-      promoCode.redeemed_count >= promoCode.max_redemptions
-    ) {
-      return NextResponse.json({ error: "Лимит промокода уже исчерпан." }, { status: 400 });
-    }
-
-    const { error: redemptionError } = await supabase.from("promo_redemptions").insert({
-      promo_code_id: promoCode.id,
-      user_id: userId,
-      email,
-      credits_granted: promoCode.credit_amount,
+    const { data, error } = await supabase.rpc("redeem_promo_code", {
+      p_code: normalizedCode,
+      p_user_id: userId,
+      p_email: email,
     });
 
-    if (redemptionError) {
-      if (redemptionError.code === "23505") {
-        return NextResponse.json(
-          { error: "Вы уже использовали этот промокод." },
-          { status: 409 },
-        );
-      }
-
-      return NextResponse.json({ error: redemptionError.message }, { status: 500 });
+    if (error) {
+      const mappedError = mapPromoRedemptionError(error.message);
+      return NextResponse.json({ error: mappedError.message }, { status: mappedError.status });
     }
 
-    const { data: profile } = await supabase
-      .from("user_profiles")
-      .select("*")
-      .eq("user_id", userId)
-      .single();
-
-    const currentFreeImages = profile?.free_images_remaining ?? 0;
-    const nextFreeImages = currentFreeImages + promoCode.credit_amount;
-
-    const { data: updatedProfile, error: profileError } = await supabase
-      .from("user_profiles")
-      .upsert(
-        {
-          user_id: userId,
-          email,
-          free_images_remaining: nextFreeImages,
-          updated_at: now,
-        },
-        { onConflict: "user_id" },
-      )
-      .select("*")
-      .single();
-
-    if (profileError || !updatedProfile) {
-      return NextResponse.json(
-        { error: profileError?.message ?? "Не удалось пополнить баланс." },
-        { status: 500 },
-      );
+    if (!data) {
+      return NextResponse.json({ error: "Не удалось применить промокод." }, { status: 500 });
     }
 
-    await supabase
-      .from("promo_codes")
-      .update({
-        redeemed_count: promoCode.redeemed_count + 1,
-      })
-      .eq("id", promoCode.id);
+    const result = data as RedeemPromoResult;
 
     return NextResponse.json({
       ok: true,
-      creditsGranted: promoCode.credit_amount,
-      freeImagesRemaining: updatedProfile.free_images_remaining,
+      creditsGranted: result.credits_granted,
+      freeImagesRemaining: result.free_images_remaining,
     });
   } catch (error) {
     return NextResponse.json(
@@ -127,6 +63,28 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+function mapPromoRedemptionError(message: string) {
+  const knownErrors: Array<{ match: string; message: string; status: number }> = [
+    { match: "Promo code not found", message: "Промокод не найден.", status: 404 },
+    {
+      match: "Promo code already redeemed",
+      message: "Вы уже использовали этот промокод.",
+      status: 409,
+    },
+    { match: "Promo code is inactive", message: "Промокод уже не активен.", status: 400 },
+    { match: "Promo code has not started", message: "Промокод ещё не активен.", status: 400 },
+    { match: "Promo code has expired", message: "Срок действия промокода истёк.", status: 400 },
+    { match: "Promo code limit reached", message: "Лимит промокода уже исчерпан.", status: 400 },
+  ];
+
+  return (
+    knownErrors.find((knownError) => message.includes(knownError.match)) ?? {
+      message: "Не удалось применить промокод.",
+      status: 500,
+    }
+  );
 }
 
 function normalizePromoCode(code: string | undefined) {

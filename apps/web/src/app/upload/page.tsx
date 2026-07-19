@@ -189,30 +189,34 @@ export default function UploadPage() {
 
   async function loadOrCreateProfile(activeUserId: string, email: string) {
     const supabase = createSupabaseBrowserClient();
-    const now = new Date().toISOString();
-    const { data, error } = await supabase
-      .from("user_profiles")
-      .upsert(
-        {
-          user_id: activeUserId,
-          email,
-          updated_at: now,
-        },
-        { onConflict: "user_id" },
-      )
-      .select("*")
-      .single();
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    const token = session?.access_token;
+    if (!token || session?.user.id !== activeUserId || !email) {
+      setAuthError("Сессия пользователя истекла. Войдите ещё раз.");
+      return;
+    }
 
-    if (error) {
+    const response = await fetch("/api/profile", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ acceptConsents: false }),
+    });
+    const payload = (await response.json()) as { error?: string; profile?: UserProfile };
+
+    if (!response.ok || !payload.profile) {
       setAuthError(
-        error.message.includes("user_profiles")
+        payload.error?.includes("user_profiles")
           ? "Профиль не удалось загрузить. Проверьте, что SQL-миграция в Supabase выполнена."
-          : error.message,
+          : payload.error ?? "Профиль не удалось загрузить.",
       );
       return;
     }
 
-    const nextProfile = data as UserProfile;
+    const nextProfile = payload.profile;
 
     const hasRequiredConsents = Boolean(
       nextProfile.legal_terms_accepted_at &&
@@ -340,8 +344,9 @@ export default function UploadPage() {
       const { data: sessionData } = await supabase.auth.getSession();
       const activeUserId = sessionData.session?.user.id;
       const activeEmail = sessionData.session?.user.email;
+      const token = sessionData.session?.access_token;
 
-      if (!activeUserId || !activeEmail) {
+      if (!activeUserId || !activeEmail || !token) {
         throw new Error("Сначала войдите по email.");
       }
 
@@ -371,66 +376,49 @@ export default function UploadPage() {
         throw new Error("Сначала выберите интерьер.");
       }
 
-      const { data: studio, error: studioError } = await supabase
-        .from("studios")
-        .select("id")
-        .eq("slug", selectedStudioSlug)
-        .single();
+      setUploadResult("Создаём фотосессию…");
 
-      if (studioError || !studio) {
-        throw new Error(studioError?.message ?? "Студия не найдена.");
+      let jobResponse: Response;
+      try {
+        jobResponse = await fetch("/api/jobs", {
+          method: "POST",
+          headers: {
+            authorization: `Bearer ${token}`,
+            "content-type": "application/json",
+          },
+          body: JSON.stringify({
+            studioSlug: selectedStudioSlug,
+            generationMode,
+            productCode: selectedPackage.code,
+          }),
+        });
+      } catch {
+        throw new Error(
+          "Не удалось начать фотосессию: соединение с сайтом прервалось. Проверьте мобильную связь или Wi-Fi и попробуйте ещё раз.",
+        );
       }
 
-      const { data: job, error: jobError } = await supabase
-        .from("jobs")
-        .insert({
-          user_id: activeUserId,
-          studio_id: studio.id,
-          generation_mode: generationMode,
-          status: "draft",
-          payment_status: selectedPackage.isFree ? "unpaid" : "unpaid",
-          amount_cents: selectedPackage.amountCents,
-          currency: "rub",
-          product_code: selectedPackage.code,
-          target_image_count: selectedPackage.imageCount,
-          progress: 0,
-        })
-        .select("id")
-        .single();
+      const jobPayload = (await jobResponse.json().catch(() => ({}))) as {
+        error?: string;
+        job?: { id: string };
+      };
 
-      if (jobError || !job) {
-        throw new Error(jobError?.message ?? "Не удалось создать job.");
+      if (!jobResponse.ok || !jobPayload.job) {
+        throw new Error(jobPayload.error ?? "Не удалось создать job.");
       }
+      const job = jobPayload.job;
 
-      const uploadedRows = [];
+      let uploadedCount = 0;
 
       for (const [index, selfie] of selfies.entries()) {
-        const filePath = `${activeUserId}/${job.id}/${String(index + 1).padStart(2, "0")}-${sanitizeFileName(selfie.name)}`;
-        const { error: uploadError } = await supabase.storage
-          .from("selfies")
-          .upload(filePath, selfie.file, {
-            contentType: selfie.file.type || "image/jpeg",
-            upsert: false,
-          });
-
-        if (uploadError) {
-          throw new Error(uploadError.message);
-        }
-
-        uploadedRows.push({
-          job_id: job.id,
-          user_id: activeUserId,
-          file_url: filePath,
-          is_approved: false,
+        setUploadResult(`Загружаем фото ${index + 1} из ${selfies.length}…`);
+        await uploadSelfieViaApi({
+          jobId: job.id,
+          token,
+          selfie,
+          slot: index + 1,
         });
-      }
-
-      const { error: selfiesError } = await supabase
-        .from("uploaded_selfies")
-        .insert(uploadedRows);
-
-      if (selfiesError) {
-        throw new Error(selfiesError.message);
+        uploadedCount += 1;
       }
 
       storeBodyProfileForJob(job.id, bodyProfile);
@@ -442,7 +430,7 @@ export default function UploadPage() {
         image_count: selectedPackage.imageCount,
       });
 
-      setUploadResult(`Job создан: ${job.id}. Загружено фото: ${uploadedRows.length}.`);
+      setUploadResult(`Фотосессия создана. Загружено фото: ${uploadedCount}.`);
       router.push(`/quality/${job.id}`);
     } catch (error) {
       setUploadError(error instanceof Error ? error.message : "Неизвестная ошибка.");
@@ -726,19 +714,81 @@ function formatFileSize(size: number) {
   return `${(size / 1024 / 1024).toFixed(1)} МБ`;
 }
 
-function sanitizeFileName(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9а-яё._-]+/gi, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
 function isAcceptedImage(file: File) {
   if (file.type.startsWith("image/")) return true;
   const extension = file.name.split(".").pop()?.toLowerCase();
   return extension ? acceptedImageExtensions.has(extension) : false;
 }
+
+async function uploadSelfieViaApi({
+  jobId,
+  token,
+  selfie,
+  slot,
+}: {
+  jobId: string;
+  token: string;
+  selfie: SelectedSelfie;
+  slot: number;
+}) {
+  let lastNetworkMessage = "";
+
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 120_000);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", selfie.file, selfie.name);
+      formData.append("slot", String(slot));
+
+      const response = await fetch(`/api/jobs/${jobId}/selfies`, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+        body: formData,
+        signal: controller.signal,
+      });
+      const payload = (await response.json().catch(() => ({}))) as { error?: string };
+
+      if (response.ok) return;
+
+      const responseMessage = payload.error ?? `Сервер вернул ошибку ${response.status}.`;
+      const retryable = response.status === 408 || response.status === 429 || response.status >= 500;
+
+      if (!retryable) {
+        throw new NonRetryableUploadError(responseMessage);
+      }
+
+      lastNetworkMessage = responseMessage;
+    } catch (error) {
+      if (error instanceof NonRetryableUploadError) throw error;
+
+      lastNetworkMessage =
+        error instanceof DOMException && error.name === "AbortError"
+          ? "время ожидания истекло"
+          : error instanceof Error
+            ? error.message
+            : "соединение прервано";
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
+
+    if (attempt < 3) {
+      await new Promise((resolve) => window.setTimeout(resolve, attempt * 800));
+    }
+  }
+
+  const technicalDetail = /load failed|failed to fetch|networkerror/i.test(lastNetworkMessage)
+    ? ""
+    : ` (${lastNetworkMessage})`;
+  throw new Error(
+    `Не удалось передать фото «${selfie.name}» после трёх попыток${technicalDetail}. Проверьте мобильную связь или Wi-Fi и нажмите кнопку ещё раз.`,
+  );
+}
+
+class NonRetryableUploadError extends Error {}
 
 function parseOptionalNumber(value: string) {
   const normalizedValue = value.trim().replace(",", ".");

@@ -75,10 +75,14 @@ services:
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+      - key: OUTREACH_SEGMENT
+        value: photo_booth_manufacturer
+      - key: OUTREACH_RESUME
+        value: false
       - key: OUTREACH_LIMIT
-        value: 10000
+        value: 50
       - key: OUTREACH_PROMO_CODE
-        value: STUDIO
+        value: CABIN
   - type: cron
     name: virtual-ai-photo-studio-media-cleanup
     runtime: node
@@ -116,7 +120,7 @@ services:
       - key: PNPM_VERSION
         value: 10.18.3
       - key: OUTREACH_AUTO_SEND_ENABLED
-        value: true
+        value: false
       - key: OUTREACH_PROMO_CODE
         value: STUDIO
       - key: OUTREACH_RAMP_STARTED_AT

@@ -46,8 +46,14 @@ export async function GET(request: NextRequest) {
       query = query.not("email", "is", null).neq("email", "");
     }
 
-    if (segment === "photo_booth_manufacturer" || segment === "photo_studio") {
+    if (segment === "photo_booth_manufacturer") {
       query = query.contains("raw", { segment });
+    }
+
+    if (segment === "photo_studio") {
+      // Leads collected before segmentation was introduced have no raw.segment.
+      // They are the original photo-studio list and must remain visible.
+      query = query.or("raw->>segment.eq.photo_studio,raw->>segment.is.null");
     }
 
     const { data, error } = await query;

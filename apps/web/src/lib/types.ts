@@ -63,11 +63,14 @@ export type Order = {
   id: string;
   job_id: string;
   user_id: string;
-  status: "pending" | "paid" | "cancelled" | "failed" | "refunded";
+  status: "pending" | "paid" | "cancelled" | "failed" | "refunded" | "refund_pending";
   provider: string;
+  provider_idempotence_key: string;
   provider_session_id: string | null;
   provider_payment_id: string | null;
   checkout_url: string | null;
+  is_active_payment_attempt: boolean;
+  reconciliation_reason: string | null;
   amount_cents: number;
   currency: string;
   product_code: string;
@@ -235,12 +238,24 @@ export type Database = {
         Row: Order;
         Insert: Omit<
           Order,
-          "id" | "provider_session_id" | "provider_payment_id" | "checkout_url" | "paid_at" | "created_at" | "updated_at"
+          | "id"
+          | "provider_idempotence_key"
+          | "provider_session_id"
+          | "provider_payment_id"
+          | "checkout_url"
+          | "is_active_payment_attempt"
+          | "reconciliation_reason"
+          | "paid_at"
+          | "created_at"
+          | "updated_at"
         > & {
           id?: string;
+          provider_idempotence_key?: string;
           provider_session_id?: string | null;
           provider_payment_id?: string | null;
           checkout_url?: string | null;
+          is_active_payment_attempt?: boolean;
+          reconciliation_reason?: string | null;
           paid_at?: string | null;
           created_at?: string;
           updated_at?: string;
@@ -312,7 +327,130 @@ export type Database = {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      reserve_yookassa_payment_attempt: {
+        Args: {
+          p_job_id: string;
+          p_user_id: string;
+          p_product_name: string;
+        };
+        Returns: {
+          id: string;
+          job_id: string;
+          user_id: string;
+          provider: string;
+          provider_idempotence_key: string;
+          provider_session_id: string | null;
+          checkout_url: string | null;
+          amount_cents: number;
+          currency: string;
+          product_code: string;
+          target_image_count: number;
+          created: boolean;
+        };
+      };
+      finalize_yookassa_payment_attempt: {
+        Args: {
+          p_order_id: string;
+          p_job_id: string;
+          p_user_id: string;
+          p_provider_idempotence_key: string;
+          p_provider_session_id: string;
+          p_checkout_url: string | null;
+        };
+        Returns: {
+          id: string;
+          job_id: string;
+          user_id: string;
+          provider: string;
+          provider_idempotence_key: string;
+          provider_session_id: string | null;
+          checkout_url: string | null;
+          amount_cents: number;
+          currency: string;
+          product_code: string;
+          target_image_count: number;
+          created: boolean;
+        };
+      };
+      settle_job_from_photo_balance: {
+        Args: {
+          p_job_id: string;
+          p_user_id: string;
+        };
+        Returns: {
+          status: "balance_settled" | "already_paid" | "provider_attempt_exists";
+          free_images_remaining?: number;
+          order_id?: string;
+          provider_session_id?: string | null;
+        };
+      };
+      delete_job_without_payment_history: {
+        Args: {
+          p_job_id: string;
+          p_user_id: string;
+        };
+        Returns: "deleted" | "not_found" | "running" | "payment_history";
+      };
+      settle_yookassa_payment: {
+        Args: {
+          p_provider_session_id: string;
+          p_provider_payment_id: string;
+          p_job_id: string;
+          p_user_id: string;
+          p_amount_cents: number;
+          p_currency: string;
+          p_product_code: string;
+          p_target_image_count: number;
+        };
+        Returns: "processed" | "already_processed" | "duplicate_payment_credited";
+      };
+      consume_user_photo_credit: {
+        Args: {
+          p_user_id: string;
+        };
+        Returns: number;
+      };
+      refund_user_photo_credit: {
+        Args: {
+          p_user_id: string;
+        };
+        Returns: number;
+      };
+      record_generated_image_with_credit: {
+        Args: {
+          p_job_id: string;
+          p_user_id: string;
+          p_studio_shot_id: string;
+          p_image_url: string;
+          p_variation_index: number;
+        };
+        Returns: {
+          inserted: boolean;
+          completed_count: number;
+          free_images_remaining?: number;
+        };
+      };
+      grant_user_photo_credits: {
+        Args: {
+          p_user_id: string;
+          p_email: string;
+          p_credit_count: number;
+        };
+        Returns: number;
+      };
+      redeem_promo_code: {
+        Args: {
+          p_code: string;
+          p_user_id: string;
+          p_email: string;
+        };
+        Returns: {
+          credits_granted: number;
+          free_images_remaining: number;
+        };
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

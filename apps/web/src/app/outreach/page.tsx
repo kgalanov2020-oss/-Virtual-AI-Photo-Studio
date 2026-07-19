@@ -52,21 +52,21 @@ https://virtualphotostudio.ru
 
 export default function OutreachPage() {
   const [segment, setSegment] = useState<"photo_studio" | "photo_booth_manufacturer">(
-    "photo_booth_manufacturer",
+    "photo_studio",
   );
   const [studioName, setStudioName] = useState("Название компании");
   const [city, setCity] = useState("Москва");
-  const [promoCode, setPromoCode] = useState("CABIN");
+  const [promoCode, setPromoCode] = useState("STUDIO");
   const [subjectTemplate, setSubjectTemplate] = useState(
-    "{{studio_name}}, AI-фотостудия как новый модуль для фотокабин",
+    "{{studio_name}}, новый формат AI-фотосессий для ваших клиентов",
   );
-  const [bodyTemplate, setBodyTemplate] = useState(manufacturerBody);
+  const [bodyTemplate, setBodyTemplate] = useState(defaultBody);
   const [copyMessage, setCopyMessage] = useState("");
   const [adminToken, setAdminToken] = useState("");
   const [leads, setLeads] = useState<OutreachLead[]>([]);
   const [leadsMessage, setLeadsMessage] = useState("");
   const [isLoadingLeads, setIsLoadingLeads] = useState(false);
-  const [emailOnly, setEmailOnly] = useState(true);
+  const [emailOnly, setEmailOnly] = useState(false);
   const [sendingLeadId, setSendingLeadId] = useState<string | null>(null);
   const [deletingLeadId, setDeletingLeadId] = useState<string | null>(null);
 
@@ -123,8 +123,16 @@ export default function OutreachPage() {
         throw new Error(payload.error ?? "Не удалось загрузить лиды.");
       }
 
-      setLeads(payload.leads ?? []);
-      setLeadsMessage(`Загружено компаний: ${(payload.leads ?? []).length}.`);
+      const loadedLeads = (payload.leads ?? []) as OutreachLead[];
+      const unsentCount = loadedLeads.filter(
+        (lead) =>
+          ["new", "needs_manual_email", "needs_review", "approved"].includes(lead.status) &&
+          !lead.last_contacted_at,
+      ).length;
+      setLeads(loadedLeads);
+      setLeadsMessage(
+        `Загружено компаний: ${loadedLeads.length}. Ещё не отправлено: ${unsentCount}.`,
+      );
     } catch (error) {
       setLeadsMessage(error instanceof Error ? error.message : "Не удалось загрузить лиды.");
     } finally {
@@ -279,6 +287,9 @@ export default function OutreachPage() {
                 <option value="photo_booth_manufacturer">Производители фотокабин</option>
                 <option value="photo_studio">Фотостудии</option>
               </select>
+              <small>
+                Старые лиды, собранные до добавления сегментов, показываются в «Фотостудиях».
+              </small>
             </label>
             <label>
               <span>Название студии</span>

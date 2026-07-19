@@ -41,6 +41,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   try {
     const token = readBearerToken(request);
+    if (!token) {
+      return NextResponse.json({ error: "Сначала войдите в аккаунт." }, { status: 401 });
+    }
     const supabase = createSupabaseAdminClient();
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
 
@@ -256,21 +259,26 @@ export async function POST(request: NextRequest, context: RouteContext) {
       .from("generated")
       .getPublicUrl(generatedPath);
 
-    const { error: imageError } = await supabase.from("generated_images").insert({
-      job_id: jobId,
-      user_id: userId,
-      studio_shot_id: shot.id,
-      image_url: publicUrlData.publicUrl,
-      seed: null,
-      variation_index: variationIndex,
-      is_favorite: false,
-    });
+    const { data: recordedImage, error: imageError } = await supabase.rpc(
+      "record_generated_image_with_credit",
+      {
+        p_job_id: jobId,
+        p_user_id: userId,
+        p_studio_shot_id: shot.id,
+        p_image_url: publicUrlData.publicUrl,
+        p_variation_index: variationIndex,
+      },
+    );
 
-    if (imageError) {
-      throw new Error(imageError.message);
+    if (imageError || !recordedImage) {
+      throw new Error(
+        /Photo credit balance is empty/.test(imageError?.message ?? "")
+          ? "Бесплатные фото закончились. Выберите платный пакет."
+          : imageError?.message ?? "Не удалось сохранить созданное изображение.",
+      );
     }
 
-    const completedAfter = completedBefore + 1;
+    const completedAfter = recordedImage.completed_count;
     const isDone = completedAfter >= totalExpected;
     lastKnownCompleted = completedAfter;
 
@@ -282,24 +290,6 @@ export async function POST(request: NextRequest, context: RouteContext) {
         completed_at: isDone ? new Date().toISOString() : null,
       })
       .eq("id", jobId);
-
-    if (shouldDebitPhotoBalance) {
-      const { data: profile } = await supabase
-        .from("user_profiles")
-        .select("free_images_remaining")
-        .eq("user_id", userId)
-        .single();
-
-      const freeImagesRemaining = Math.max(0, (profile?.free_images_remaining ?? 0) - 1);
-
-      await supabase
-        .from("user_profiles")
-        .update({
-          free_images_remaining: freeImagesRemaining,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("user_id", userId);
-    }
 
     return NextResponse.json({
       ok: true,
@@ -331,7 +321,10 @@ export async function POST(request: NextRequest, context: RouteContext) {
       // Keep the original generation error.
     }
 
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: message },
+      { status: /Бесплатные фото закончились/.test(message) ? 402 : 500 },
+    );
   }
 }
 
@@ -413,14 +406,9 @@ function normalizeGenerationError(
 }
 
 function readBearerToken(request: NextRequest) {
-  const authorization = request.headers.get("authorization");
-  const token = authorization?.replace(/^Bearer\s+/i, "");
-
-  if (!token) {
-    throw new Error("Нет токена пользователя.");
-  }
-
-  return token;
+  const authorization = request.headers.get("authorization") ?? "";
+  const [scheme, token] = authorization.split(" ");
+  return scheme.toLowerCase() === "bearer" && token ? token : null;
 }
 
 async function readRequestBody(request: NextRequest): Promise<{ bodyProfile: BodyProfile | null }> {

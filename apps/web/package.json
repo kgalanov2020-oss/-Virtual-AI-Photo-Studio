@@ -5,7 +5,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:payments": "node --test src/lib/payment-attempt-orchestrator.test.mjs src/lib/payment-schema-security.test.mjs src/lib/yookassa-verification.test.mjs",
+    "test:uploads": "node --test src/lib/selfie-upload.test.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.108.2",

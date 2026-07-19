@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import { settleVerifiedYooKassaPayment } from "@/lib/payment-settlement";
 import { createSupabaseAdminClient } from "@/lib/supabase";
+import {
+  retrieveYooKassaPayment,
+  YooKassaVerificationError,
+} from "@/lib/yookassa-verification.mjs";
 
 export const runtime = "nodejs";
 
@@ -7,126 +12,101 @@ type YooKassaWebhook = {
   event?: string;
   object?: {
     id?: string;
-    status?: string;
-    amount?: {
-      value?: string;
-      currency?: string;
-    };
-    metadata?: {
-      job_id?: string;
-      user_id?: string;
-    };
   };
 };
 
 export async function POST(request: NextRequest) {
-  const body = (await request.json()) as YooKassaWebhook;
+  try {
+    const body = (await request.json()) as YooKassaWebhook;
 
-  if (body.event !== "payment.succeeded") {
-    return NextResponse.json({ status: "ignored" });
-  }
+    if (body.event !== "payment.succeeded") {
+      return NextResponse.json({ status: "ignored" });
+    }
 
-  const payment = body.object;
-  const paymentId = payment?.id;
-  const jobId = payment?.metadata?.job_id;
-  const userId = payment?.metadata?.user_id;
+    const paymentId = body.object?.id;
+    if (!paymentId) {
+      return NextResponse.json({ status: "rejected", error: "invalid payment payload" });
+    }
 
-  if (!paymentId || !jobId || !userId || payment?.status !== "succeeded") {
-    return NextResponse.json({ error: "invalid payment payload" }, { status: 400 });
-  }
+    const shopId = process.env.YOOKASSA_SHOP_ID;
+    const secretKey = process.env.YOOKASSA_SECRET_KEY;
+    if (!shopId || !secretKey) {
+      return NextResponse.json(
+        { error: "YOOKASSA_SHOP_ID или YOOKASSA_SECRET_KEY не настроены." },
+        { status: 501 },
+      );
+    }
 
-  const supabase = createSupabaseAdminClient();
-  const { data: existingOrder, error: existingError } = await supabase
-    .from("orders")
-    .select("id, status, target_image_count")
-    .eq("provider_session_id", paymentId)
-    .eq("job_id", jobId)
-    .eq("user_id", userId)
-    .maybeSingle();
-
-  if (existingError) {
-    return NextResponse.json({ error: existingError.message }, { status: 500 });
-  }
-
-  if (existingOrder?.status === "paid") {
-    return NextResponse.json({ status: "already_processed" });
-  }
-
-  const paidAt = new Date().toISOString();
-  const { error: orderError } = await supabase
-    .from("orders")
-    .update({
-      status: "paid",
-      provider_payment_id: paymentId,
-      paid_at: paidAt,
-      updated_at: paidAt,
-    })
-    .eq("provider_session_id", paymentId)
-    .eq("job_id", jobId)
-    .eq("user_id", userId);
-
-  if (orderError) {
-    return NextResponse.json({ error: orderError.message }, { status: 500 });
-  }
-
-  if ((existingOrder?.target_image_count ?? 0) > 0) {
-    const balanceError = await addPhotoBalance({
-      supabase,
-      userId,
-      imageCount: existingOrder?.target_image_count ?? 0,
+    // The notification body is untrusted. YooKassa is the source of truth.
+    const payment = await retrieveYooKassaPayment({
+      shopId,
+      secretKey,
+      paymentId,
     });
 
-    if (balanceError) {
-      return NextResponse.json({ error: balanceError }, { status: 500 });
+    const supabase = createSupabaseAdminClient();
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select(
+        "job_id, user_id, provider, provider_session_id, amount_cents, currency, product_code, target_image_count",
+      )
+      .eq("provider_session_id", paymentId)
+      .maybeSingle();
+
+    if (orderError) {
+      throw new Error(orderError.message);
     }
+
+    if (!order) {
+      return NextResponse.json({ error: "Платёжный заказ не найден." }, { status: 404 });
+    }
+
+    const { data: job, error: jobError } = await supabase
+      .from("jobs")
+      .select(
+        "id, user_id, payment_status, amount_cents, currency, product_code, target_image_count",
+      )
+      .eq("id", order.job_id)
+      .eq("user_id", order.user_id)
+      .maybeSingle();
+
+    if (jobError) {
+      throw new Error(jobError.message);
+    }
+
+    if (!job) {
+      return NextResponse.json({ error: "Задание платежа не найдено." }, { status: 404 });
+    }
+
+    const result = await settleVerifiedYooKassaPayment({
+      supabase,
+      payment,
+      order,
+      job,
+    });
+
+    return NextResponse.json({
+      status:
+        result === "processed"
+          ? "success"
+          : result === "duplicate_payment_credited"
+            ? "duplicate_payment_credited"
+            : "already_processed",
+      payment_id: paymentId,
+    });
+  } catch (error) {
+    if (
+      error instanceof YooKassaVerificationError &&
+      error.code !== "payment_not_succeeded"
+    ) {
+      // A verified provider payment that permanently fails our invariants will
+      // not become valid on retry. Acknowledge it to stop a 24-hour retry loop.
+      return NextResponse.json({ status: "rejected", error: error.message });
+    }
+
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Не удалось обработать уведомление ЮKassa." },
+      { status: 500 },
+    );
   }
-
-  const { error: jobError } = await supabase
-    .from("jobs")
-    .update({
-      status: "queued",
-      payment_status: "paid",
-      paid_at: paidAt,
-      progress: 5,
-      queued_at: paidAt,
-      error_message: null,
-    })
-    .eq("id", jobId)
-    .eq("user_id", userId);
-
-  if (jobError) {
-    return NextResponse.json({ error: jobError.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ status: "success", payment_id: paymentId });
-}
-
-async function addPhotoBalance({
-  supabase,
-  userId,
-  imageCount,
-}: {
-  supabase: ReturnType<typeof createSupabaseAdminClient>;
-  userId: string;
-  imageCount: number;
-}) {
-  const { data: profile, error: profileError } = await supabase
-    .from("user_profiles")
-    .select("free_images_remaining")
-    .eq("user_id", userId)
-    .single();
-
-  if (profileError || !profile) {
-    return profileError?.message ?? "Профиль пользователя не найден.";
-  }
-
-  const { error: updateError } = await supabase
-    .from("user_profiles")
-    .update({
-      free_images_remaining: profile.free_images_remaining + imageCount,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
-
-  return updateError?.message ?? null;
 }

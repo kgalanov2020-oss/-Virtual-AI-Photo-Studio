@@ -19,6 +19,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
 
   try {
     const token = readBearerToken(request);
+    if (!token) {
+      return NextResponse.json({ error: "Сначала войдите в аккаунт." }, { status: 401 });
+    }
     const supabase = createSupabaseAdminClient();
     const { data: userData, error: userError } = await supabase.auth.getUser(token);
 
@@ -132,12 +135,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
 }
 
 function readBearerToken(request: NextRequest) {
-  const authorization = request.headers.get("authorization");
-  const token = authorization?.replace(/^Bearer\s+/i, "");
-
-  if (!token) {
-    throw new Error("Нет токена пользователя.");
-  }
-
-  return token;
+  const authorization = request.headers.get("authorization") ?? "";
+  const [scheme, token] = authorization.split(" ");
+  return scheme.toLowerCase() === "bearer" && token ? token : null;
 }

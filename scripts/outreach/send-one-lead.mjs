@@ -3,7 +3,7 @@ import nodemailer from "nodemailer";
 const supabase = createSupabaseConfig();
 const smtp = createSmtpConfig();
 const promoCode = process.env.OUTREACH_PROMO_CODE ?? "STUDIO";
-const autoSendEnabled = (process.env.OUTREACH_AUTO_SEND_ENABLED ?? "true") === "true";
+const autoSendEnabled = (process.env.OUTREACH_AUTO_SEND_ENABLED ?? "false") === "true";
 const sendLimit = getSendLimit();
 
 if (!autoSendEnabled) {
@@ -69,7 +69,9 @@ async function findNextLeads(limit) {
   params.append("email", "not.is.null");
   params.append("email", "neq.");
   params.set("order", "last_contacted_at.asc.nullsfirst,created_at.asc");
-  params.set("limit", String(limit));
+  // Load enough candidates to keep legacy photo-studio leads available even if
+  // newer manufacturer leads are interleaved in the same table.
+  params.set("limit", "10000");
 
   const response = await fetch(`${supabase.restUrl}/outreach_leads?${params}`, {
     headers: supabaseHeaders(),
@@ -79,7 +81,14 @@ async function findNextLeads(limit) {
     throw new Error(`Could not load outreach lead: ${await response.text()}`);
   }
 
-  return (await response.json()) ?? [];
+  const candidates = (await response.json()) ?? [];
+
+  // Rows created before segmentation have no raw.segment and are photo studios.
+  // Manufacturers require a separate, manually reviewed proposal and must never
+  // be picked up by the legacy automatic studio campaign.
+  return candidates
+    .filter((lead) => lead.raw?.segment !== "photo_booth_manufacturer")
+    .slice(0, limit);
 }
 
 async function sendEmail(lead) {

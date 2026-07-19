@@ -111,27 +111,28 @@ export default function LoginPage() {
 
   async function saveProfileConsents(nextUser: User) {
     const supabase = createSupabaseBrowserClient();
-    const now = new Date().toISOString();
-    const { data, error: profileError } = await supabase
-      .from("user_profiles")
-      .upsert(
-        {
-          user_id: nextUser.id,
-          email: nextUser.email ?? email.trim(),
-          legal_terms_accepted_at: now,
-          privacy_accepted_at: now,
-          personal_data_accepted_at: now,
-          photo_rights_accepted_at: now,
-        },
-        { onConflict: "user_id" },
-      )
-      .select("*")
-      .single();
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    const token = session?.access_token;
+    if (!token || session?.user.id !== nextUser.id) {
+      throw new Error("Сессия пользователя истекла. Войдите ещё раз.");
+    }
 
-    if (profileError) throw profileError;
+    const response = await fetch("/api/profile", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify({ acceptConsents: true }),
+    });
+    const payload = (await response.json()) as { error?: string; profile?: UserProfile };
+    if (!response.ok || !payload.profile) {
+      throw new Error(payload.error ?? "Не удалось сохранить согласия.");
+    }
 
-    setProfile(data);
-    return data;
+    setProfile(payload.profile);
+    return payload.profile;
   }
 
   function redirectToNext() {

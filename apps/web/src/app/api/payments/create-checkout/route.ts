@@ -1,28 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  formatMoney,
-  getPhotoPackage,
-  PAYMENT_CURRENCY,
-} from "@/lib/pricing";
+import { resolveYooKassaPaymentAttempt } from "@/lib/payment-attempt-orchestrator.mjs";
+import { formatMoney, getPhotoPackage, PAYMENT_CURRENCY } from "@/lib/pricing";
+import { settleVerifiedYooKassaPayment } from "@/lib/payment-settlement";
 import { createSupabaseAdminClient } from "@/lib/supabase";
+import type { Order } from "@/lib/types";
+import {
+  retrieveYooKassaPayment,
+  type YooKassaPayment,
+  YooKassaVerificationError,
+} from "@/lib/yookassa-verification.mjs";
 
 export const runtime = "nodejs";
 
-type YooKassaPayment = {
-  id: string;
-  status: string;
-  confirmation?: {
-    confirmation_url?: string;
-  };
-  metadata?: {
-    job_id?: string;
-    user_id?: string;
-  };
+type PaymentAttempt = Pick<
+  Order,
+  | "id"
+  | "job_id"
+  | "user_id"
+  | "provider"
+  | "provider_idempotence_key"
+  | "provider_session_id"
+  | "checkout_url"
+  | "amount_cents"
+  | "currency"
+  | "product_code"
+  | "target_image_count"
+> & { created: boolean };
+
+type PhotoBalanceSettlement = {
+  status: "balance_settled" | "already_paid" | "provider_attempt_exists";
+  free_images_remaining?: number;
+  order_id?: string;
+  provider_session_id?: string | null;
 };
 
 export async function POST(request: NextRequest) {
   try {
     const token = readBearerToken(request);
+    if (!token) {
+      return NextResponse.json({ error: "Сначала войдите в аккаунт." }, { status: 401 });
+    }
+
     const { jobId, email } = (await request.json()) as { jobId?: string; email?: string };
 
     if (!jobId) {
@@ -39,7 +57,9 @@ export async function POST(request: NextRequest) {
     const userId = userData.user.id;
     const { data: job, error: jobError } = await supabase
       .from("jobs")
-      .select("id, user_id, status, payment_status, product_code, target_image_count")
+      .select(
+        "id, user_id, status, payment_status, amount_cents, currency, product_code, target_image_count",
+      )
       .eq("id", jobId)
       .single();
 
@@ -74,24 +94,21 @@ export async function POST(request: NextRequest) {
     }
 
     if (profile.free_images_remaining >= selectedPackage.imageCount) {
-      await markJobPaidFromPhotoBalance({
-        supabase,
-        jobId,
-        userId,
-        selectedPackage,
-      });
+      const balanceSettlement = await markJobPaidFromPhotoBalance({ supabase, jobId, userId });
 
-      return NextResponse.json({
-        ok: true,
-        paid: true,
-        redirectUrl: `/generation/${jobId}`,
-        balancePaid: true,
-      });
+      if (balanceSettlement.status !== "provider_attempt_exists") {
+        return NextResponse.json({
+          ok: true,
+          paid: true,
+          redirectUrl: `/generation/${jobId}`,
+          balancePaid: balanceSettlement.status === "balance_settled",
+        });
+      }
     }
 
-    const yookassaShopId = process.env.YOOKASSA_SHOP_ID;
-    const yookassaSecretKey = process.env.YOOKASSA_SECRET_KEY;
-    if (!yookassaShopId || !yookassaSecretKey) {
+    const shopId = process.env.YOOKASSA_SHOP_ID;
+    const secretKey = process.env.YOOKASSA_SECRET_KEY;
+    if (!shopId || !secretKey) {
       return NextResponse.json(
         {
           error:
@@ -105,111 +122,143 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Введите email для электронного чека." }, { status: 400 });
     }
 
-    const { data: pendingOrders, error: pendingOrderError } = await supabase
-      .from("orders")
-      .select("provider_session_id, checkout_url")
-      .eq("job_id", jobId)
-      .eq("user_id", userId)
-      .eq("status", "pending")
-      .order("created_at", { ascending: false })
-      .limit(10);
+    const returnOrigin = getPaymentReturnOrigin();
 
-    if (pendingOrderError) {
-      throw new Error(pendingOrderError.message);
-    }
-
-    for (const pendingOrder of pendingOrders ?? []) {
-      if (!pendingOrder.provider_session_id) {
-        continue;
-      }
-
-      const existingPayment = await retrieveYooKassaPayment(
-        yookassaShopId,
-        yookassaSecretKey,
-        pendingOrder.provider_session_id,
-      );
-
-      if (existingPayment.status === "succeeded") {
-        await markPaymentPaid({
+    // DB reservation plus the persisted provider key makes parallel calls
+    // converge on one YooKassa payment.
+    const result = await resolveYooKassaPaymentAttempt<PaymentAttempt>({
+      reserveAttempt: () =>
+        reservePaymentAttempt({
           supabase,
           jobId,
           userId,
-          paymentId: existingPayment.id,
+          productName: selectedPackage.name,
+        }),
+      retrievePayment: (paymentId) =>
+        retrieveYooKassaPayment({ shopId, secretKey, paymentId }),
+      createPayment: (idempotenceKey) =>
+        createYooKassaPayment({
+          shopId,
+          secretKey,
+          returnOrigin,
+          jobId,
+          userId,
+          email,
           selectedPackage,
-        });
-
-        return NextResponse.json({ ok: true, paid: true, redirectUrl: `/generation/${jobId}` });
-      }
-
-      if (pendingOrder.checkout_url && !["canceled", "failed"].includes(existingPayment.status)) {
-        return NextResponse.json({
-          ok: true,
-          checkoutUrl: pendingOrder.checkout_url,
-          label: formatMoney(selectedPackage.amountCents),
-        });
-      }
-    }
-
-    const origin = request.headers.get("origin") ?? new URL(request.url).origin;
-    const payment = await createYooKassaPayment({
-      shopId: yookassaShopId,
-      secretKey: yookassaSecretKey,
-      origin,
-      jobId,
-      userId,
-      email,
-      selectedPackage,
-    });
-    const checkoutUrl = payment.confirmation?.confirmation_url;
-
-    if (!checkoutUrl) {
-      throw new Error("ЮKassa не вернула ссылку на оплату.");
-    }
-
-    const { error: orderError } = await supabase.from("orders").insert({
-      job_id: jobId,
-      user_id: userId,
-      status: "pending",
-      provider: "yookassa",
-      provider_session_id: payment.id,
-      checkout_url: checkoutUrl,
-      amount_cents: selectedPackage.amountCents,
-      currency: PAYMENT_CURRENCY,
-      product_code: selectedPackage.code,
-      product_name: selectedPackage.name,
-      target_image_count: selectedPackage.imageCount,
+          idempotenceKey,
+        }),
+      finalizeAttempt: (attempt, payment) =>
+        finalizePaymentAttempt({ supabase, attempt, payment }),
+      closeAttempt: (attempt, status) =>
+        closePaymentAttempt({ supabase, attempt, status }),
+      settlePayment: (attempt, payment) =>
+        settleVerifiedYooKassaPayment({
+          supabase,
+          payment,
+          order: attempt,
+          job,
+        }),
     });
 
-    if (orderError) {
-      throw new Error(orderError.message);
-    }
-
-    const { error: paymentError } = await supabase
-      .from("jobs")
-      .update({
-        status: "awaiting_payment",
-        payment_status: "pending",
-        amount_cents: selectedPackage.amountCents,
-        currency: PAYMENT_CURRENCY,
-        product_code: selectedPackage.code,
-        target_image_count: selectedPackage.imageCount,
-      })
-      .eq("id", jobId);
-
-    if (paymentError) {
-      throw new Error(paymentError.message);
+    if (result.kind === "paid") {
+      return NextResponse.json({
+        ok: true,
+        paid: true,
+        redirectUrl: `/generation/${jobId}`,
+        duplicatePaymentCredited: result.settlement === "duplicate_payment_credited",
+      });
     }
 
     return NextResponse.json({
       ok: true,
-      checkoutUrl,
+      checkoutUrl: result.checkoutUrl,
       label: formatMoney(selectedPackage.amountCents),
     });
   } catch (error) {
+    const status = error instanceof YooKassaVerificationError ? 409 : 500;
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Не удалось создать оплату." },
-      { status: 500 },
+      { status },
     );
+  }
+}
+
+async function reservePaymentAttempt({
+  supabase,
+  jobId,
+  userId,
+  productName,
+}: {
+  supabase: ReturnType<typeof createSupabaseAdminClient>;
+  jobId: string;
+  userId: string;
+  productName: string;
+}) {
+  const { data, error } = await supabase.rpc("reserve_yookassa_payment_attempt", {
+    p_job_id: jobId,
+    p_user_id: userId,
+    p_product_name: productName,
+  });
+
+  if (error || !data) {
+    throw new Error(error?.message ?? "Не удалось зарезервировать попытку оплаты.");
+  }
+
+  return data as PaymentAttempt;
+}
+
+async function finalizePaymentAttempt({
+  supabase,
+  attempt,
+  payment,
+}: {
+  supabase: ReturnType<typeof createSupabaseAdminClient>;
+  attempt: PaymentAttempt;
+  payment: YooKassaPayment;
+}) {
+  if (!payment.id) {
+    throw new Error("ЮKassa не вернула идентификатор платежа.");
+  }
+
+  const { data, error } = await supabase.rpc("finalize_yookassa_payment_attempt", {
+    p_order_id: attempt.id,
+    p_job_id: attempt.job_id,
+    p_user_id: attempt.user_id,
+    p_provider_idempotence_key: attempt.provider_idempotence_key,
+    p_provider_session_id: payment.id,
+    p_checkout_url: payment.confirmation?.confirmation_url ?? attempt.checkout_url,
+  });
+
+  if (error || !data) {
+    throw new Error(error?.message ?? "Не удалось сохранить попытку оплаты.");
+  }
+
+  return data as PaymentAttempt;
+}
+
+async function closePaymentAttempt({
+  supabase,
+  attempt,
+  status,
+}: {
+  supabase: ReturnType<typeof createSupabaseAdminClient>;
+  attempt: PaymentAttempt;
+  status: "cancelled" | "failed";
+}) {
+  const { error } = await supabase
+    .from("orders")
+    .update({
+      status,
+      is_active_payment_attempt: false,
+      reconciliation_reason: `provider_${status}`,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", attempt.id)
+    .eq("status", "pending")
+    .eq("is_active_payment_attempt", true);
+
+  if (error) {
+    throw new Error(error.message);
   }
 }
 
@@ -217,138 +266,50 @@ async function markJobPaidFromPhotoBalance({
   supabase,
   jobId,
   userId,
-  selectedPackage,
 }: {
   supabase: ReturnType<typeof createSupabaseAdminClient>;
   jobId: string;
   userId: string;
-  selectedPackage: ReturnType<typeof getPhotoPackage>;
 }) {
-  const paidAt = new Date().toISOString();
-  const { error: jobError } = await supabase
-    .from("jobs")
-    .update({
-      status: "queued",
-      payment_status: "paid",
-      paid_at: paidAt,
-      amount_cents: 0,
-      currency: PAYMENT_CURRENCY,
-      product_code: selectedPackage.code,
-      target_image_count: selectedPackage.imageCount,
-      progress: 5,
-      queued_at: paidAt,
-      error_message: null,
-    })
-    .eq("id", jobId)
-    .eq("user_id", userId);
-
-  if (jobError) {
-    throw new Error(jobError.message);
-  }
-}
-
-async function markPaymentPaid({
-  supabase,
-  jobId,
-  userId,
-  paymentId,
-  selectedPackage,
-}: {
-  supabase: ReturnType<typeof createSupabaseAdminClient>;
-  jobId: string;
-  userId: string;
-  paymentId: string;
-  selectedPackage: ReturnType<typeof getPhotoPackage>;
-}) {
-  const paidAt = new Date().toISOString();
-  const { error: orderError } = await supabase
-    .from("orders")
-    .update({
-      status: "paid",
-      provider_payment_id: paymentId,
-      paid_at: paidAt,
-      updated_at: paidAt,
-    })
-    .eq("provider_session_id", paymentId)
-    .eq("job_id", jobId)
-    .eq("user_id", userId);
-
-  if (orderError) {
-    throw new Error(orderError.message);
-  }
-
-  await addPhotoBalance({
-    supabase,
-    userId,
-    imageCount: selectedPackage.imageCount,
+  const { data, error } = await supabase.rpc("settle_job_from_photo_balance", {
+    p_job_id: jobId,
+    p_user_id: userId,
   });
 
-  const { error: jobError } = await supabase
-    .from("jobs")
-    .update({
-      status: "queued",
-      payment_status: "paid",
-      paid_at: paidAt,
-      progress: 5,
-      queued_at: paidAt,
-      error_message: null,
-    })
-    .eq("id", jobId)
-    .eq("user_id", userId);
-
-  if (jobError) {
-    throw new Error(jobError.message);
-  }
-}
-
-async function addPhotoBalance({
-  supabase,
-  userId,
-  imageCount,
-}: {
-  supabase: ReturnType<typeof createSupabaseAdminClient>;
-  userId: string;
-  imageCount: number;
-}) {
-  const { data: profile, error: profileError } = await supabase
-    .from("user_profiles")
-    .select("free_images_remaining")
-    .eq("user_id", userId)
-    .single();
-
-  if (profileError || !profile) {
-    throw new Error(profileError?.message ?? "Профиль пользователя не найден.");
+  if (error || !data) {
+    throw new Error(error?.message ?? "Не удалось применить баланс фото.");
   }
 
-  const { error: updateError } = await supabase
-    .from("user_profiles")
-    .update({
-      free_images_remaining: profile.free_images_remaining + imageCount,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("user_id", userId);
-
-  if (updateError) {
-    throw new Error(updateError.message);
+  const result = data as PhotoBalanceSettlement;
+  if (
+    result.status !== "balance_settled" &&
+    result.status !== "already_paid" &&
+    result.status !== "provider_attempt_exists"
+  ) {
+    throw new Error("База данных вернула неизвестный результат оплаты балансом.");
   }
+
+  return result;
 }
 
 async function createYooKassaPayment({
   shopId,
   secretKey,
-  origin,
+  returnOrigin,
   jobId,
   userId,
   email,
   selectedPackage,
+  idempotenceKey,
 }: {
   shopId: string;
   secretKey: string;
-  origin: string;
+  returnOrigin: string;
   jobId: string;
   userId: string;
   email: string;
   selectedPackage: ReturnType<typeof getPhotoPackage>;
+  idempotenceKey: string;
 }) {
   const amountValue = (selectedPackage.amountCents / 100).toFixed(2);
   const response = await fetch("https://api.yookassa.ru/v3/payments", {
@@ -356,7 +317,7 @@ async function createYooKassaPayment({
     headers: {
       Authorization: `Basic ${Buffer.from(`${shopId}:${secretKey}`).toString("base64")}`,
       "Content-Type": "application/json",
-      "Idempotence-Key": crypto.randomUUID(),
+      "Idempotence-Key": idempotenceKey,
     },
     body: JSON.stringify({
       amount: {
@@ -366,7 +327,7 @@ async function createYooKassaPayment({
       capture: true,
       confirmation: {
         type: "redirect",
-        return_url: `${origin}/checkout/${jobId}?payment_return=1`,
+        return_url: `${returnOrigin}/checkout/${jobId}?payment_return=1`,
       },
       description: selectedPackage.name,
       metadata: {
@@ -377,9 +338,7 @@ async function createYooKassaPayment({
         email,
       },
       receipt: {
-        customer: {
-          email,
-        },
+        customer: { email },
         items: [
           {
             description: selectedPackage.description,
@@ -395,6 +354,7 @@ async function createYooKassaPayment({
         ],
       },
     }),
+    signal: AbortSignal.timeout(10000),
   });
   const data = (await response.json()) as YooKassaPayment & {
     description?: string;
@@ -408,31 +368,29 @@ async function createYooKassaPayment({
   return data;
 }
 
-async function retrieveYooKassaPayment(shopId: string, secretKey: string, paymentId: string) {
-  const response = await fetch(`https://api.yookassa.ru/v3/payments/${paymentId}`, {
-    headers: {
-      Authorization: `Basic ${Buffer.from(`${shopId}:${secretKey}`).toString("base64")}`,
-    },
-  });
-  const data = (await response.json()) as YooKassaPayment & {
-    description?: string;
-    error?: { message?: string };
-  };
+function getPaymentReturnOrigin() {
+  const configured = process.env.PAYMENT_RETURN_ORIGIN ?? "https://virtualphotostudio.ru";
+  const url = new URL(configured);
+  const allowedHosts = new Set(["virtualphotostudio.ru", "www.virtualphotostudio.ru"]);
 
-  if (!response.ok) {
-    throw new Error(data.description ?? data.error?.message ?? "Не удалось проверить платёж ЮKassa.");
+  if (process.env.NODE_ENV !== "production") {
+    allowedHosts.add("localhost");
+    allowedHosts.add("127.0.0.1");
   }
 
-  return data;
+  if (!(["https:", "http:"].includes(url.protocol)) || !allowedHosts.has(url.hostname)) {
+    throw new Error("PAYMENT_RETURN_ORIGIN содержит недопустимый публичный адрес.");
+  }
+
+  if (process.env.NODE_ENV === "production" && url.protocol !== "https:") {
+    throw new Error("PAYMENT_RETURN_ORIGIN в production должен использовать HTTPS.");
+  }
+
+  return url.origin;
 }
 
 function readBearerToken(request: NextRequest) {
-  const authorization = request.headers.get("authorization");
-  const token = authorization?.replace(/^Bearer\s+/i, "");
-
-  if (!token) {
-    throw new Error("Нет токена пользователя.");
-  }
-
-  return token;
+  const authorization = request.headers.get("authorization") ?? "";
+  const [scheme, token] = authorization.split(" ");
+  return scheme.toLowerCase() === "bearer" && token ? token : null;
 }

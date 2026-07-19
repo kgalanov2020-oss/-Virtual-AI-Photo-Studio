@@ -215,24 +215,23 @@ export default function GenerationPage({ params }: GenerationPageProps) {
 
     try {
       const supabase = createSupabaseBrowserClient();
-      const updatePayload: Partial<Job> = {
-        generation_mode: nextMode,
-        error_message: null,
-      };
-
-      if (job?.status === "failed") {
-        updatePayload.status = "queued";
-        updatePayload.progress = Math.max(job.progress, 5);
-        updatePayload.queued_at = new Date().toISOString();
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        throw new Error("Сессия пользователя истекла. Войдите ещё раз.");
       }
 
-      const { error: updateError } = await supabase
-        .from("jobs")
-        .update(updatePayload)
-        .eq("id", jobId);
-
-      if (updateError) {
-        throw new Error(updateError.message);
+      const response = await fetch(`/api/jobs/${jobId}`, {
+        method: "PATCH",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ generationMode: nextMode }),
+      });
+      const payload = (await response.json()) as { error?: string };
+      if (!response.ok) {
+        throw new Error(payload.error ?? "Не удалось изменить режим.");
       }
 
       setGenerationMode(nextMode);
