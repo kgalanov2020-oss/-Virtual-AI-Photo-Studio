@@ -22,6 +22,8 @@ export function buildOutreachText(variables: OutreachEmailVariables) {
 
 Для пилота можем предоставить API или веб-модуль, адаптировать интерфейс под экран кабины и подготовить демонстрационный сценарий без изменений в основной механике оборудования.
 
+Для знакомства даём промокод ${variables.promo_code}. По нему можно бесплатно проверить результат на своих фото.
+
 Будем рады коротко показать рабочий сервис и обсудить тестовую интеграцию.
 
 Сайт: https://virtualphotostudio.ru
@@ -107,6 +109,11 @@ function buildPhotoBoothManufacturerHtml(variables: OutreachEmailVariables) {
             <b>Что может дать интеграция:</b><br>новый платный сценарий для владельцев кабин;<br>увеличение среднего чека;<br>отличие оборудования от обычных решений для печати фото.
           </div>
           <p style="margin:0 0 16px;font-size:16px;line-height:1.55;">Для пилота можем предоставить API или веб-модуль, адаптировать интерфейс под экран кабины и подготовить демонстрационный сценарий без изменений в основной механике оборудования.</p>
+          <div style="background:#f3eee8;border:1px solid #e0d6ca;border-radius:12px;margin:0 0 20px;padding:18px;">
+            <div style="font-size:13px;color:#74685e;margin-bottom:6px;">Промокод для теста</div>
+            <div style="font-size:28px;font-weight:900;letter-spacing:.08em;">${escapeHtml(variables.promo_code)}</div>
+          </div>
+          <p style="margin:0 0 16px;font-size:16px;line-height:1.55;">По промокоду можно бесплатно проверить результат на своих фото.</p>
           <p style="margin:24px 0;"><a href="https://virtualphotostudio.ru/" style="display:inline-block;background:#8a7b6c;color:#ffffff;text-decoration:none;border-radius:999px;padding:14px 22px;font-weight:800;">Посмотреть Virtual AI Photo Studio</a></p>
           <p style="margin:0;font-size:16px;line-height:1.55;">С уважением,<br>Virtual AI Photo Studio<br>https://virtualphotostudio.ru</p>
           <p style="margin:24px 0 0;font-size:12px;line-height:1.45;color:#6b665f;">Если предложение неактуально, ответьте "стоп", и мы больше не будем писать.</p>

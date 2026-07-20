@@ -67,13 +67,17 @@ async function sendOutreachEmail(request: NextRequest) {
     return NextResponse.json({ error: `Lead status is ${lead.status}.` }, { status: 409 });
   }
 
+  const segment =
+    (lead.raw as Record<string, unknown> | null)?.segment === "photo_booth_manufacturer"
+      ? ("photo_booth_manufacturer" as const)
+      : ("photo_studio" as const);
   const variables = {
     city: lead.city ?? "",
-    promo_code: lead.promo_code || process.env.OUTREACH_PROMO_CODE || "STUDIO",
-    segment:
-      (lead.raw as Record<string, unknown> | null)?.segment === "photo_booth_manufacturer"
-        ? ("photo_booth_manufacturer" as const)
-        : ("photo_studio" as const),
+    promo_code:
+      segment === "photo_booth_manufacturer"
+        ? process.env.OUTREACH_BOOTH_PROMO_CODE || "CABIN"
+        : lead.promo_code || process.env.OUTREACH_PROMO_CODE || "STUDIO",
+    segment,
     studio_name: lead.studio_name || "коллеги",
   };
 

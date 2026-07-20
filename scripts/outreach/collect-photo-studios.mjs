@@ -85,7 +85,12 @@ for (const city of apiKey ? cities : []) {
         phone: details.formatted_phone_number ?? "",
         source: "google_places",
         promo_code: promoCode,
-        status: emails.length > 0 ? "new" : "needs_manual_email",
+        status:
+          emails.length > 0
+            ? segment === "photo_booth_manufacturer"
+              ? "needs_review"
+              : "new"
+            : "needs_manual_email",
         last_contacted_at: "",
         raw: {
           google_place_id: place.place_id,

@@ -1,10 +1,21 @@
 import nodemailer from "nodemailer";
+import {
+  MIXED_SEGMENT,
+  PHOTO_BOOTH_SEGMENT,
+  buildOutreachSubject,
+  buildOutreachText,
+  capSendLimitForMode,
+  getLeadSegment,
+  getPromoCodeForLead,
+  normalizeOutreachMode,
+  selectNextLeads,
+} from "./outreach-campaign.mjs";
 
 const supabase = createSupabaseConfig();
 const smtp = createSmtpConfig();
-const promoCode = process.env.OUTREACH_PROMO_CODE ?? "STUDIO";
+const outreachMode = normalizeOutreachMode(process.env.OUTREACH_SEGMENT);
 const autoSendEnabled = (process.env.OUTREACH_AUTO_SEND_ENABLED ?? "false") === "true";
-const sendLimit = getSendLimit();
+const sendLimit = capSendLimitForMode(getSendLimit(), outreachMode);
 
 if (!autoSendEnabled) {
   console.log("Outreach auto send is disabled.");
@@ -19,29 +30,42 @@ if (!smtp) {
   throw new Error("Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS and SMTP_FROM.");
 }
 
-const leads = await findNextLeads(sendLimit);
+const leads = await findNextLeads(sendLimit, outreachMode);
 
 if (leads.length === 0) {
   console.log("No outreach leads ready for automatic email.");
   process.exit(0);
 }
 
-console.log(`Outreach send limit for this run: ${sendLimit}. Leads loaded: ${leads.length}.`);
+console.log(
+  `Outreach mode: ${outreachMode}. Send limit for this run: ${sendLimit}. Leads loaded: ${leads.length}.`,
+);
 
 for (const lead of leads) {
+  const leadSegment = getLeadSegment(lead);
   console.log(`Sending outreach email to ${lead.email} (${lead.studio_name})`);
 
   try {
-    await sendEmail(lead);
-    await updateLead(lead.id, {
+    const claimedLead =
+      leadSegment === PHOTO_BOOTH_SEGMENT ? await claimApprovedBoothLead(lead) : lead;
+
+    if (!claimedLead) {
+      console.log(`Skipped ${lead.email}: the approved booth lead was already claimed.`);
+      continue;
+    }
+
+    await sendEmail(claimedLead, leadSegment);
+    const sentAt = new Date().toISOString();
+    await updateLead(claimedLead.id, {
       last_contacted_at: new Date().toISOString(),
       status: "sent",
       raw: {
-        ...(lead.raw ?? {}),
-        last_auto_send_at: new Date().toISOString(),
+        ...(claimedLead.raw ?? {}),
+        last_auto_send_at: sentAt,
+        last_auto_send_segment: leadSegment,
       },
     });
-    console.log(`Sent outreach email to ${lead.email}`);
+    console.log(`Sent ${leadSegment} outreach email to ${claimedLead.email}`);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown SMTP error.";
     const rejectedStatus = getRejectedStatus(error);
@@ -59,7 +83,7 @@ for (const lead of leads) {
   }
 }
 
-async function findNextLeads(limit) {
+async function findNextLeads(limit, mode) {
   const params = new URLSearchParams();
   params.set(
     "select",
@@ -69,8 +93,8 @@ async function findNextLeads(limit) {
   params.append("email", "not.is.null");
   params.append("email", "neq.");
   params.set("order", "last_contacted_at.asc.nullsfirst,created_at.asc");
-  // Load enough candidates to keep legacy photo-studio leads available even if
-  // newer manufacturer leads are interleaved in the same table.
+  // Load enough candidates to keep both isolated queues available even when
+  // their creation dates are interleaved in the same table.
   params.set("limit", "10000");
 
   const response = await fetch(`${supabase.restUrl}/outreach_leads?${params}`, {
@@ -82,19 +106,70 @@ async function findNextLeads(limit) {
   }
 
   const candidates = (await response.json()) ?? [];
+  const lastAutoSegment = mode === MIXED_SEGMENT ? await findLastAutoSendSegment() : null;
 
-  // Rows created before segmentation have no raw.segment and are photo studios.
-  // Manufacturers require a separate, manually reviewed proposal and must never
-  // be picked up by the legacy automatic studio campaign.
-  return candidates
-    .filter((lead) => lead.raw?.segment !== "photo_booth_manufacturer")
-    .slice(0, limit);
+  return selectNextLeads(candidates, mode, lastAutoSegment, limit);
 }
 
-async function sendEmail(lead) {
+async function findLastAutoSendSegment() {
+  const params = new URLSearchParams();
+  params.set("select", "raw,last_contacted_at");
+  params.set("status", "eq.sent");
+  params.append("last_contacted_at", "not.is.null");
+  params.set("order", "last_contacted_at.desc");
+  params.set("limit", "100");
+
+  const response = await fetch(`${supabase.restUrl}/outreach_leads?${params}`, {
+    headers: supabaseHeaders(),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not load the last outreach send: ${await response.text()}`);
+  }
+
+  const recentSentLeads = (await response.json()) ?? [];
+  const lastAutomaticLead = recentSentLeads.find((lead) => lead.raw?.last_auto_send_at);
+  if (!lastAutomaticLead) return null;
+
+  return getLeadSegment(lastAutomaticLead);
+}
+
+async function claimApprovedBoothLead(lead) {
+  const claimedAt = new Date().toISOString();
+  const params = new URLSearchParams();
+  params.set("id", `eq.${lead.id}`);
+  params.set("status", "eq.approved");
+
+  const response = await fetch(`${supabase.restUrl}/outreach_leads?${params}`, {
+    body: JSON.stringify({
+      raw: {
+        ...(lead.raw ?? {}),
+        auto_send_claimed_at: claimedAt,
+        auto_send_claimed_segment: PHOTO_BOOTH_SEGMENT,
+      },
+      status: "needs_review",
+    }),
+    headers: {
+      ...supabaseHeaders(),
+      "content-type": "application/json",
+      prefer: "return=representation",
+    },
+    method: "PATCH",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Could not claim booth lead ${lead.id}: ${await response.text()}`);
+  }
+
+  const claimedLeads = (await response.json()) ?? [];
+  return claimedLeads[0] ?? null;
+}
+
+async function sendEmail(lead, segment) {
   const variables = {
     city: lead.city ?? "",
-    promo_code: lead.promo_code || promoCode,
+    promo_code: getPromoCodeForLead(lead, segment),
+    segment,
     studio_name: lead.studio_name || "коллеги",
   };
 
@@ -202,32 +277,6 @@ function getSendLimit() {
 
 function getMaxSendLimit() {
   return Math.max(1, Number(process.env.OUTREACH_MAX_SENDS_PER_RUN ?? "3"));
-}
-
-function buildOutreachSubject(variables) {
-  return `${variables.studio_name}, AI-фотосессии для клиентов`;
-}
-
-function buildOutreachText(variables) {
-  return `Здравствуйте, ${variables.studio_name}!
-
-Мы сделали Virtual AI Photo Studio - сервис, где клиент загружает обычные селфи, выбирает интерьер и получает серию AI-портретов в готовой локации.
-
-Для фотостудии это может быть простым дополнительным продуктом:
-- показать клиенту быстрый пример "до/после";
-- дать AI-фотосессию как бонус к пакету;
-- предложить недорогой цифровой формат тем, кто пока не готов к полноценной съемке.
-
-Для знакомства даем промокод ${variables.promo_code}. По нему можно бесплатно проверить результат на своих фото.
-
-Сайт: https://virtualphotostudio.ru
-
-Если вам интересно, можем подготовить отдельный промокод для клиентов вашей студии и подобрать интерьеры под ваш стиль.
-
-С уважением,
-Virtual AI Photo Studio
-
-Если предложение неактуально, ответьте "стоп", и мы больше не будем писать.`;
 }
 
 function getRejectedStatus(error) {
