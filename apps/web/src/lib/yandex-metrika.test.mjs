@@ -20,7 +20,7 @@ test("accepts only a numeric public counter ID", () => {
 test("builds a safe standard Metrika initialization snippet", () => {
   const script = buildYandexMetrikaInitScript("12345678");
 
-  assert.match(script, /https:\/\/mc\.yandex\.ru\/metrika\/tag\.js/);
+  assert.match(script, /https:\/\/mc\.yandex\.ru\/metrika\/tag\.js\?id=12345678/);
   assert.match(script, /ym\(12345678,"init"/);
   assert.match(script, /ssr:true/);
   assert.match(script, /ecommerce:"dataLayer"/);
