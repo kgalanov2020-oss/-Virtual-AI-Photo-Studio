@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { MarketingAttributionTracker } from "@/app/marketing-attribution-tracker";
 import {
   buildYandexMetrikaInitScript,
@@ -105,15 +104,15 @@ _tmr.push({id: "${vkPixelId}", type: "pageView", start: (new Date()).getTime()})
           }}
           type="text/javascript"
         />
-      </head>
-      <body>
         {yandexMetrikaId && yandexMetrikaScript ? (
-          <Script
+          <script
             dangerouslySetInnerHTML={{ __html: yandexMetrikaScript }}
             id="yandex-metrika"
-            strategy="afterInteractive"
+            type="text/javascript"
           />
         ) : null}
+      </head>
+      <body>
         <MarketingAttributionTracker />
         {children}
         <noscript>

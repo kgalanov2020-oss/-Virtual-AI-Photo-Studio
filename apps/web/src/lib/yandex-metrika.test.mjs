@@ -61,6 +61,11 @@ test("wires the public counter and verified conversion goals into the client", a
 
   assert.match(layout, /NEXT_PUBLIC_YANDEX_METRIKA_ID/);
   assert.match(layout, /buildYandexMetrikaInitScript/);
+  assert.doesNotMatch(layout, /from ["']next\/script["']/);
+  assert.doesNotMatch(layout, /strategy=["']afterInteractive["']/);
+
+  const headSource = layout.slice(layout.indexOf("<head>"), layout.indexOf("</head>"));
+  assert.match(headSource, /<script[\s\S]*id="yandex-metrika"[\s\S]*type="text\/javascript"/);
   assert.match(login, /trackYandexRegistrationOnce\(data\.user\.id\)/);
   assert.match(login, /data\.user\?\.identities\?\.length/);
   assert.match(checkout, /paymentSuccessGoal/);
