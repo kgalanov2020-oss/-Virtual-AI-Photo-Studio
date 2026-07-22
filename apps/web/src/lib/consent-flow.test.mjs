@@ -5,6 +5,7 @@ import test from "node:test";
 const loginPageUrl = new URL("../app/login/page.tsx", import.meta.url);
 const profileRouteUrl = new URL("../app/api/profile/route.ts", import.meta.url);
 const agreementPageUrl = new URL("../app/oferta/page.tsx", import.meta.url);
+const globalStylesUrl = new URL("../app/globals.css", import.meta.url);
 
 test("registration renders four independent required consents", async () => {
   const loginPage = await readFile(loginPageUrl, "utf8");
@@ -42,4 +43,17 @@ test("agreement updates apply prospectively and preserve paid orders", async () 
   assert.match(agreementPage, /заказам, оформленным после даты её вступления в силу/);
   assert.match(agreementPage, /Изменения не применяются к уже оплаченным заказам/);
   assert.match(agreementPage, /только после получения соответствующего согласия/);
+});
+
+test("long account email cannot overflow the mobile viewport", async () => {
+  const globalStyles = await readFile(globalStylesUrl, "utf8");
+
+  assert.match(
+    globalStyles,
+    /\.account-state div\s*\{[^}]*min-width:\s*0;/s,
+  );
+  assert.match(
+    globalStyles,
+    /\.account-state strong,\s*\.account-state span\s*\{[^}]*overflow-wrap:\s*anywhere;/s,
+  );
 });

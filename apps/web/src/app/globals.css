@@ -3196,6 +3196,12 @@ h1 {
 .account-state div {
   display: grid;
   gap: 6px;
+  min-width: 0;
+}
+
+.account-state strong,
+.account-state span {
+  overflow-wrap: anywhere;
 }
 
 .account-state span {
