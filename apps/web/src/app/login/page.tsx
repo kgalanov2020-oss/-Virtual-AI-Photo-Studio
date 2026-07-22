@@ -12,6 +12,20 @@ import { trackYandexGoal } from "@/lib/yandex-metrika";
 
 const defaultNextPath = "/#studios";
 
+type ConsentState = {
+  legalTerms: boolean;
+  privacy: boolean;
+  personalData: boolean;
+  photoRights: boolean;
+};
+
+const emptyConsentState: ConsentState = {
+  legalTerms: false,
+  privacy: false,
+  personalData: false,
+  photoRights: false,
+};
+
 function sanitizeNext(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) return defaultNextPath;
 
@@ -47,7 +61,7 @@ function formatAuthError(error: unknown) {
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [consentsAccepted, setConsentsAccepted] = useState(false);
+  const [consents, setConsents] = useState<ConsentState>(emptyConsentState);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [nextPath, setNextPath] = useState(defaultNextPath);
@@ -61,6 +75,7 @@ export default function LoginPage() {
       profile.personal_data_accepted_at &&
       profile.photo_rights_accepted_at,
   );
+  const allConsentsAccepted = Object.values(consents).every(Boolean);
   const shouldShowConsents = !user || !storedConsentsAccepted;
 
   useEffect(() => {
@@ -106,8 +121,15 @@ export default function LoginPage() {
       throw profileError;
     }
 
-    setProfile(data ?? null);
-    return data ?? null;
+    const nextProfile = data ?? null;
+    setProfile(nextProfile);
+    setConsents((current) => ({
+      legalTerms: current.legalTerms || Boolean(nextProfile?.legal_terms_accepted_at),
+      privacy: current.privacy || Boolean(nextProfile?.privacy_accepted_at),
+      personalData: current.personalData || Boolean(nextProfile?.personal_data_accepted_at),
+      photoRights: current.photoRights || Boolean(nextProfile?.photo_rights_accepted_at),
+    }));
+    return nextProfile;
   }
 
   async function saveProfileConsents(nextUser: User) {
@@ -125,7 +147,7 @@ export default function LoginPage() {
         authorization: `Bearer ${token}`,
         "content-type": "application/json",
       },
-      body: JSON.stringify({ acceptConsents: true }),
+      body: JSON.stringify({ consents }),
     });
     const payload = (await response.json()) as { error?: string; profile?: UserProfile };
     if (!response.ok || !payload.profile) {
@@ -149,8 +171,8 @@ export default function LoginPage() {
       return;
     }
 
-    if (!consentsAccepted) {
-      setError("Перед регистрацией нужно принять документы сервиса и подтвердить права на фото.");
+    if (!allConsentsAccepted) {
+      setError("Перед регистрацией отметьте каждое обязательное согласие отдельно.");
       return;
     }
 
@@ -242,7 +264,7 @@ export default function LoginPage() {
   }
 
   async function saveConsentsAndContinue() {
-    if (!user || !consentsAccepted || isSubmitting) return;
+    if (!user || !allConsentsAccepted || isSubmitting) return;
 
     setError("");
     setMessage("");
@@ -267,6 +289,11 @@ export default function LoginPage() {
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
+    setConsents(emptyConsentState);
+  }
+
+  function updateConsent(key: keyof ConsentState, checked: boolean) {
+    setConsents((current) => ({ ...current, [key]: checked }));
   }
 
   return (
@@ -317,7 +344,7 @@ export default function LoginPage() {
               ) : (
                 <button
                   className="button button-primary"
-                  disabled={isSubmitting || !consentsAccepted}
+                  disabled={isSubmitting || !allConsentsAccepted}
                   onClick={saveConsentsAndContinue}
                   type="button"
                 >
@@ -349,8 +376,12 @@ export default function LoginPage() {
         )}
 
         {shouldShowConsents ? (
-          <div className="legal-consent-panel">
-            <p>
+          <div
+            aria-labelledby="consent-heading"
+            className="legal-consent-panel"
+            role="group"
+          >
+            <p id="consent-heading">
               {user
                 ? "Подтвердите согласия один раз. Мы сохраним их в профиле."
                 : "Подтвердите согласия перед регистрацией."}
@@ -358,28 +389,64 @@ export default function LoginPage() {
 
             <label className="consent-option">
               <input
-                checked={consentsAccepted}
-                disabled={isSubmitting}
-                onChange={(event) => setConsentsAccepted(event.target.checked)}
+                checked={consents.personalData}
+                disabled={isSubmitting || Boolean(profile?.personal_data_accepted_at)}
+                onChange={(event) => updateConsent("personalData", event.target.checked)}
                 type="checkbox"
               />
               <span>
-                Я принимаю{" "}
-                <Link href="/oferta" target="_blank">
-                  Пользовательское соглашение
-                </Link>
-                ,{" "}
-                <Link href="/privacy" target="_blank">
-                  Политику конфиденциальности
-                </Link>{" "}
-                и даю{" "}
-                <Link href="/personal-data-consent" target="_blank">
+                Я даю{" "}
+                <Link href="/personal-data-consent" rel="noreferrer" target="_blank">
                   согласие на обработку персональных данных
                 </Link>
-                , а также подтверждаю, что мне исполнилось 18 лет, я имею право использовать
-                загруженные изображения, не загружаю чужие фото без согласия и не создаю
+                .
+              </span>
+            </label>
+
+            <label className="consent-option">
+              <input
+                checked={consents.legalTerms}
+                disabled={isSubmitting || Boolean(profile?.legal_terms_accepted_at)}
+                onChange={(event) => updateConsent("legalTerms", event.target.checked)}
+                type="checkbox"
+              />
+              <span>
+                Я ознакомился(-ась) и принимаю{" "}
+                <Link href="/oferta" rel="noreferrer" target="_blank">
+                  Пользовательское соглашение
+                </Link>
+                .
+              </span>
+            </label>
+
+            <label className="consent-option">
+              <input
+                checked={consents.privacy}
+                disabled={isSubmitting || Boolean(profile?.privacy_accepted_at)}
+                onChange={(event) => updateConsent("privacy", event.target.checked)}
+                type="checkbox"
+              />
+              <span>
+                Я ознакомился(-ась) и принимаю{" "}
+                <Link href="/privacy" rel="noreferrer" target="_blank">
+                  Политику конфиденциальности
+                </Link>
+                .
+              </span>
+            </label>
+
+            <label className="consent-option">
+              <input
+                checked={consents.photoRights}
+                disabled={isSubmitting || Boolean(profile?.photo_rights_accepted_at)}
+                onChange={(event) => updateConsent("photoRights", event.target.checked)}
+                type="checkbox"
+              />
+              <span>
+                Я подтверждаю, что мне исполнилось 18 лет и я имею право использовать
+                загружаемые фотографии. Я не загружаю чужие фото без согласия и не создаю
                 незаконный или запрещённый контент. Если на фото ребёнок, я являюсь
-                родителем/законным представителем или имею согласие на использование
+                родителем/законным представителем или имею согласие на использование его
                 изображения.
               </span>
             </label>
@@ -396,7 +463,7 @@ export default function LoginPage() {
           <div className="auth-actions auth-actions-after-consent">
             <button
               className="button button-primary"
-              disabled={isSubmitting || !email.trim() || password.length < 6 || !consentsAccepted}
+              disabled={isSubmitting || !email.trim() || password.length < 6 || !allConsentsAccepted}
               onClick={register}
               type="button"
             >
@@ -404,7 +471,7 @@ export default function LoginPage() {
             </button>
             <button
               className="button button-secondary"
-              disabled={isSubmitting || !email.trim() || !password.trim() || !consentsAccepted}
+              disabled={isSubmitting || !email.trim() || !password.trim()}
               onClick={login}
               type="button"
             >

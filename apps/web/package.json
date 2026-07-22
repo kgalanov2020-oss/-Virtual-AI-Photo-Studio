@@ -9,6 +9,7 @@
     "test:payments": "node --test src/lib/payment-attempt-orchestrator.test.mjs src/lib/payment-return-polling.test.mjs src/lib/payment-schema-security.test.mjs src/lib/yookassa-verification.test.mjs",
     "test:marketing": "node --test src/lib/marketing-attribution.test.mjs src/lib/yandex-metrika.test.mjs",
     "test:assets": "node --test src/lib/static-assets.test.mjs",
+    "test:consents": "node --test src/lib/consent-flow.test.mjs",
     "test:uploads": "node --test src/lib/selfie-upload.test.mjs"
   },
   "dependencies": {

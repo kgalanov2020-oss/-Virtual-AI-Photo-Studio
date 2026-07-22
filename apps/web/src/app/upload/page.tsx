@@ -204,7 +204,7 @@ export default function UploadPage() {
         authorization: `Bearer ${token}`,
         "content-type": "application/json",
       },
-      body: JSON.stringify({ acceptConsents: false }),
+      body: JSON.stringify({}),
     });
     const payload = (await response.json()) as { error?: string; profile?: UserProfile };
 

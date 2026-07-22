@@ -3263,14 +3263,18 @@ h1 {
 
 .consent-option {
   align-items: flex-start;
-  cursor: pointer;
+  cursor: default;
   display: flex;
   gap: 12px;
   line-height: 1.5;
 }
 
 .consent-option input {
+  accent-color: var(--accent);
+  flex: 0 0 auto;
+  height: 20px;
   margin-top: 5px;
+  width: 20px;
 }
 
 .legal-page {
