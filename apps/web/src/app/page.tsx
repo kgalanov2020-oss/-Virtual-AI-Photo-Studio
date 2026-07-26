@@ -307,6 +307,7 @@ function StudioPreview({ alt, src }: { alt: string; src: string }) {
       loading="lazy"
       sizes="(max-width: 1100px) 50vw, 33vw"
       src={src}
+      unoptimized
     />
   );
 }

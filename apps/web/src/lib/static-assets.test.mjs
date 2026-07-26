@@ -76,3 +76,13 @@ test("CSS background assets use the same immutable version as the cache rule", a
   assert.ok(css.includes(backgroundUrl));
   assert.equal(css.includes('/studios/modern-office/master-wide.webp")'), false);
 });
+
+test("studio cards and galleries serve static WebP without the runtime image optimizer", async () => {
+  const [homePage, studioPage] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/studios/[slug]/page.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(homePage, /function StudioPreview[\s\S]*?<Image[\s\S]*?\bunoptimized\b/);
+  assert.match(studioPage, /function StudioImage[\s\S]*?<Image[\s\S]*?\bunoptimized\b/);
+});
