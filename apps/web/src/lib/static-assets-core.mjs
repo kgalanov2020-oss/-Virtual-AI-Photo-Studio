@@ -1,4 +1,4 @@
-export const STATIC_ASSET_VERSION = "2026-07-19-mobile-images-1";
+export const STATIC_ASSET_VERSION = "2026-07-26-distinct-studios-1";
 
 const PUBLIC_ASSET_EXTENSION_PATTERN =
   "avif|gif|heic|heif|jpeg|jpg|mp4|png|svg|webm|webp";

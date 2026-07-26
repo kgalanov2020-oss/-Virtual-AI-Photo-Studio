@@ -4,6 +4,7 @@ import type { Studio, StudioShot } from "./types";
 import { translateShot, translateStudio } from "./ru";
 import { preferWebpAsset } from "./assets";
 import { sortStudiosByRating } from "./studio-rating";
+import { versionPublicAsset } from "./static-assets-core.mjs";
 
 type CatalogStudio = {
   slug: string;
@@ -99,11 +100,14 @@ export async function getStudioSession(
 
 function withCatalogMetadata(studio: Studio): Studio {
   const catalogStudio = catalogBySlug.get(studio.slug);
+  const previewUrl = preferWebpAsset(studio.preview_url);
 
   return {
     ...studio,
-    preview_url: preferWebpAsset(studio.preview_url),
-    gallery_urls: catalogStudio?.gallery_urls?.map((url) => preferWebpAsset(url) ?? url),
+    preview_url: previewUrl ? versionPublicAsset(previewUrl) : previewUrl,
+    gallery_urls: catalogStudio?.gallery_urls?.map((url) =>
+      versionPublicAsset(preferWebpAsset(url) ?? url),
+    ),
     wardrobe_prompt: catalogStudio?.wardrobe_prompt,
   };
 }
