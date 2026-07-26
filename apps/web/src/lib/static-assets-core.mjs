@@ -1,5 +1,5 @@
 export const STATIC_ASSET_VERSION = "2026-07-26-distinct-studios-1";
-export const STATIC_ASSET_CDN_REVISION = "f7bb7f599749b2e9c3f0cad0c25d886ab030069e";
+export const STATIC_ASSET_CDN_REVISION = "8f4ebf4edd6165472e6a9806320c63d6be794bd0";
 export const STATIC_ASSET_CDN_BASE =
   `https://cdn.jsdelivr.net/gh/kgalanov2020-oss/-Virtual-AI-Photo-Studio@${STATIC_ASSET_CDN_REVISION}/apps/web/public`;
 
