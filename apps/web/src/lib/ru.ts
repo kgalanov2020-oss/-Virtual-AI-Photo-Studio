@@ -167,9 +167,9 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
       "Powder blue editorial studio: голубая plaster-циклорама, translucent acrylic panels, frosted glass, хром, velvet stool и прохладный fashion-свет.",
   },
   "cliffside-coast": {
-    name: "Обрывистый скальный берег",
+    name: "Полиньяно-а-Маре",
     description:
-      "Драматичный скальный берег: высокие утёсы, морская дымка, ветер, волны и кинематографичный свет для сильной coastal editorial-серии.",
+      "Белый город Полиньяно-а-Маре над Адриатикой: известняковые утёсы, узкие улочки старого города, морские террасы, бухта Лама-Монакиле, белая галька и бирюзовая вода.",
   },
   "red-carpet-premiere": {
     name: "Красная дорожка",

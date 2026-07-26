@@ -629,11 +629,11 @@
     },
     {
       "slug": "cliffside-coast",
-      "name": "Обрывистый скальный берег",
-      "description": "Драматичный скальный берег: высокие утёсы, морская дымка, ветер, волны и кинематографичный свет для сильной coastal editorial-серии.",
+      "name": "Полиньяно-а-Маре",
+      "description": "Белый город Полиньяно-а-Маре над Адриатикой: известняковые утёсы, узкие улочки старого города, морские террасы, бухта Лама-Монакиле, белая галька и бирюзовая вода.",
       "preview_url": "/studios/cliffside-coast/preview.png",
-      "base_prompt": "on a dramatic rugged cliffside coast with high dark rock formations, crashing sea waves, windswept coastal grass, ocean mist, layered cinematic sky, broad stable stone viewpoints and natural paths, premium coastal fashion editorial atmosphere, the person always stands or sits on wide secure ground several metres away from any cliff edge, no unsafe ledge pose",
-      "wardrobe_prompt": "cliffside coast wardrobe: dramatic wind-friendly fashion styling, long wool coat, structured trench, textured knitwear, tailored trousers or flowing midi or maxi dress, practical elegant boots, rich neutral coastal colors, fully clothed cinematic editorial look, no swimwear, no stilettos, no office suit",
+      "base_prompt": "across authentic Polignano a Mare in Puglia, Italy: white limestone houses perched above honey-colored limestone cliffs, narrow stone alleys, arched passages, sea-view terraces, turquoise Adriatic water, sea caves, the iconic Lama Monachile pebble cove and historic bridge, bright refined Mediterranean light, premium Italian coastal editorial atmosphere, varied city-and-sea viewpoints, the person always stands or sits on broad safe streets, terraces or platforms behind solid parapets, no unsafe cliff-edge pose, no crowds, no readable signs, no logos",
+      "wardrobe_prompt": "Polignano a Mare wardrobe: refined Mediterranean resort styling, linen shirt or blouse, lightweight tailored trousers, elegant midi or maxi dress, cotton separates, leather sandals or loafers, optional straw accessories, white, cream, sand, terracotta, navy and sea-blue palette, fully clothed polished Italian summer look, no swimwear, no stilettos on stone streets, no heavy winter coat, no office suit",
       "gallery_urls": [
         "/studios/cliffside-coast/master-wide.png",
         "/studios/cliffside-coast/angle-02.png",
