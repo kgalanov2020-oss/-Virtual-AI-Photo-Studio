@@ -3,6 +3,7 @@ import catalog from "./studio-catalog.json";
 import type { Studio, StudioShot } from "./types";
 import { translateShot, translateStudio } from "./ru";
 import { preferWebpAsset } from "./assets";
+import { sortStudiosByRating } from "./studio-rating";
 
 type CatalogStudio = {
   slug: string;
@@ -42,7 +43,9 @@ export async function getActiveStudios(): Promise<StudiosResult> {
 
   return {
     status: "ok",
-    studios: ((data ?? []) as Studio[]).map(withCatalogMetadata).map(translateStudio),
+    studios: sortStudiosByRating(
+      ((data ?? []) as Studio[]).map(withCatalogMetadata).map(translateStudio),
+    ),
   };
 }
 

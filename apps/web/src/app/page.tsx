@@ -38,6 +38,12 @@ const studioLabels: Record<string, string> = {
   "black-photo-studio": "Minimal fashion",
   "fashion-boutique": "Fashion editorial",
   "moroccan-riad": "Desert resort",
+  "cliffside-coast": "Coastal editorial",
+  "red-carpet-premiere": "Premiere glamour",
+  "old-moscow": "Исторический портрет",
+  "alpine-chalet": "Winter luxury",
+  "tropical-conservatory": "Botanical editorial",
+  "podcast-studio": "Экспертный контент",
 };
 
 export default async function Home() {

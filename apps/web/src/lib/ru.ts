@@ -166,6 +166,36 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
     description:
       "Powder blue editorial studio: голубая plaster-циклорама, translucent acrylic panels, frosted glass, хром, velvet stool и прохладный fashion-свет.",
   },
+  "cliffside-coast": {
+    name: "Обрывистый скальный берег",
+    description:
+      "Драматичный скальный берег: высокие утёсы, морская дымка, ветер, волны и кинематографичный свет для сильной coastal editorial-серии.",
+  },
+  "red-carpet-premiere": {
+    name: "Красная дорожка",
+    description:
+      "Премьера на красной дорожке: парадный вход, вспышки фотографов, бархатные ограждения и вечерний glamour без логотипов и надписей.",
+  },
+  "old-moscow": {
+    name: "Старая Москва",
+    description:
+      "Дореволюционная Москва: мощёная улица, купеческие особняки, чугунные фонари и мягкий исторический свет конца XIX — начала XX века.",
+  },
+  "alpine-chalet": {
+    name: "Альпийское шале",
+    description:
+      "Премиальное альпийское шале: панорамные снежные горы, камин, натуральное дерево, камень и тёплая winter luxury-атмосфера.",
+  },
+  "tropical-conservatory": {
+    name: "Тропическая оранжерея",
+    description:
+      "Тропическая оранжерея: стеклянная архитектура, экзотическая зелень, каменные дорожки и мягкие солнечные блики для botanical editorial-серии.",
+  },
+  "podcast-studio": {
+    name: "Подкаст-студия",
+    description:
+      "Современная podcast-студия: профессиональные микрофоны, акустические панели, тёплый свет и чистый экспертный образ для личного бренда.",
+  },
 };
 
 const shotTranslations: Record<

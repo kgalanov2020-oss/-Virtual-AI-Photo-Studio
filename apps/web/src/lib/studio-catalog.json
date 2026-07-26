@@ -626,6 +626,120 @@
         "/studios/powder-blue-studio/detail-shot.png",
         "/studios/powder-blue-studio/alternate-wide.png"
       ]
+    },
+    {
+      "slug": "cliffside-coast",
+      "name": "Обрывистый скальный берег",
+      "description": "Драматичный скальный берег: высокие утёсы, морская дымка, ветер, волны и кинематографичный свет для сильной coastal editorial-серии.",
+      "preview_url": "/studios/cliffside-coast/preview.png",
+      "base_prompt": "on a dramatic rugged cliffside coast with high dark rock formations, crashing sea waves, windswept coastal grass, ocean mist, layered cinematic sky, broad stable stone viewpoints and natural paths, premium coastal fashion editorial atmosphere, the person always stands or sits on wide secure ground several metres away from any cliff edge, no unsafe ledge pose",
+      "wardrobe_prompt": "cliffside coast wardrobe: dramatic wind-friendly fashion styling, long wool coat, structured trench, textured knitwear, tailored trousers or flowing midi or maxi dress, practical elegant boots, rich neutral coastal colors, fully clothed cinematic editorial look, no swimwear, no stilettos, no office suit",
+      "gallery_urls": [
+        "/studios/cliffside-coast/master-wide.png",
+        "/studios/cliffside-coast/angle-02.png",
+        "/studios/cliffside-coast/angle-03.png",
+        "/studios/cliffside-coast/angle-04.png",
+        "/studios/cliffside-coast/angle-05.png",
+        "/studios/cliffside-coast/angle-06.png",
+        "/studios/cliffside-coast/angle-07.png",
+        "/studios/cliffside-coast/detail-shot.png",
+        "/studios/cliffside-coast/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "red-carpet-premiere",
+      "name": "Красная дорожка",
+      "description": "Премьера на красной дорожке: парадный вход, вспышки фотографов, бархатные ограждения и вечерний glamour без логотипов и надписей.",
+      "preview_url": "/studios/red-carpet-premiere/preview.png",
+      "base_prompt": "at a prestigious film premiere entrance with a luxurious red carpet, polished dark stone facade, velvet rope barriers, elegant architectural lighting, camera flash bokeh, refined evening arrival atmosphere, abstract matte premiere backdrop without readable text, logos, brands or celebrity imagery",
+      "wardrobe_prompt": "red carpet premiere wardrobe: elegant evening gown, sophisticated cocktail dress, tuxedo or sharply tailored dark suit, polished formal shoes, restrained premium jewelry, fully clothed refined premiere styling, no casual clothes, no brand logos, no costume look",
+      "gallery_urls": [
+        "/studios/red-carpet-premiere/master-wide.png",
+        "/studios/red-carpet-premiere/angle-02.png",
+        "/studios/red-carpet-premiere/angle-03.png",
+        "/studios/red-carpet-premiere/angle-04.png",
+        "/studios/red-carpet-premiere/angle-05.png",
+        "/studios/red-carpet-premiere/angle-06.png",
+        "/studios/red-carpet-premiere/angle-07.png",
+        "/studios/red-carpet-premiere/detail-shot.png",
+        "/studios/red-carpet-premiere/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "old-moscow",
+      "name": "Старая Москва",
+      "description": "Дореволюционная Москва: мощёная улица, купеческие особняки, чугунные фонари и мягкий исторический свет конца XIX — начала XX века.",
+      "preview_url": "/studios/old-moscow/preview.png",
+      "base_prompt": "on an elegant pre-revolutionary Moscow street circa 1890 to 1910, ornate merchant mansions and historic apartment houses, pale stone and red brick facades, cobblestone pavement, wrought-iron street lamps, wooden storefronts without readable signs, subtle horse-carriage details, soft cinematic late-afternoon light, refined late-Imperial Russian city atmosphere, historically coherent architecture, no Soviet symbols, no modern cars, no asphalt, no neon, no modern objects, no readable text, no logos",
+      "wardrobe_prompt": "old Moscow wardrobe: refined late-Imperial Russian city fashion inspired by 1890 to 1910, tailored wool overcoat, three-piece suit, waistcoat, high-collar blouse, long structured dress, elegant hat and leather boots, historically coherent fully clothed styling, no folk costume, no Soviet military uniform, no modern sportswear, no logos",
+      "gallery_urls": [
+        "/studios/old-moscow/master-wide.png",
+        "/studios/old-moscow/angle-02.png",
+        "/studios/old-moscow/angle-03.png",
+        "/studios/old-moscow/angle-04.png",
+        "/studios/old-moscow/angle-05.png",
+        "/studios/old-moscow/angle-06.png",
+        "/studios/old-moscow/angle-07.png",
+        "/studios/old-moscow/detail-shot.png",
+        "/studios/old-moscow/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "alpine-chalet",
+      "name": "Альпийское шале",
+      "description": "Премиальное альпийское шале: панорамные снежные горы, камин, натуральное дерево, камень и тёплая winter luxury-атмосфера.",
+      "preview_url": "/studios/alpine-chalet/preview.png",
+      "base_prompt": "inside a premium Alpine chalet with panoramic windows overlooking snowy mountains, aged natural timber beams, textured stone fireplace, warm wool and linen seating, sculptural lounge furniture, soft firelight balanced with cool mountain daylight, elegant winter luxury atmosphere",
+      "wardrobe_prompt": "Alpine chalet wardrobe: refined winter lifestyle outfit, cashmere turtleneck, textured cream knitwear, tailored wool trousers, elegant long coat, sophisticated après-ski layers and clean winter boots, fully clothed quiet luxury styling, no technical ski helmet, no bulky sports costume, no logos",
+      "gallery_urls": [
+        "/studios/alpine-chalet/master-wide.png",
+        "/studios/alpine-chalet/angle-02.png",
+        "/studios/alpine-chalet/angle-03.png",
+        "/studios/alpine-chalet/angle-04.png",
+        "/studios/alpine-chalet/angle-05.png",
+        "/studios/alpine-chalet/angle-06.png",
+        "/studios/alpine-chalet/angle-07.png",
+        "/studios/alpine-chalet/detail-shot.png",
+        "/studios/alpine-chalet/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "tropical-conservatory",
+      "name": "Тропическая оранжерея",
+      "description": "Тропическая оранжерея: стеклянная архитектура, экзотическая зелень, каменные дорожки и мягкие солнечные блики для botanical editorial-серии.",
+      "preview_url": "/studios/tropical-conservatory/preview.png",
+      "base_prompt": "inside a grand tropical botanical conservatory with elegant glass and dark metal architecture, tall palms, monstera and fern foliage, stone walkways, discreet water features, soft humid atmospheric depth, diffused sunlight through the glass roof, refined premium botanical editorial atmosphere, no signs, no readable text",
+      "wardrobe_prompt": "tropical conservatory wardrobe: elegant botanical lifestyle styling, breathable linen, silk blouse, tailored resort separates or flowing midi dress, cream, emerald and natural earth colors, refined sandals or loafers, fully clothed premium editorial look, no safari costume, no swimwear, no logos",
+      "gallery_urls": [
+        "/studios/tropical-conservatory/master-wide.png",
+        "/studios/tropical-conservatory/angle-02.png",
+        "/studios/tropical-conservatory/angle-03.png",
+        "/studios/tropical-conservatory/angle-04.png",
+        "/studios/tropical-conservatory/angle-05.png",
+        "/studios/tropical-conservatory/angle-06.png",
+        "/studios/tropical-conservatory/angle-07.png",
+        "/studios/tropical-conservatory/detail-shot.png",
+        "/studios/tropical-conservatory/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "podcast-studio",
+      "name": "Подкаст-студия",
+      "description": "Современная podcast-студия: профессиональные микрофоны, акустические панели, тёплый свет и чистый экспертный образ для личного бренда.",
+      "preview_url": "/studios/podcast-studio/preview.png",
+      "base_prompt": "inside a premium modern podcast recording studio with sculptural acoustic wall panels, elegant dark table, professional broadcast microphones on articulated arms, headphones, warm practical lamps, subtle amber and blue accent lighting, glass partition, screens showing abstract waveforms without readable text, polished expert-content atmosphere, no logos",
+      "wardrobe_prompt": "podcast studio wardrobe: polished expert smart casual, clean blazer, refined knit, simple shirt or blouse, tailored trousers or dark denim, minimal jewelry, confident personal-brand styling, one clean outer layer only, fully clothed, no bulky double jackets, no stage costume, no logos",
+      "gallery_urls": [
+        "/studios/podcast-studio/master-wide.png",
+        "/studios/podcast-studio/angle-02.png",
+        "/studios/podcast-studio/angle-03.png",
+        "/studios/podcast-studio/angle-04.png",
+        "/studios/podcast-studio/angle-05.png",
+        "/studios/podcast-studio/angle-06.png",
+        "/studios/podcast-studio/angle-07.png",
+        "/studios/podcast-studio/detail-shot.png",
+        "/studios/podcast-studio/alternate-wide.png"
+      ]
     }
   ]
 }

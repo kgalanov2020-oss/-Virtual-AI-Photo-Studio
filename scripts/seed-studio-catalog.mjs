@@ -8,24 +8,34 @@ const require = createRequire(path.join(root, "apps", "web", "package.json"));
 const { createClient } = require("@supabase/supabase-js");
 const envPath = path.join(root, "apps", "web", ".env.local");
 const catalogPath = path.join(root, "apps", "web", "src", "lib", "studio-catalog.json");
+const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8"));
+const dryRun = process.argv.includes("--dry-run");
+const onlyArgument = process.argv.find((argument) => argument.startsWith("--only="));
+const onlySlugs = (onlyArgument?.slice("--only=".length) ?? "")
+  .split(",")
+  .map((slug) => slug.trim())
+  .filter(Boolean);
 
-for (const line of fs.readFileSync(envPath, "utf8").split(/\r?\n/)) {
-  const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
-  if (!match) continue;
-  process.env[match[1]] = match[2].replace(/^["']|["']$/g, "");
+if (fs.existsSync(envPath)) {
+  for (const line of fs.readFileSync(envPath, "utf8").split(/\r?\n/)) {
+    const match = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+    if (!match) continue;
+    process.env[match[1]] = match[2].replace(/^["']|["']$/g, "");
+  }
 }
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !serviceRoleKey) {
+if (!dryRun && (!supabaseUrl || !serviceRoleKey)) {
   throw new Error("NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required in apps/web/.env.local");
 }
 
-const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8"));
-const supabase = createClient(supabaseUrl, serviceRoleKey, {
-  auth: { persistSession: false },
-});
+const supabase = dryRun
+  ? null
+  : createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false },
+    });
 
 const negativePrompt = [
   "nsfw, nude, naked, porn, erotic",
@@ -1114,6 +1124,84 @@ const cyprusVillaPoseTemplates = [
   { slug: "villa-hero", name: "Главный Cyprus кадр", camera: "лучший resort editorial-ракурс, объектив 70 мм", pose: "финальная уверенная поза на солнечной вилле", prompt: "signature sunny Cyprus villa editorial portrait, bright Mediterranean light, polished final resort lifestyle image" },
 ];
 
+const cliffsideCoastPoseTemplates = [
+  { slug: "coastal-overlook", name: "На прибрежной площадке", camera: "объектив 70 мм, уровень глаз", pose: "стоит на широкой безопасной каменной площадке далеко от края", prompt: "standing on a broad secure coastal overlook several metres from the cliff edge, ocean and dark rocks behind, wind-shaped editorial posture" },
+  { slug: "windswept-path", name: "На тропе у моря", camera: "объектив 50 мм, репортажный ракурс", pose: "идёт по широкой природной тропе, естественный шаг", prompt: "walking along a wide safe coastal path, windswept grass and sea mist visible, natural fashion movement" },
+  { slug: "rock-wall", name: "У скальной стены", camera: "объектив 85 мм, мягкая глубина", pose: "стоит у фактурной скальной стены, корпус слегка повернут", prompt: "near textured dark rock wall on stable ground, ocean bokeh, elegant three-quarter coastal portrait" },
+  { slug: "ocean-profile", name: "Профиль к океану", camera: "объектив 85 мм, боковой свет", pose: "полуоборот к морю, лицо и руки хорошо видны", prompt: "half-turn toward the ocean, face and hands visible, layered mist and waves behind, refined windswept profile" },
+  { slug: "stone-seat", name: "На природном камне", camera: "объектив 70 мм, спокойный нижний ракурс", pose: "сидит на широком низком камне вдали от обрыва", prompt: "seated on a broad low coastal rock well away from any edge, relaxed hands, premium rugged landscape portrait" },
+  { slug: "grass-foreground", name: "Через прибрежные травы", camera: "объектив 85 мм, размытый передний план", pose: "стоит на безопасной ровной земле, обрамлён травами", prompt: "portrait framed through blurred windswept coastal grass, stable level ground, cliffs and ocean in the distance" },
+  { slug: "storm-light", name: "В драматичном свете", camera: "объектив 70 мм, контровой свет", pose: "уверенная статичная поза на широкой площадке", prompt: "confident pose on a broad safe viewpoint under dramatic layered sky, rim light, ocean spray and cinematic depth" },
+  { slug: "coastal-walk", name: "Движение вдоль берега", camera: "объектив 50 мм, динамичный editorial-ракурс", pose: "идёт параллельно береговой линии по безопасной дорожке", prompt: "walking parallel to the shoreline on a secure inland path, coat or dress moving in the wind, no edge proximity" },
+  { slug: "wide-coast", name: "Широкий кадр побережья", camera: "широкий объектив 35 мм", pose: "стоит небольшим силуэтом на просторной безопасной площадке", prompt: "wide environmental coastal portrait, person small on a broad stable plateau, dramatic cliffs, waves and sky dominate" },
+  { slug: "coast-hero", name: "Главный coastal кадр", camera: "лучший cinematic-ракурс, объектив 70 мм", pose: "финальная сильная fashion-поза на безопасной смотровой площадке", prompt: "signature cliffside coast fashion portrait on secure ground, strong wind, cinematic ocean light, polished final editorial image" },
+];
+
+const redCarpetPremierePoseTemplates = [
+  { slug: "premiere-arrival", name: "Выход на дорожку", camera: "объектив 70 мм, уровень глаз", pose: "стоит у начала красной дорожки, уверенный взгляд", prompt: "arriving at the start of a luxurious red carpet, confident formal posture, elegant premiere entrance behind" },
+  { slug: "velvet-ropes", name: "У бархатных ограждений", camera: "объектив 85 мм, мягкая глубина", pose: "стоит между бархатными ограждениями, руки видны", prompt: "standing between velvet rope barriers, hands visible, refined flash bokeh and dark stone facade" },
+  { slug: "step-and-repeat", name: "У премьерного фона", camera: "объектив 70 мм, прямой event-ракурс", pose: "полуоборот у матового фона без текста и логотипов", prompt: "three-quarter pose beside an abstract matte premiere backdrop with no text or logos, polished formal portrait" },
+  { slug: "carpet-walk", name: "Шаг по красной дорожке", camera: "репортажный объектив 50 мм", pose: "идёт по дорожке, естественный торжественный шаг", prompt: "walking along the red carpet with a natural elegant stride, formal arrival atmosphere, subtle flash bokeh" },
+  { slug: "premiere-steps", name: "На парадных ступенях", camera: "объектив 70 мм, лёгкий нижний ракурс", pose: "стоит на широких парадных ступенях", prompt: "standing on broad polished entrance steps, red carpet below, premium architectural evening lighting" },
+  { slug: "flash-profile", name: "Профиль во вспышках", camera: "объектив 85 мм, боковой event-свет", pose: "профиль или полуоборот, плечи расслаблены", prompt: "side profile or half-turn with tasteful camera-flash bokeh, elegant premiere lighting, no photographers visible" },
+  { slug: "formal-seated", name: "В premiere lounge", camera: "объектив 70 мм, ракурс три четверти", pose: "сидит в элегантном кресле у входа, руки и часть ног видны", prompt: "seated in an elegant premiere lounge chair near the entrance, hands and legs visible, refined formal mood" },
+  { slug: "entrance-portrait", name: "У парадного входа", camera: "объектив 85 мм, тёплый контровой свет", pose: "стоит в дверном портале, лёгкий поворот корпуса", prompt: "standing in a grand illuminated doorway, slight torso turn, red carpet and velvet ropes framing the portrait" },
+  { slug: "wide-premiere", name: "Широкий кадр премьеры", camera: "широкий объектив 35 мм", pose: "стоит в центре дорожки, архитектура входа доминирует", prompt: "wide environmental premiere shot, person smaller on centered red carpet, grand entrance and barriers dominate, no crowd" },
+  { slug: "premiere-hero", name: "Главный premiere кадр", camera: "лучший glamour-ракурс, объектив 70 мм", pose: "финальная торжественная поза на красной дорожке", prompt: "signature red carpet glamour portrait, polished formal pose, luxurious entrance lighting and tasteful flash bokeh" },
+];
+
+const oldMoscowPoseTemplates = [
+  { slug: "merchant-mansion", name: "У купеческого особняка", camera: "объектив 70 мм, уровень глаз", pose: "стоит у краснокирпичного особняка, корпус слегка повернут", prompt: "standing beside an ornate red-brick merchant mansion circa 1900, cobblestones and wrought iron visible" },
+  { slug: "cobblestone-walk", name: "По мощёной улице", camera: "репортажный объектив 50 мм", pose: "идёт по спокойной мощёной улице, естественный шаг", prompt: "walking along an empty cobblestone Old Moscow lane, historic facades and warm lanterns, natural period editorial movement" },
+  { slug: "iron-lantern", name: "У чугунного фонаря", camera: "объектив 85 мм, мягкая глубина", pose: "полуоборот рядом со старинным фонарём", prompt: "half-turn near a cast-iron street lantern, late-Imperial Moscow facades softly layered behind" },
+  { slug: "ornate-doorway", name: "В старинном портале", camera: "объектив 70 мм, архитектурный ракурс", pose: "стоит в резном дверном портале, руки видны", prompt: "standing in an ornate historic doorway, hands visible, red brick and carved stone details, no readable signs" },
+  { slug: "moscow-profile", name: "Исторический профиль", camera: "объектив 85 мм, боковой золотой свет", pose: "профиль или полуоборот на фоне улицы", prompt: "side profile in warm late-afternoon light, cobblestone street and merchant houses forming authentic depth" },
+  { slug: "mansion-steps", name: "На ступенях особняка", camera: "объектив 70 мм, лёгкий нижний ракурс", pose: "стоит или сидит на широких каменных ступенях", prompt: "standing or seated on broad stone mansion steps, wrought-iron railing, elegant historically coherent setting" },
+  { slug: "courtyard-gate", name: "У ворот двора", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит у кованых ворот, расслабленная уверенная поза", prompt: "near ornate wrought-iron courtyard gates, relaxed confident pose, pale stucco and red brick beyond" },
+  { slug: "lantern-evening", name: "В свете фонарей", camera: "объектив 85 мм, тёплый вечерний свет", pose: "стоит на тротуаре под мягким светом фонаря", prompt: "portrait beneath warm historic street-lamp glow, wet cobblestones reflecting light, no modern objects" },
+  { slug: "wide-old-moscow", name: "Широкий кадр Старой Москвы", camera: "широкий объектив 35 мм", pose: "стоит небольшим силуэтом посреди просторной улицы", prompt: "wide environmental Old Moscow portrait, person small in frame, historic mansions, cobblestones and lanterns dominate" },
+  { slug: "old-moscow-hero", name: "Главный исторический кадр", camera: "лучший cinematic-ракурс, объектив 70 мм", pose: "финальная благородная поза на дореволюционной улице", prompt: "signature pre-revolutionary Moscow editorial portrait, elegant period atmosphere, golden light, polished final image" },
+];
+
+const alpineChaletPoseTemplates = [
+  { slug: "fireplace-portrait", name: "У камина", camera: "объектив 70 мм, тёплый боковой свет", pose: "стоит у каменного камина, руки видны", prompt: "standing near textured stone fireplace, hands visible, warm firelight balanced with cool mountain daylight" },
+  { slug: "panoramic-window", name: "У панорамного окна", camera: "объектив 85 мм, мягкая глубина", pose: "полуоборот у окна со снежными горами", prompt: "half-turn beside panoramic chalet window, snowy Alpine peaks behind, refined winter lifestyle portrait" },
+  { slug: "chalet-lounge", name: "В lounge-зоне", camera: "объектив 70 мм, ракурс три четверти", pose: "сидит в скульптурном кресле, руки и часть ног видны", prompt: "seated in sculptural lounge chair, timber beams and wool textures visible, elegant quiet-luxury pose" },
+  { slug: "timber-stairs", name: "На деревянной лестнице", camera: "объектив 70 мм, лёгкий нижний ракурс", pose: "стоит на широких ступенях, корпус слегка повернут", prompt: "standing on broad timber chalet stairs, slight torso turn, stone and mountain architecture visible" },
+  { slug: "window-walk", name: "Вдоль окон шале", camera: "репортажный объектив 50 мм", pose: "идёт вдоль панорамных окон, естественный шаг", prompt: "walking beside panoramic windows, natural winter-fashion movement, snowy mountain view and warm interior contrast" },
+  { slug: "fireside-seated", name: "Каминный портрет сидя", camera: "объектив 85 мм, мягкий огненный свет", pose: "сидит у камина, спокойная relaxed-поза", prompt: "relaxed seated fireside portrait, soft amber glow, cashmere and wood textures, polished winter mood" },
+  { slug: "chalet-table", name: "У деревянного стола", camera: "объектив 70 мм, lifestyle-ракурс", pose: "стоит или сидит у массивного деревянного стола", prompt: "near a refined solid-wood chalet table, hands visible, natural materials and mountain daylight" },
+  { slug: "mountain-profile", name: "Профиль на фоне гор", camera: "объектив 85 мм, контровой свет", pose: "профиль у окна, лицо отделено от фона", prompt: "side profile against snowy mountain panorama, clean rim light, warm chalet reflections" },
+  { slug: "wide-chalet", name: "Широкий кадр шале", camera: "широкий объектив 35 мм", pose: "стоит внутри гостиной, архитектура и горы доминируют", prompt: "wide environmental Alpine chalet shot, person smaller in frame, fireplace, timber beams and panoramic mountains dominate" },
+  { slug: "chalet-hero", name: "Главный winter luxury кадр", camera: "лучший lifestyle-ракурс, объектив 70 мм", pose: "финальная уверенная поза в центре шале", prompt: "signature Alpine chalet winter-luxury portrait, warm firelight and cool snow view, polished final editorial image" },
+];
+
+const tropicalConservatoryPoseTemplates = [
+  { slug: "palm-avenue", name: "На пальмовой аллее", camera: "объектив 70 мм, уровень глаз", pose: "стоит на широкой каменной дорожке среди пальм", prompt: "standing on a broad stone path beneath tall palms, elegant glasshouse structure and diffused sunlight" },
+  { slug: "glass-arch", name: "Под стеклянной аркой", camera: "объектив 50 мм, архитектурный ракурс", pose: "стоит под стеклянной аркой, корпус слегка повернут", prompt: "standing beneath grand glass-and-dark-metal conservatory arch, slight torso turn, lush foliage behind" },
+  { slug: "monstera-portrait", name: "У крупной зелени", camera: "объектив 85 мм, мягкая глубина", pose: "полуоборот у листьев монстеры, лицо и руки открыты", prompt: "half-turn near large monstera leaves, face and hands clear, soft humid botanical depth" },
+  { slug: "garden-walk", name: "Прогулка по оранжерее", camera: "репортажный объектив 50 мм", pose: "идёт по каменной дорожке, естественный шаг", prompt: "walking along conservatory path, natural resort-fashion movement, palms, ferns and glass roof visible" },
+  { slug: "stone-bench", name: "На каменной скамье", camera: "объектив 70 мм, ракурс три четверти", pose: "сидит на сухой каменной скамье, руки и часть ног видны", prompt: "seated on a dry elegant stone bench, hands and legs visible, tropical foliage and glass architecture around" },
+  { slug: "fern-foreground", name: "Через папоротники", camera: "объектив 85 мм, размытый передний план", pose: "стоит на ровной дорожке, обрамлён папоротниками", prompt: "portrait framed through blurred fern leaves, stable stone path, luminous conservatory depth" },
+  { slug: "water-feature", name: "У воды", camera: "объектив 70 мм, мягкий отражённый свет", pose: "стоит у безопасного невысокого водного элемента", prompt: "standing beside a low discreet conservatory water feature, reflected soft light, palms and dark metal structure" },
+  { slug: "botanical-profile", name: "Ботанический профиль", camera: "объектив 85 мм, боковой свет", pose: "профиль или полуоборот в солнечных бликах", prompt: "side profile or half-turn in filtered botanical sunlight, elegant leaf shadows, refined beauty editorial mood" },
+  { slug: "wide-conservatory", name: "Широкий кадр оранжереи", camera: "широкий объектив 35 мм", pose: "стоит небольшим силуэтом на центральной дорожке", prompt: "wide environmental tropical conservatory shot, person smaller in frame, glass roof, palms and pathways dominate" },
+  { slug: "conservatory-hero", name: "Главный botanical кадр", camera: "лучший beauty editorial-ракурс, объектив 70 мм", pose: "финальная элегантная поза среди зелени", prompt: "signature tropical conservatory editorial portrait, diffused sunlight, lush refined greenery, polished final image" },
+];
+
+const podcastStudioPoseTemplates = [
+  { slug: "host-microphone", name: "У микрофона ведущего", camera: "объектив 70 мм, уровень глаз", pose: "сидит у broadcast-микрофона, лицо и руки открыты", prompt: "seated at a professional broadcast microphone, face and hands clear, warm expert-content studio lighting" },
+  { slug: "cohost-angle", name: "Ракурс соведущего", camera: "объектив 85 мм, боковой ракурс", pose: "полуоборот к соседнему микрофону, спокойный уверенный взгляд", prompt: "three-quarter co-host angle toward a second microphone, sculptural acoustic panels and amber practical lights" },
+  { slug: "expert-gesture", name: "Экспертный жест", camera: "объектив 70 мм, conversational-ракурс", pose: "сидит за столом, естественный жест одной рукой", prompt: "seated at podcast table making one natural explanatory hand gesture, polished personal-brand atmosphere" },
+  { slug: "headphones-table", name: "У стола с наушниками", camera: "объектив 85 мм, мягкая глубина", pose: "стоит или сидит у стола, наушники лежат рядом", prompt: "near elegant podcast desk with headphones resting beside the microphone, no brand marks, refined studio depth" },
+  { slug: "studio-standing", name: "Стоя в podcast-студии", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит рядом со столом и микрофонной стойкой", prompt: "standing beside podcast table and articulated microphone arm, confident expert portrait, acoustic wall visible" },
+  { slug: "glass-booth", name: "У стеклянной перегородки", camera: "объектив 85 мм, отражённый свет", pose: "полуоборот у стеклянной перегородки, плечи расслаблены", prompt: "half-turn near studio glass partition, subtle reflections, amber and restrained blue accent lighting" },
+  { slug: "content-walk", name: "Движение в студии", camera: "репортажный объектив 50 мм", pose: "идёт вдоль акустической стены, естественный шаг", prompt: "walking alongside sculptural acoustic wall, natural smart-casual movement, premium content studio setting" },
+  { slug: "waveform-profile", name: "Профиль у экрана", camera: "объектив 85 мм, боковой свет", pose: "профиль рядом с абстрактной световой волной без текста", prompt: "side profile near a screen showing abstract non-readable waveform graphics, clean expert-content lighting" },
+  { slug: "wide-podcast", name: "Широкий кадр podcast-студии", camera: "широкий объектив 35 мм", pose: "сидит небольшим силуэтом за столом, интерьер доминирует", prompt: "wide environmental podcast studio shot, person smaller at elegant desk, microphones, panels and glass partition dominate" },
+  { slug: "podcast-hero", name: "Главный экспертный кадр", camera: "лучший personal-brand ракурс, объектив 70 мм", pose: "финальная уверенная поза ведущего у микрофона", prompt: "signature premium podcast host portrait, confident relaxed posture, warm polished personal-brand final image" },
+];
+
 const studioPoseTemplates = {
   "modern-office": officePoseTemplates,
   "executive-boardroom": boardroomPoseTemplates,
@@ -1148,6 +1236,12 @@ const studioPoseTemplates = {
   "white-cyclorama-studio": whiteCycloramaStudioPoseTemplates,
   "pink-pastel-studio": pinkPastelStudioPoseTemplates,
   "powder-blue-studio": powderBlueStudioPoseTemplates,
+  "cliffside-coast": cliffsideCoastPoseTemplates,
+  "red-carpet-premiere": redCarpetPremierePoseTemplates,
+  "old-moscow": oldMoscowPoseTemplates,
+  "alpine-chalet": alpineChaletPoseTemplates,
+  "tropical-conservatory": tropicalConservatoryPoseTemplates,
+  "podcast-studio": podcastStudioPoseTemplates,
 };
 
 const distanceVariants = [
@@ -1181,18 +1275,54 @@ const distanceVariants = [
   },
 ];
 
-const activeSlugs = catalog.studios.map((studio) => studio.slug);
+const selectedStudios = onlySlugs.length > 0
+  ? catalog.studios.filter((studio) => onlySlugs.includes(studio.slug))
+  : catalog.studios;
+const missingOnlySlugs = onlySlugs.filter(
+  (slug) => !selectedStudios.some((studio) => studio.slug === slug),
+);
 
-const { error: deactivateError } = await supabase
-  .from("studios")
-  .update({ is_active: false })
-  .not("slug", "in", `(${activeSlugs.map((slug) => `"${slug}"`).join(",")})`);
-
-if (deactivateError) {
-  throw new Error(`Failed to deactivate old studios: ${deactivateError.message}`);
+if (missingOnlySlugs.length > 0) {
+  throw new Error(`Unknown catalog studios in --only: ${missingOnlySlugs.join(", ")}`);
 }
 
-for (const studio of catalog.studios) {
+for (const studio of selectedStudios) {
+  const templates = studioPoseTemplates[studio.slug];
+  if (!templates || templates.length !== 10) {
+    throw new Error(`${studio.slug} must have exactly 10 dedicated pose templates`);
+  }
+}
+
+if (dryRun) {
+  console.log(
+    `Dry run: ${selectedStudios.length} studios, ${selectedStudios.length * 10 * distanceVariants.length} shots; no Supabase writes.`,
+  );
+  for (const studio of selectedStudios) {
+    console.log(`${studio.slug}: 10 poses x ${distanceVariants.length} distances = 40 shots`);
+  }
+  process.exit(0);
+}
+
+if (!supabase) {
+  throw new Error("Supabase client was not initialized");
+}
+
+const activeSlugs = catalog.studios.map((studio) => studio.slug);
+
+if (onlySlugs.length === 0) {
+  const { error: deactivateError } = await supabase
+    .from("studios")
+    .update({ is_active: false })
+    .not("slug", "in", `(${activeSlugs.map((slug) => `"${slug}"`).join(",")})`);
+
+  if (deactivateError) {
+    throw new Error(`Failed to deactivate old studios: ${deactivateError.message}`);
+  }
+} else {
+  console.log(`Scoped seed: global studio deactivation skipped for ${onlySlugs.join(", ")}`);
+}
+
+for (const studio of selectedStudios) {
   const { data: studioRow, error: studioError } = await supabase
     .from("studios")
     .upsert(
@@ -1288,4 +1418,4 @@ for (const studio of catalog.studios) {
   console.log(`${studio.slug}: ${shots.length} shots`);
 }
 
-console.log(`Seeded ${catalog.studios.length} studios with ${officePoseTemplates.length * distanceVariants.length} shots each.`);
+console.log(`Seeded ${selectedStudios.length} studios with ${officePoseTemplates.length * distanceVariants.length} shots each.`);
