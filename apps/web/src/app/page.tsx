@@ -1,6 +1,6 @@
 import { PRODUCT_IMAGES_PER_STUDIO, TARGET_SHOTS_PER_STUDIO } from "@/lib/generation";
 import { getActiveStudios } from "@/lib/studios";
-import { versionPublicAsset } from "@/lib/static-assets-core.mjs";
+import { publicCdnAssetUrl, versionPublicAsset } from "@/lib/static-assets-core.mjs";
 import Image from "next/image";
 import { AuthNavAction } from "./auth-nav-action";
 import { LazyAutoplayVideo } from "./lazy-autoplay-video";
@@ -254,7 +254,7 @@ export default async function Home() {
               src="/avatar-showcase/avatar-woman.png"
             />
             <LazyAutoplayVideo
-              src={versionPublicAsset("/avatar-showcase/avatar-result-taurus.mp4")}
+              src={publicCdnAssetUrl(versionPublicAsset("/avatar-showcase/avatar-result-taurus.mp4"))}
             />
             <span>Говорящее видео</span>
           </span>
@@ -307,7 +307,6 @@ function StudioPreview({ alt, src }: { alt: string; src: string }) {
       loading="lazy"
       sizes="(max-width: 1100px) 50vw, 33vw"
       src={src}
-      unoptimized
     />
   );
 }

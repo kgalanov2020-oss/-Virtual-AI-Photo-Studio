@@ -1,4 +1,6 @@
 export const STATIC_ASSET_VERSION: string;
+export const STATIC_ASSET_CDN_REVISION: string;
+export const STATIC_ASSET_CDN_BASE: string;
 export const CACHEABLE_PUBLIC_ASSET_ROUTES: string[];
 
 export type PublicAssetHeader = {
@@ -17,4 +19,5 @@ export type PublicAssetHeaderRule = {
 };
 
 export function versionPublicAsset(url: string): string;
+export function publicCdnAssetUrl(url: string): string;
 export function buildPublicAssetHeaderRules(): PublicAssetHeaderRule[];

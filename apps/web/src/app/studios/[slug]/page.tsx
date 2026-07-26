@@ -132,7 +132,6 @@ function StudioImage({
       priority={priority}
       sizes={sizes}
       src={src}
-      unoptimized
       width={1200}
     />
   );

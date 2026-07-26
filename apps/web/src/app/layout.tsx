@@ -4,6 +4,7 @@ import {
   buildYandexMetrikaInitScript,
   normalizeYandexMetrikaId,
 } from "@/lib/yandex-metrika-core.mjs";
+import { STATIC_ASSET_CDN_BASE } from "@/lib/static-assets-core.mjs";
 import "./globals.css";
 
 const siteUrl = "https://virtualphotostudio.ru";
@@ -14,6 +15,7 @@ const yandexMetrikaId = normalizeYandexMetrikaId(
 const yandexMetrikaScript = buildYandexMetrikaInitScript(yandexMetrikaId);
 const siteDescription =
   "Virtual AI Photo Studio — виртуальная фотостудия с готовыми интерьерами. Выберите локацию, загрузите селфи и получите профессиональную фотосессию в офисе, отеле, яхте, ресторане, городе, на пляже и других пространствах.";
+const socialPreviewImage = `${STATIC_ASSET_CDN_BASE}/studios/modern-office/master-wide.webp`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -52,7 +54,7 @@ export const metadata: Metadata = {
     siteName: "Virtual AI Photo Studio",
     images: [
       {
-        url: "/studios/modern-office/master-wide.webp",
+        url: socialPreviewImage,
         width: 1366,
         height: 768,
         alt: "Virtual AI Photo Studio — фотосессия в выбранном интерьере",
@@ -65,7 +67,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Virtual AI Photo Studio",
     description: siteDescription,
-    images: ["/studios/modern-office/master-wide.webp"],
+    images: [socialPreviewImage],
   },
   robots: {
     index: true,

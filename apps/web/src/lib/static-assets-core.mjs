@@ -1,4 +1,7 @@
 export const STATIC_ASSET_VERSION = "2026-07-26-distinct-studios-1";
+export const STATIC_ASSET_CDN_REVISION = "f7bb7f599749b2e9c3f0cad0c25d886ab030069e";
+export const STATIC_ASSET_CDN_BASE =
+  `https://cdn.jsdelivr.net/gh/kgalanov2020-oss/-Virtual-AI-Photo-Studio@${STATIC_ASSET_CDN_REVISION}/apps/web/public`;
 
 const PUBLIC_ASSET_EXTENSION_PATTERN =
   "avif|gif|heic|heif|jpeg|jpg|mp4|png|svg|webm|webp";
@@ -20,6 +23,14 @@ const CACHEABLE_PUBLIC_ASSET_PREFIXES = [
 const EDGE_CACHE_CONTROL =
   "public, max-age=300, s-maxage=86400, stale-while-revalidate=604800";
 const VERSIONED_CACHE_CONTROL = "public, max-age=31536000, immutable";
+
+export function publicCdnAssetUrl(url) {
+  if (typeof url !== "string" || !url.startsWith("/") || url.startsWith("//")) {
+    return url;
+  }
+
+  return `${STATIC_ASSET_CDN_BASE}${url}`;
+}
 
 export function versionPublicAsset(url) {
   if (

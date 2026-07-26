@@ -4,8 +4,10 @@ import { createRequire } from "node:module";
 import test from "node:test";
 import {
   CACHEABLE_PUBLIC_ASSET_ROUTES,
+  STATIC_ASSET_CDN_BASE,
   STATIC_ASSET_VERSION,
   buildPublicAssetHeaderRules,
+  publicCdnAssetUrl,
   versionPublicAsset,
 } from "./static-assets-core.mjs";
 
@@ -27,6 +29,23 @@ test("versions only the public asset namespaces served by this app", () => {
   );
   assert.equal(versionPublicAsset("https://cdn.example.com/result.webp"), "https://cdn.example.com/result.webp");
   assert.equal(versionPublicAsset("blob:https://virtualphotostudio.ru/photo"), "blob:https://virtualphotostudio.ru/photo");
+});
+
+test("maps local public files to the immutable asset CDN", () => {
+  assert.equal(
+    publicCdnAssetUrl(`/studios/old-moscow/preview.webp?v=${STATIC_ASSET_VERSION}`),
+    `${STATIC_ASSET_CDN_BASE}/studios/old-moscow/preview.webp?v=${STATIC_ASSET_VERSION}`,
+  );
+  assert.equal(
+    publicCdnAssetUrl("https://storage.example.com/generated.webp"),
+    "https://storage.example.com/generated.webp",
+  );
+  assert.equal(publicCdnAssetUrl("//cdn.example.com/result.webp"), "//cdn.example.com/result.webp");
+  assert.equal(
+    publicCdnAssetUrl("blob:https://virtualphotostudio.ru/photo"),
+    "blob:https://virtualphotostudio.ru/photo",
+  );
+  assert.equal(publicCdnAssetUrl("data:image/png;base64,AA=="), "data:image/png;base64,AA==");
 });
 
 test("uses bounded edge caching for stable paths and immutable caching only for the current version", () => {
@@ -69,20 +88,35 @@ test("asset cache routes match media files but never the dynamic studio HTML rou
   assert.equal(matcher.test("/studios/modern-office/notes.txt"), false);
 });
 
-test("CSS background assets use the same immutable version as the cache rule", async () => {
+test("CSS background assets use the immutable asset CDN", async () => {
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  const backgroundUrl = `/studios/modern-office/master-wide.webp?v=${STATIC_ASSET_VERSION}`;
+  const backgroundUrl = `${STATIC_ASSET_CDN_BASE}/studios/modern-office/master-wide.webp`;
 
   assert.ok(css.includes(backgroundUrl));
-  assert.equal(css.includes('/studios/modern-office/master-wide.webp")'), false);
+  assert.equal(css.includes('url("/studios/modern-office/master-wide.webp'), false);
 });
 
-test("studio cards and galleries serve static WebP without the runtime image optimizer", async () => {
-  const [homePage, studioPage] = await Promise.all([
-    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
-    readFile(new URL("../app/studios/[slug]/page.tsx", import.meta.url), "utf8"),
+test("Next images use the custom CDN loader instead of the runtime optimizer", async () => {
+  const [nextConfig, loader] = await Promise.all([
+    readFile(new URL("../../next.config.ts", import.meta.url), "utf8"),
+    readFile(new URL("./cdn-image-loader.ts", import.meta.url), "utf8"),
   ]);
 
-  assert.match(homePage, /function StudioPreview[\s\S]*?<Image[\s\S]*?\bunoptimized\b/);
-  assert.match(studioPage, /function StudioImage[\s\S]*?<Image[\s\S]*?\bunoptimized\b/);
+  assert.match(nextConfig, /loader:\s*["']custom["']/);
+  assert.match(nextConfig, /loaderFile:\s*["']\.\/src\/lib\/cdn-image-loader\.ts["']/);
+  assert.match(loader, /publicCdnAssetUrl\(src\)/);
+});
+
+test("non-Image media and social previews avoid the same-origin image route", async () => {
+  const [homePage, layout, outreach] = await Promise.all([
+    readFile(new URL("../app/page.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/outreach/page.tsx", import.meta.url), "utf8"),
+  ]);
+
+  assert.match(homePage, /publicCdnAssetUrl\(versionPublicAsset\("\/avatar-showcase\/avatar-result-taurus\.mp4"\)\)/);
+  assert.match(layout, /STATIC_ASSET_CDN_BASE/);
+  assert.match(outreach, /STATIC_ASSET_CDN_BASE/);
+  assert.equal(outreach.includes("https://virtualphotostudio.ru/selfie-guide/"), false);
+  assert.equal(outreach.includes("https://virtualphotostudio.ru/before-after/"), false);
 });
