@@ -4,6 +4,7 @@ import { buildPublicAssetHeaderRules } from "./src/lib/static-assets-core.mjs";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  output: "standalone",
   images: {
     loader: "custom",
     loaderFile: "./src/lib/cdn-image-loader.ts",
