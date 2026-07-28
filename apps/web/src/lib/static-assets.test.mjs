@@ -31,10 +31,10 @@ test("versions only the public asset namespaces served by this app", () => {
   assert.equal(versionPublicAsset("blob:https://virtualphotostudio.ru/photo"), "blob:https://virtualphotostudio.ru/photo");
 });
 
-test("maps local public files to the immutable asset CDN", () => {
+test("keeps local public files on the app origin", () => {
   assert.equal(
     publicCdnAssetUrl(`/studios/old-moscow/preview.webp?v=${STATIC_ASSET_VERSION}`),
-    `${STATIC_ASSET_CDN_BASE}/studios/old-moscow/preview.webp?v=${STATIC_ASSET_VERSION}`,
+    `/studios/old-moscow/preview.webp?v=${STATIC_ASSET_VERSION}`,
   );
   assert.equal(
     publicCdnAssetUrl("https://storage.example.com/generated.webp"),
@@ -88,15 +88,15 @@ test("asset cache routes match media files but never the dynamic studio HTML rou
   assert.equal(matcher.test("/studios/modern-office/notes.txt"), false);
 });
 
-test("CSS background assets use the immutable asset CDN", async () => {
+test("CSS background assets use local versioned public paths", async () => {
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  const backgroundUrl = `${STATIC_ASSET_CDN_BASE}/studios/modern-office/master-wide.webp`;
+  const backgroundUrl = `/studios/modern-office/master-wide.webp?v=${STATIC_ASSET_VERSION}`;
 
   assert.ok(css.includes(backgroundUrl));
-  assert.equal(css.includes('url("/studios/modern-office/master-wide.webp'), false);
+  assert.equal(css.includes("cdn.jsdelivr.net"), false);
 });
 
-test("Next images use the custom CDN loader instead of the runtime optimizer", async () => {
+test("Next images use the custom public asset loader instead of the runtime optimizer", async () => {
   const [nextConfig, loader] = await Promise.all([
     readFile(new URL("../../next.config.ts", import.meta.url), "utf8"),
     readFile(new URL("./cdn-image-loader.ts", import.meta.url), "utf8"),
@@ -117,6 +117,7 @@ test("non-Image media and social previews avoid the same-origin image route", as
   assert.match(homePage, /publicCdnAssetUrl\(versionPublicAsset\("\/avatar-showcase\/avatar-result-taurus\.mp4"\)\)/);
   assert.match(layout, /STATIC_ASSET_CDN_BASE/);
   assert.match(outreach, /STATIC_ASSET_CDN_BASE/);
+  assert.equal(STATIC_ASSET_CDN_BASE, "");
   assert.equal(outreach.includes("https://virtualphotostudio.ru/selfie-guide/"), false);
   assert.equal(outreach.includes("https://virtualphotostudio.ru/before-after/"), false);
 });
