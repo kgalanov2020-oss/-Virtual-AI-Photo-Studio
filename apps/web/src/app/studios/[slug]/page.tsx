@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { AuthNavAction } from "@/app/auth-nav-action";
+import { formatMoney, getPhotoPackage } from "@/lib/pricing";
 import { getStudioSession } from "@/lib/studios";
 
 type StudioPageProps = {
@@ -24,6 +25,8 @@ export default async function StudioPage({ params }: StudioPageProps) {
   }
 
   const { studio, shots } = result;
+  const freePackage = getPhotoPackage("free_2");
+  const fullPackage = getPhotoPackage("studio_40");
   const galleryUrls = studio.gallery_urls?.length
     ? studio.gallery_urls
     : Array(9).fill(studio.preview_url).filter(Boolean) as string[];
@@ -45,6 +48,16 @@ export default async function StudioPage({ params }: StudioPageProps) {
         <div>
           <p className="eyebrow">Интерьер</p>
           <h1>{studio.name}</h1>
+          <div className="pricing-strip studio-pricing-strip" aria-label="Стоимость AI-фотосессии">
+            <span>
+              <strong>{fullPackage.imageCount} фото</strong>
+              {formatMoney(fullPackage.amountCents)}
+            </span>
+            <span>
+              <strong>Первые {freePackage.imageCount} фото</strong>
+              бесплатно, с водяным знаком
+            </span>
+          </div>
           <div className="actions studio-actions">
             <Link className="button button-primary" href={`/upload?studio=${studio.slug}`}>
               Выбрать этот интерьер

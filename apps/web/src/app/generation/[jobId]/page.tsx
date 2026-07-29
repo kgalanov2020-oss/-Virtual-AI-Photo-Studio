@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getTargetShots, getTargetVariationCount, isTargetVariation } from "@/lib/generation";
+import { formatMoney, getPhotoPackage } from "@/lib/pricing";
 import { translateShot } from "@/lib/ru";
 import { createSupabaseBrowserClient } from "@/lib/supabase";
 import type { BodyProfile } from "@/lib/body-profile";
@@ -40,6 +41,7 @@ const statusLabels: Record<Job["status"], string> = {
 export default function GenerationPage({ params }: GenerationPageProps) {
   const [jobId, setJobId] = useState("");
   const [job, setJob] = useState<Job | null>(null);
+  const [studioSlug, setStudioSlug] = useState("");
   const [shots, setShots] = useState<GenerationShot[]>([]);
   const [generationMode, setGenerationMode] = useState<GenerationMode>("standard");
   const [isLoading, setIsLoading] = useState(true);
@@ -79,6 +81,9 @@ export default function GenerationPage({ params }: GenerationPageProps) {
   }, [visibleShotTargets]);
 
   const totalExpected = visibleShotTargets.length;
+  const freePackage = getPhotoPackage("free_2");
+  const starterPackage = getPhotoPackage("studio_15");
+  const isFreePreviewJob = job?.product_code === "free_1" || job?.product_code === "free_2";
 
   const totalGenerated = useMemo(
     () =>
@@ -108,7 +113,11 @@ export default function GenerationPage({ params }: GenerationPageProps) {
       const activeError =
         currentJob.status === "failed" ? currentJob.error_message : null;
 
-      const [{ data: shotData, error: shotError }, { data: imageData, error: imageError }] =
+      const [
+        { data: shotData, error: shotError },
+        { data: imageData, error: imageError },
+        { data: studioData, error: studioError },
+      ] =
         await Promise.all([
           supabase
             .from("studio_shots")
@@ -124,6 +133,11 @@ export default function GenerationPage({ params }: GenerationPageProps) {
             )
             .eq("job_id", resolvedJobId)
             .order("created_at", { ascending: true }),
+          supabase
+            .from("studios")
+            .select("slug")
+            .eq("id", currentJob.studio_id)
+            .single(),
         ]);
 
       if (shotError) {
@@ -134,7 +148,16 @@ export default function GenerationPage({ params }: GenerationPageProps) {
         throw new Error(imageError.message);
       }
 
-      const generated = (imageData ?? []) as GeneratedImage[];
+      if (studioError || !studioData) {
+        throw new Error(studioError?.message ?? "Не удалось определить студию.");
+      }
+
+      const shouldWatermarkJob = currentJob.product_code === "free_1" || currentJob.product_code === "free_2";
+      const generated = (imageData ?? []).map((image) => ({
+        ...image,
+        is_watermarked:
+          "is_watermarked" in image ? Boolean(image.is_watermarked) : shouldWatermarkJob,
+      })) as GeneratedImage[];
       const nextShots = ((shotData ?? []) as StudioShot[]).map((shot) => ({
         ...translateShot(shot),
         generated: generated.filter(
@@ -143,6 +166,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
       }));
 
       setJob(currentJob);
+      setStudioSlug((studioData as { slug: string }).slug);
       setGenerationMode(currentJob.generation_mode ?? "standard");
       setShots(nextShots);
       setError(activeError);
@@ -380,6 +404,39 @@ export default function GenerationPage({ params }: GenerationPageProps) {
               </span>
             </div>
 
+            {isFreePreviewJob && totalGenerated > 0 ? (
+              <div className="upsell-panel">
+                <div>
+                  <p className="eyebrow">Понравился результат?</p>
+                  <h2>
+                    Получите ещё {starterPackage.imageCount} фото в этой же студии за{" "}
+                    {formatMoney(starterPackage.amountCents)}
+                  </h2>
+                  <p>
+                    Бесплатные {freePackage.imageCount} фото показываются с водяным знаком.
+                    Платный пакет создаёт полноценную серию без водяного знака.
+                  </p>
+                  <Link
+                    className="button button-primary"
+                    href={`/upload?studio=${studioSlug}&package=${starterPackage.code}`}
+                  >
+                    Купить пакет {starterPackage.imageCount} фото
+                  </Link>
+                </div>
+                <div className="upsell-preview-grid" aria-label="Ваши пробные фото">
+                  {shots
+                    .flatMap((shot) => shot.generated)
+                    .slice(0, 3)
+                    .map((image) => (
+                      <div className="generated-thumb generated-thumb-watermarked" key={image.id}>
+                        <img alt="Пробное AI-фото" src={image.image_url} />
+                        <span className="watermark-badge">Preview</span>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            ) : null}
+
             <div className="generation-grid">
               {getTargetShots(shots)
                 .filter((shot) => (targetCountByShotId.get(shot.id) ?? 0) > 0)
@@ -394,11 +451,17 @@ export default function GenerationPage({ params }: GenerationPageProps) {
                     {Array.from({ length: targetCountByShotId.get(shot.id) ?? 0 }).map((_, index) => {
                       const generatedImage = shot.generated[index];
                       return generatedImage ? (
-                        <div className="generated-thumb" key={generatedImage.id}>
+                        <div
+                          className={`generated-thumb ${generatedImage.is_watermarked ? "generated-thumb-watermarked" : ""}`}
+                          key={generatedImage.id}
+                        >
                           <img
                             alt={`${shot.name} вариант ${index + 1}`}
                             src={generatedImage.image_url}
                           />
+                          {generatedImage.is_watermarked ? (
+                            <span className="watermark-badge">Virtual AI Photo Studio</span>
+                          ) : null}
                           <a
                             download={`${slugify(shot.name)}-${index + 1}.${getImageExtension(generatedImage.image_url)}`}
                             href={generatedImage.image_url}

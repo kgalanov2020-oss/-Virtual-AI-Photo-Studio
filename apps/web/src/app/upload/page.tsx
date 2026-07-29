@@ -50,7 +50,7 @@ const selfieGuide = [
 
 const acceptedImageTypes = ".jpg,.jpeg,.png,.webp,.heic,.heif,.avif";
 const acceptedImageExtensions = new Set(["jpg", "jpeg", "png", "webp", "heic", "heif", "avif"]);
-const visiblePhotoPackages = PHOTO_PACKAGES.filter((photoPackage) => photoPackage.code !== "free_1");
+const visiblePhotoPackages = PHOTO_PACKAGES.filter((photoPackage) => !photoPackage.isLegacy);
 
 export default function UploadPage() {
   const router = useRouter();
@@ -65,7 +65,7 @@ export default function UploadPage() {
   const [heightCm, setHeightCm] = useState("");
   const [weightKg, setWeightKg] = useState("");
   const [selectedStudioSlug, setSelectedStudioSlug] = useState<string | null>(null);
-  const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("studio_5");
+  const [selectedPackageCode, setSelectedPackageCode] = useState<PhotoPackageCode>("studio_15");
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadResult, setUploadResult] = useState<string | null>(null);
   const [promoCode, setPromoCode] = useState("");
@@ -121,7 +121,9 @@ export default function UploadPage() {
   }, [readyCount]);
 
   useEffect(() => {
-    const studioSlug = new URLSearchParams(window.location.search).get("studio");
+    const searchParams = new URLSearchParams(window.location.search);
+    const studioSlug = searchParams.get("studio");
+    const packageCode = searchParams.get("package");
 
     if (!studioSlug) {
       window.location.replace("/#studios");
@@ -129,6 +131,13 @@ export default function UploadPage() {
     }
 
     setSelectedStudioSlug(studioSlug);
+
+    const requestedPackage = PHOTO_PACKAGES.find(
+      (photoPackage) => photoPackage.code === packageCode && !photoPackage.isLegacy,
+    );
+    if (requestedPackage) {
+      setSelectedPackageCode(requestedPackage.code);
+    }
   }, []);
 
   useEffect(() => {
@@ -183,10 +192,20 @@ export default function UploadPage() {
   }
 
   useEffect(() => {
-    if (selectedPackageCode === "free_1") {
-      setSelectedPackageCode("studio_5");
+    if (!profile) return;
+
+    if (selectedPackageCode === "free_1" || getPhotoPackage(selectedPackageCode).isLegacy) {
+      setSelectedPackageCode(profile.free_images_remaining >= getPhotoPackage("free_2").imageCount ? "free_2" : "studio_15");
+      return;
     }
-  }, [selectedPackageCode]);
+
+    if (
+      selectedPackageCode === "studio_15" &&
+      profile.free_images_remaining >= getPhotoPackage("free_2").imageCount
+    ) {
+      setSelectedPackageCode("free_2");
+    }
+  }, [profile, selectedPackageCode]);
 
   async function loadOrCreateProfile(activeUserId: string, email: string) {
     const supabase = createSupabaseBrowserClient();
@@ -287,8 +306,8 @@ export default function UploadPage() {
             }
           : currentProfile,
       );
-      if ((payload.freeImagesRemaining ?? 0) >= getPhotoPackage("studio_5").imageCount) {
-        setSelectedPackageCode("studio_5");
+      if ((payload.freeImagesRemaining ?? 0) >= getPhotoPackage("free_2").imageCount) {
+        setSelectedPackageCode("free_2");
       }
       setPromoCode("");
       setPromoMessage(
@@ -541,7 +560,11 @@ export default function UploadPage() {
                     />
                     <strong>{photoPackage.imageCount} фото</strong>
                     <span>
-                      {packageCoveredByBalance ? "С баланса" : formatMoney(photoPackage.amountCents)}
+                      {photoPackage.isFree
+                        ? "Бесплатно"
+                        : packageCoveredByBalance
+                          ? "С баланса"
+                          : formatMoney(photoPackage.amountCents)}
                     </span>
                     <em>{photoPackage.description}</em>
                   </label>

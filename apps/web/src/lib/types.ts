@@ -179,6 +179,7 @@ export type GeneratedImage = {
   seed: number | null;
   variation_index: number;
   is_favorite: boolean;
+  is_watermarked: boolean;
   created_at: string;
 };
 
@@ -243,9 +244,10 @@ export type Database = {
       };
       generated_images: {
         Row: GeneratedImage;
-        Insert: Omit<GeneratedImage, "id" | "created_at"> & {
+        Insert: Omit<GeneratedImage, "id" | "created_at" | "is_watermarked"> & {
           id?: string;
           created_at?: string;
+          is_watermarked?: boolean;
         };
         Update: Partial<GeneratedImage>;
         Relationships: [];

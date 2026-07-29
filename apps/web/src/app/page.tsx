@@ -1,4 +1,5 @@
 import { PRODUCT_IMAGES_PER_STUDIO, TARGET_SHOTS_PER_STUDIO } from "@/lib/generation";
+import { formatMoney, getPhotoPackage } from "@/lib/pricing";
 import { getActiveStudios } from "@/lib/studios";
 import { publicCdnAssetUrl, versionPublicAsset } from "@/lib/static-assets-core.mjs";
 import Image from "next/image";
@@ -59,6 +60,8 @@ export default async function Home() {
 
   const studios = studiosResult.studios;
   const featuredStudio = studios.find((studio) => studio.slug === "modern-office") ?? studios[0];
+  const freePackage = getPhotoPackage("free_2");
+  const fullPackage = getPhotoPackage("studio_40");
 
   return (
     <main className="atelier-page">
@@ -93,6 +96,16 @@ export default async function Home() {
             <a className="atelier-button atelier-button-light" href="#studios">
               Выбрать интерьер
             </a>
+          </div>
+          <div className="pricing-strip" aria-label="Стоимость AI-фотосессии">
+            <span>
+              <strong>{fullPackage.imageCount} фото</strong>
+              {formatMoney(fullPackage.amountCents)}
+            </span>
+            <span>
+              <strong>Первые {freePackage.imageCount} фото</strong>
+              бесплатно, с водяным знаком
+            </span>
           </div>
         </div>
         <div className="atelier-hero-stats" aria-label="Параметры фотосессии">

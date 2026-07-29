@@ -1,8 +1,11 @@
 export type PhotoPackageCode =
   | "free_1"
+  | "free_2"
   | "studio_5"
   | "studio_10"
+  | "studio_15"
   | "studio_20"
+  | "studio_mid"
   | "studio_40";
 
 export type PhotoPackage = {
@@ -12,6 +15,7 @@ export type PhotoPackage = {
   imageCount: number;
   amountCents: number;
   isFree?: boolean;
+  isLegacy?: boolean;
 };
 
 export const PAYMENT_CURRENCY = (
@@ -26,6 +30,15 @@ export const PHOTO_PACKAGES: PhotoPackage[] = [
     imageCount: 5,
     amountCents: 0,
     isFree: true,
+    isLegacy: true,
+  },
+  {
+    code: "free_2",
+    name: "Пробные 2 фото",
+    description: "2 бесплатных фото с водяным знаком",
+    imageCount: 2,
+    amountCents: 0,
+    isFree: true,
   },
   {
     code: "studio_5",
@@ -33,6 +46,7 @@ export const PHOTO_PACKAGES: PhotoPackage[] = [
     description: "5 изображений в выбранном интерьере",
     imageCount: 5,
     amountCents: 24900,
+    isLegacy: true,
   },
   {
     code: "studio_10",
@@ -40,6 +54,14 @@ export const PHOTO_PACKAGES: PhotoPackage[] = [
     description: "10 изображений в выбранном интерьере",
     imageCount: 10,
     amountCents: 49900,
+    isLegacy: true,
+  },
+  {
+    code: "studio_15",
+    name: "AI-фотосессия 15 фото",
+    description: "Пробный пакет: 15 фото в выбранном интерьере",
+    imageCount: 15,
+    amountCents: 14900,
   },
   {
     code: "studio_20",
@@ -47,13 +69,21 @@ export const PHOTO_PACKAGES: PhotoPackage[] = [
     description: "20 изображений в выбранном интерьере",
     imageCount: 20,
     amountCents: 79900,
+    isLegacy: true,
+  },
+  {
+    code: "studio_mid",
+    name: "AI-фотосессия 25 фото",
+    description: "Промежуточный пакет: 25 фото",
+    imageCount: 25,
+    amountCents: 39900,
   },
   {
     code: "studio_40",
     name: "AI-фотосессия 40 фото",
     description: "40 изображений в выбранном интерьере",
     imageCount: 40,
-    amountCents: Number(process.env.PAYMENT_AMOUNT_CENTS ?? "99900"),
+    amountCents: Number(process.env.PAYMENT_AMOUNT_CENTS ?? "99000"),
   },
 ];
 

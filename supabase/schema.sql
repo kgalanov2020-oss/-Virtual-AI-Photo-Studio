@@ -143,13 +143,14 @@ create table if not exists public.generated_images (
   seed bigint,
   variation_index integer not null default 1,
   is_favorite boolean not null default false,
+  is_watermarked boolean not null default false,
   created_at timestamptz not null default now()
 );
 
 create table if not exists public.user_profiles (
   user_id uuid primary key references auth.users(id) on delete cascade,
   email text not null,
-  free_images_remaining integer not null default 5 check (free_images_remaining >= 0),
+  free_images_remaining integer not null default 2 check (free_images_remaining >= 0),
   legal_terms_accepted_at timestamptz,
   privacy_accepted_at timestamptz,
   personal_data_accepted_at timestamptz,
@@ -963,7 +964,8 @@ begin
     image_url,
     seed,
     variation_index,
-    is_favorite
+    is_favorite,
+    is_watermarked
   ) values (
     p_job_id,
     p_user_id,
@@ -971,7 +973,8 @@ begin
     p_image_url,
     null,
     p_variation_index,
-    false
+    false,
+    payment_job.product_code in ('free_1', 'free_2')
   );
 
   select count(*)::integer into completed_count
