@@ -195,15 +195,11 @@ export default function UploadPage() {
     if (!profile) return;
 
     if (selectedPackageCode === "free_1" || getPhotoPackage(selectedPackageCode).isLegacy) {
-      setSelectedPackageCode(profile.free_images_remaining >= getPhotoPackage("free_2").imageCount ? "free_2" : "studio_15");
-      return;
-    }
-
-    if (
-      selectedPackageCode === "studio_15" &&
-      profile.free_images_remaining >= getPhotoPackage("free_2").imageCount
-    ) {
-      setSelectedPackageCode("free_2");
+      setSelectedPackageCode(
+        profile.free_images_remaining >= getPhotoPackage("free_2").imageCount
+          ? "free_2"
+          : "studio_15",
+      );
     }
   }, [profile, selectedPackageCode]);
 
@@ -306,7 +302,10 @@ export default function UploadPage() {
             }
           : currentProfile,
       );
-      if ((payload.freeImagesRemaining ?? 0) >= getPhotoPackage("free_2").imageCount) {
+      if (
+        selectedPackage.isFree &&
+        (payload.freeImagesRemaining ?? 0) >= getPhotoPackage("free_2").imageCount
+      ) {
         setSelectedPackageCode("free_2");
       }
       setPromoCode("");

@@ -363,6 +363,11 @@ export default function GenerationPage({ params }: GenerationPageProps) {
           <Link className="button button-secondary" href="/#studios">
             Новая фотосессия
           </Link>
+          {job?.status === "awaiting_payment" ? (
+            <Link className="button button-primary" href={`/checkout/${job.id}`}>
+              Перейти к оплате
+            </Link>
+          ) : null}
           <button
             className="button button-secondary"
             disabled={isLoading || isDownloadingAll || totalGenerated === 0}
@@ -404,7 +409,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
               </span>
             </div>
 
-            {isFreePreviewJob && totalGenerated > 0 ? (
+            {isFreePreviewJob ? (
               <div className="upsell-panel">
                 <div>
                   <p className="eyebrow">Понравился результат?</p>
@@ -414,7 +419,7 @@ export default function GenerationPage({ params }: GenerationPageProps) {
                   </h2>
                   <p>
                     Бесплатные {freePackage.imageCount} фото помогают оценить стиль и качество.
-                    Платный пакет создаёт полноценную серию для скачивания.
+                    Выберите пакет 15, 25 или 40 фото, чтобы создать полноценную серию.
                   </p>
                   <Link
                     className="button button-primary"
@@ -423,17 +428,19 @@ export default function GenerationPage({ params }: GenerationPageProps) {
                     Купить пакет {starterPackage.imageCount} фото
                   </Link>
                 </div>
-                <div className="upsell-preview-grid" aria-label="Ваши пробные фото">
-                  {shots
-                    .flatMap((shot) => shot.generated)
-                    .slice(0, 3)
-                    .map((image) => (
-                      <div className="generated-thumb generated-thumb-watermarked" key={image.id}>
-                        <img alt="Пробное AI-фото" src={image.image_url} />
-                        <span className="watermark-badge">Preview</span>
-                      </div>
-                    ))}
-                </div>
+                {totalGenerated > 0 ? (
+                  <div className="upsell-preview-grid" aria-label="Ваши пробные фото">
+                    {shots
+                      .flatMap((shot) => shot.generated)
+                      .slice(0, 3)
+                      .map((image) => (
+                        <div className="generated-thumb generated-thumb-watermarked" key={image.id}>
+                          <img alt="Пробное AI-фото" src={image.image_url} />
+                          <span className="watermark-badge">Preview</span>
+                        </div>
+                      ))}
+                  </div>
+                ) : null}
               </div>
             ) : null}
 

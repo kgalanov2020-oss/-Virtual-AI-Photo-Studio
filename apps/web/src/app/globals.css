@@ -3189,8 +3189,11 @@ h1 {
 
 .selfie-card img {
   aspect-ratio: 4 / 5;
+  background: var(--panel-soft);
   display: block;
-  object-fit: cover;
+  max-height: 360px;
+  object-fit: contain;
+  object-position: center;
   width: 100%;
 }
 
@@ -3533,8 +3536,11 @@ h1 {
 .quality-card img,
 .quality-placeholder {
   aspect-ratio: 4 / 5;
+  background: var(--panel-soft);
   display: grid;
-  object-fit: cover;
+  max-height: 360px;
+  object-fit: contain;
+  object-position: center;
   place-items: center;
   width: 100%;
 }
