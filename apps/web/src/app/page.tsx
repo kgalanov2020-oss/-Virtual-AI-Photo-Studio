@@ -99,12 +99,16 @@ export default async function Home() {
           </div>
           <div className="pricing-strip" aria-label="Стоимость AI-фотосессии">
             <span>
+              <strong>Пакеты от</strong>
+              {formatMoney(getPhotoPackage("studio_15").amountCents)}
+            </span>
+            <span>
               <strong>{fullPackage.imageCount} фото</strong>
               {formatMoney(fullPackage.amountCents)}
             </span>
             <span>
               <strong>Первые {freePackage.imageCount} фото</strong>
-              бесплатно, с водяным знаком
+              бесплатно
             </span>
           </div>
         </div>

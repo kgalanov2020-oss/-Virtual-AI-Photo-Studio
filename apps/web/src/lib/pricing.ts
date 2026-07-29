@@ -35,7 +35,7 @@ export const PHOTO_PACKAGES: PhotoPackage[] = [
   {
     code: "free_2",
     name: "Пробные 2 фото",
-    description: "2 бесплатных фото с водяным знаком",
+    description: "2 бесплатных пробных фото",
     imageCount: 2,
     amountCents: 0,
     isFree: true,

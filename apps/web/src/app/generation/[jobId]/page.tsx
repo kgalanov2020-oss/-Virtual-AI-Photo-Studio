@@ -413,8 +413,8 @@ export default function GenerationPage({ params }: GenerationPageProps) {
                     {formatMoney(starterPackage.amountCents)}
                   </h2>
                   <p>
-                    Бесплатные {freePackage.imageCount} фото показываются с водяным знаком.
-                    Платный пакет создаёт полноценную серию без водяного знака.
+                    Бесплатные {freePackage.imageCount} фото помогают оценить стиль и качество.
+                    Платный пакет создаёт полноценную серию для скачивания.
                   </p>
                   <Link
                     className="button button-primary"
