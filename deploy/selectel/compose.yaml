@@ -3,6 +3,12 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_PAYMENTS_ENABLED: ${NEXT_PUBLIC_PAYMENTS_ENABLED:-false}
     image: virtual-ai-photo-studio:latest
     restart: unless-stopped
     env_file:
@@ -43,4 +49,3 @@ services:
 volumes:
   caddy_data:
   caddy_config:
-
