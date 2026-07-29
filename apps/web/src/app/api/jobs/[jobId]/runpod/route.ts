@@ -236,10 +236,28 @@ export async function POST(request: NextRequest, context: RouteContext) {
       ...buildGenerationSettings(shot, generationMode),
     };
     const provider = getImageProvider();
-    const result =
-      provider === "gemini"
-        ? await generateGeminiStudioPhoto(selfieBlob, generationPrompt)
-        : await generateBusinessPortrait(selfieBlob, generationPrompt);
+    let result: Awaited<ReturnType<typeof generateGeminiStudioPhoto>>;
+
+    try {
+      result =
+        provider === "gemini"
+          ? await generateGeminiStudioPhoto(selfieBlob, generationPrompt)
+          : await generateBusinessPortrait(selfieBlob, generationPrompt);
+    } catch (generationError) {
+      if (provider === "gemini" && isGeminiRegionUnavailable(generationError)) {
+        const fallbackResponse = await proxyGenerationToFallback({
+          jobId,
+          token,
+          requestBody,
+        });
+
+        if (fallbackResponse) {
+          return fallbackResponse;
+        }
+      }
+
+      throw generationError;
+    }
 
     const generatedExtension = provider === "gemini" ? "jpg" : "png";
     const generatedContentType = provider === "gemini" ? "image/jpeg" : result.contentType;
@@ -342,6 +360,54 @@ function isGeminiPolicyBlock(error: unknown) {
   return /Input blocked|Prohibited Use policy|invalid_request/i.test(message);
 }
 
+function isGeminiRegionUnavailable(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error);
+
+  return /not available in your current location|available-regions|current location/i.test(message);
+}
+
+async function proxyGenerationToFallback({
+  jobId,
+  token,
+  requestBody,
+}: {
+  jobId: string;
+  token: string;
+  requestBody: { bodyProfile: BodyProfile | null };
+}) {
+  const fallbackBaseUrl = process.env.GENERATION_FALLBACK_BASE_URL?.replace(/\/$/, "");
+
+  if (!fallbackBaseUrl) {
+    return null;
+  }
+
+  try {
+    const fallbackResponse = await fetch(`${fallbackBaseUrl}/api/jobs/${jobId}/runpod`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+    const contentType = fallbackResponse.headers.get("content-type") ?? "application/json";
+    const responseBody = await fallbackResponse.text();
+
+    return new NextResponse(responseBody, {
+      status: fallbackResponse.status,
+      headers: {
+        "Content-Type": contentType,
+      },
+    });
+  } catch (error) {
+    throw new Error(
+      `AI-генератор недоступен из текущего региона сервера, резервный генератор тоже не ответил: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
+}
+
 function getLimitedGenerationTargets(shots: StudioShot[], targetImageCount: number) {
   const targets: Array<{ shot: StudioShot; variationIndex: number }> = [];
 
@@ -391,6 +457,13 @@ function normalizeGenerationError(
     return [
       "Gemini временно не может создать фото: закончилась или превышена квота запросов.",
       "Попробуйте позже или подключите новый ключ/платный лимит Gemini.",
+    ].join(" ");
+  }
+
+  if (/not available in your current location|available-regions|current location/i.test(rawMessage)) {
+    return [
+      "AI-генератор недоступен из текущего региона сервера.",
+      "Мы уже переключаем генерацию на резервный регион. Попробуйте нажать «Продолжить генерацию» ещё раз.",
     ].join(" ");
   }
 
