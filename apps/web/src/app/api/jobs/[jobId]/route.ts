@@ -119,10 +119,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     // Payment records are fiscal/audit data. Never cascade-delete a paid job
     // or a job for which any provider attempt has already been recorded.
     if (job.payment_status === "paid" || (paymentOrders?.length ?? 0) > 0) {
-      return NextResponse.json(
-        { error: "Оплаченную фотосессию или её платёжную историю удалить нельзя." },
-        { status: 409 },
-      );
+      return NextResponse.json({ ok: true, hidden: true });
     }
 
     const canDelete = !["running"].includes(job.status);
@@ -167,10 +164,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     }
 
     if (deletionResult === "payment_history") {
-      return NextResponse.json(
-        { error: "Оплаченную фотосессию или её платёжную историю удалить нельзя." },
-        { status: 409 },
-      );
+      return NextResponse.json({ ok: true, hidden: true });
     }
 
     if (deletionResult === "running") {

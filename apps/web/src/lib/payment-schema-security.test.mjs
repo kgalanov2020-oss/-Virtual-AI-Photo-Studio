@@ -169,7 +169,7 @@ test("job deletion preserves all payment audit records", async () => {
   assert.match(route, /from\("orders"\)/);
   assert.match(route, /job\.payment_status === "paid" \|\| \(paymentOrders\?\.length \?\? 0\) > 0/);
   assert.match(route, /rpc\(\s*"delete_job_without_payment_history"/);
-  assert.match(route, /status: 409/);
+  assert.match(route, /hidden: true/);
   assert.ok(
     deletion.indexOf("from public.jobs") < deletion.indexOf("from public.orders"),
     "atomic deletion must lock job before checking orders",

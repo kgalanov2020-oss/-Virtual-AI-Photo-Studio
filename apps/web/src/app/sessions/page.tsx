@@ -14,6 +14,8 @@ type SessionRow = {
   generatedCount: number;
 };
 
+const HIDDEN_SESSIONS_STORAGE_KEY_PREFIX = "virtual-ai-photo-studio:hidden-sessions";
+
 const statusLabels: Record<Job["status"], string> = {
   draft: "Черновик",
   awaiting_payment: "Ожидает оплату",
@@ -76,7 +78,8 @@ export default function SessionsPage() {
 
       if (jobsError) throw jobsError;
 
-      const jobRows = jobs ?? [];
+      const hiddenJobIds = getHiddenSessionIds(user.id);
+      const jobRows = (jobs ?? []).filter((job) => !hiddenJobIds.has(job.id));
       const studioIds = Array.from(new Set(jobRows.map((job) => job.studio_id)));
       const jobIds = jobRows.map((job) => job.id);
 
@@ -168,7 +171,7 @@ export default function SessionsPage() {
     if (isDeletingJobId) return;
 
     const confirmed = window.confirm(
-      "Удалить эту фотосессию из истории? Загруженные и готовые фото будут удалены. Оплата не возвращается автоматически.",
+      "Убрать эту фотосессию из истории? Неоплаченные черновики будут удалены, а платёжные записи по оплаченным заказам сохранятся для учёта.",
     );
 
     if (!confirmed) return;
@@ -179,12 +182,14 @@ export default function SessionsPage() {
     try {
       const supabase = createSupabaseBrowserClient();
       const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
+      const activeSession = sessionData.session;
+      const token = activeSession?.access_token;
 
       if (!token) {
         throw new Error("Нет активной сессии Supabase. Обновите страницу и попробуйте снова.");
       }
 
+      const userId = activeSession.user.id;
       const response = await fetch(`/api/jobs/${row.job.id}`, {
         method: "DELETE",
         headers: {
@@ -193,8 +198,23 @@ export default function SessionsPage() {
       });
       const data = (await response.json()) as { ok?: boolean; error?: string };
 
+      if (
+        response.status === 409 &&
+        data.error?.toLowerCase().includes("платёжную историю")
+      ) {
+        hideSessionFromHistory(userId, row.job.id);
+        setRows((currentRows) =>
+          currentRows.filter((currentRow) => currentRow.job.id !== row.job.id),
+        );
+        return;
+      }
+
       if (!response.ok || data.error) {
         throw new Error(data.error ?? "Не удалось удалить фотосессию.");
+      }
+
+      if (data.ok) {
+        hideSessionFromHistory(userId, row.job.id);
       }
 
       setRows((currentRows) => currentRows.filter((currentRow) => currentRow.job.id !== row.job.id));
@@ -337,6 +357,34 @@ export default function SessionsPage() {
       </section>
     </main>
   );
+}
+
+function getHiddenSessionIds(userId: string) {
+  if (typeof window === "undefined") return new Set<string>();
+
+  try {
+    const rawValue = window.localStorage.getItem(getHiddenSessionsStorageKey(userId));
+    const parsedValue = rawValue ? JSON.parse(rawValue) : [];
+
+    return new Set(Array.isArray(parsedValue) ? parsedValue.filter((id) => typeof id === "string") : []);
+  } catch {
+    return new Set<string>();
+  }
+}
+
+function hideSessionFromHistory(userId: string, jobId: string) {
+  if (typeof window === "undefined") return;
+
+  const hiddenJobIds = getHiddenSessionIds(userId);
+  hiddenJobIds.add(jobId);
+  window.localStorage.setItem(
+    getHiddenSessionsStorageKey(userId),
+    JSON.stringify(Array.from(hiddenJobIds)),
+  );
+}
+
+function getHiddenSessionsStorageKey(userId: string) {
+  return `${HIDDEN_SESSIONS_STORAGE_KEY_PREFIX}:${userId}`;
 }
 
 function formatDate(value: string) {
