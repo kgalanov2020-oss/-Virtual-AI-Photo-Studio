@@ -974,7 +974,7 @@ begin
     null,
     p_variation_index,
     false,
-    payment_job.product_code in ('free_1', 'free_2')
+    false
   );
 
   select count(*)::integer into completed_count

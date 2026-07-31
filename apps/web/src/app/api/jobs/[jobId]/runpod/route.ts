@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import sharp from "sharp";
 import catalog from "@/lib/studio-catalog.json";
 import {
   calculateBodyProfile,
@@ -260,16 +259,9 @@ export async function POST(request: NextRequest, context: RouteContext) {
       throw generationError;
     }
 
-    const shouldWatermark = shouldWatermarkGeneratedImage(job);
-    const generatedBytes = shouldWatermark
-      ? await addPreviewWatermark(result.bytes)
-      : result.bytes;
-    const generatedExtension = shouldWatermark ? "jpg" : provider === "gemini" ? "jpg" : "png";
-    const generatedContentType = shouldWatermark
-      ? "image/jpeg"
-      : provider === "gemini"
-        ? "image/jpeg"
-        : result.contentType;
+    const generatedBytes = result.bytes;
+    const generatedExtension = provider === "gemini" ? "jpg" : "png";
+    const generatedContentType = provider === "gemini" ? "image/jpeg" : result.contentType;
     const generatedPath = `${userId}/${jobId}/${shot.slug}-${variationIndex}.${generatedExtension}`;
     const { error: uploadError } = await supabase.storage
       .from("generated")
@@ -367,58 +359,6 @@ function isGeminiPolicyBlock(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
 
   return /Input blocked|Prohibited Use policy|invalid_request/i.test(message);
-}
-
-function shouldWatermarkGeneratedImage(job: Job) {
-  return job.product_code?.startsWith("free_") || job.amount_cents === 0;
-}
-
-async function addPreviewWatermark(bytes: Buffer) {
-  const image = sharp(bytes).rotate();
-  const metadata = await image.metadata();
-  const width = metadata.width ?? 1024;
-  const height = metadata.height ?? 1024;
-  const fontSize = Math.max(42, Math.round(Math.min(width, height) / 13));
-  const strokeWidth = Math.max(2, Math.round(fontSize / 18));
-  const tileWidth = Math.round(width * 0.86);
-  const tileHeight = Math.round(fontSize * 3.1);
-  const watermarkSvg = `
-    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <pattern id="preview-watermark" width="${tileWidth}" height="${tileHeight}" patternUnits="userSpaceOnUse" patternTransform="rotate(-28 ${width / 2} ${height / 2})">
-          <text
-            x="${Math.round(fontSize * 0.35)}"
-            y="${Math.round(fontSize * 1.7)}"
-            fill="rgba(255,255,255,0.34)"
-            stroke="rgba(0,0,0,0.22)"
-            stroke-width="${strokeWidth}"
-            paint-order="stroke"
-            font-family="Arial, Helvetica, sans-serif"
-            font-size="${fontSize}"
-            font-weight="800"
-            letter-spacing="${Math.round(fontSize * 0.08)}"
-          >VIRTUAL AI PHOTO STUDIO</text>
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#preview-watermark)" />
-      <rect x="${Math.round(width * 0.05)}" y="${Math.round(height * 0.9)}" rx="${Math.round(fontSize * 0.35)}" width="${Math.round(width * 0.9)}" height="${Math.round(fontSize * 1.3)}" fill="rgba(0,0,0,0.44)" />
-      <text
-        x="${Math.round(width * 0.5)}"
-        y="${Math.round(height * 0.9 + fontSize * 0.86)}"
-        text-anchor="middle"
-        fill="rgba(255,255,255,0.92)"
-        font-family="Arial, Helvetica, sans-serif"
-        font-size="${Math.round(fontSize * 0.52)}"
-        font-weight="800"
-        letter-spacing="${Math.round(fontSize * 0.05)}"
-      >VIRTUAL AI PHOTO STUDIO</text>
-    </svg>
-  `;
-
-  return await image
-    .composite([{ input: Buffer.from(watermarkSvg), blend: "over" }])
-    .jpeg({ quality: 90, mozjpeg: true })
-    .toBuffer();
 }
 
 function isGeminiRegionUnavailable(error: unknown) {

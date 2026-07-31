@@ -152,11 +152,9 @@ export default function GenerationPage({ params }: GenerationPageProps) {
         throw new Error(studioError?.message ?? "Не удалось определить студию.");
       }
 
-      const shouldWatermarkJob = currentJob.product_code === "free_1" || currentJob.product_code === "free_2";
       const generated = (imageData ?? []).map((image) => ({
         ...image,
-        is_watermarked:
-          "is_watermarked" in image ? Boolean(image.is_watermarked) : shouldWatermarkJob,
+        is_watermarked: false,
       })) as GeneratedImage[];
       const nextShots = ((shotData ?? []) as StudioShot[]).map((shot) => ({
         ...translateShot(shot),
@@ -434,9 +432,8 @@ export default function GenerationPage({ params }: GenerationPageProps) {
                       .flatMap((shot) => shot.generated)
                       .slice(0, 3)
                       .map((image) => (
-                        <div className="generated-thumb generated-thumb-watermarked" key={image.id}>
+                        <div className="generated-thumb" key={image.id}>
                           <img alt="Пробное AI-фото" src={image.image_url} />
-                          <span className="watermark-badge">Preview</span>
                         </div>
                       ))}
                   </div>
@@ -458,17 +455,11 @@ export default function GenerationPage({ params }: GenerationPageProps) {
                     {Array.from({ length: targetCountByShotId.get(shot.id) ?? 0 }).map((_, index) => {
                       const generatedImage = shot.generated[index];
                       return generatedImage ? (
-                        <div
-                          className={`generated-thumb ${generatedImage.is_watermarked ? "generated-thumb-watermarked" : ""}`}
-                          key={generatedImage.id}
-                        >
+                        <div className="generated-thumb" key={generatedImage.id}>
                           <img
                             alt={`${shot.name} вариант ${index + 1}`}
                             src={generatedImage.image_url}
                           />
-                          {generatedImage.is_watermarked ? (
-                            <span className="watermark-badge">Virtual AI Photo Studio</span>
-                          ) : null}
                           <a
                             download={`${slugify(shot.name)}-${index + 1}.${getImageExtension(generatedImage.image_url)}`}
                             href={generatedImage.image_url}
