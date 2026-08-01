@@ -1189,6 +1189,19 @@ const tropicalConservatoryPoseTemplates = [
   { slug: "conservatory-hero", name: "Главный botanical кадр", camera: "лучший beauty editorial-ракурс, объектив 70 мм", pose: "финальная элегантная поза среди зелени", prompt: "signature tropical conservatory editorial portrait, diffused sunlight, lush refined greenery, polished final image" },
 ];
 
+const jokiJoyaMoscowPoseTemplates = [
+  { slug: "play-zone-portrait", name: "В игровой зоне", camera: "объектив 70 мм, уровень глаз", pose: "стоит в просторной современной игровой зоне, лицо и руки открыты", prompt: "standing in a premium indoor play-zone with colorful soft modules, safe open floor, polished family lifestyle lighting, no logos or readable signs" },
+  { slug: "ball-pit-edge", name: "У шарикового бассейна", camera: "объектив 85 мм, мягкая глубина", pose: "сидит или стоит у края шарикового бассейна, спокойная естественная поза", prompt: "near the edge of a bright ball pit, colorful spheres as soft background texture, clean cheerful family portrait, no mascot characters" },
+  { slug: "slide-zone", name: "У горки", camera: "объектив 70 мм, ракурс три четверти", pose: "стоит рядом с безопасной современной горкой, корпус слегка повернут", prompt: "beside a modern indoor slide and padded play structure, dynamic but safe composition, bright lifestyle atmosphere" },
+  { slug: "climbing-net", name: "У сеточного лабиринта", camera: "объектив 70 мм, лёгкий нижний ракурс", pose: "стоит у прозрачной игровой сетки, руки видны", prompt: "standing near a safe climbing-net maze, geometric rope texture and colorful padded shapes, premium indoor family entertainment mood" },
+  { slug: "arcade-lights", name: "У игровых автоматов", camera: "объектив 85 мм, боковой свет", pose: "полуоборот у мягких аркадных огней без видимых брендов", prompt: "half-turn near abstract arcade light glow, non-readable screens, no logos, playful Moscow entertainment-center ambience" },
+  { slug: "trampoline-zone", name: "У батутной зоны", camera: "репортажный объектив 50 мм", pose: "идёт вдоль батутной зоны, естественный шаг", prompt: "walking beside a safe trampoline-zone boundary, netting and soft padded floor visible, natural energetic lifestyle movement" },
+  { slug: "party-room", name: "В праздничной комнате", camera: "объектив 70 мм, тёплый праздничный свет", pose: "стоит у сервированного праздничного стола без текста и логотипов", prompt: "in a bright birthday party room with balloons, clean table decor, pastel lights, no readable text, no branded characters" },
+  { slug: "family-cafe-lounge", name: "В family lounge", camera: "объектив 85 мм, мягкий интерьерный свет", pose: "сидит в lounge-зоне, руки и часть ног видны", prompt: "seated in a comfortable family cafe lounge inside an entertainment center, soft seats, warm light, play zones softly visible behind" },
+  { slug: "wide-game-space", name: "Широкий кадр пространства", camera: "широкий объектив 35 мм", pose: "стоит небольшим силуэтом в центре большого игрового пространства", prompt: "wide environmental indoor game space shot, person smaller in frame, slides, nets, soft modules and party lights dominate, no crowds" },
+  { slug: "game-space-hero", name: "Главный family fun кадр", camera: "лучший lifestyle-ракурс, объектив 70 мм", pose: "финальная уверенная и дружелюбная поза в ярком игровом пространстве", prompt: "signature premium family entertainment center portrait, colorful safe play architecture, polished cheerful final image, no logos" },
+];
+
 const podcastStudioPoseTemplates = [
   { slug: "host-microphone", name: "У микрофона ведущего", camera: "объектив 70 мм, уровень глаз", pose: "сидит у broadcast-микрофона, лицо и руки открыты", prompt: "seated at a professional broadcast microphone, face and hands clear, warm expert-content studio lighting" },
   { slug: "cohost-angle", name: "Ракурс соведущего", camera: "объектив 85 мм, боковой ракурс", pose: "сидит один за подкаст-столом в полуобороте к соседнему пустому микрофону, спокойный уверенный взгляд; в кадре не должно быть второго человека", prompt: "solo three-quarter podcast co-host camera angle toward a second empty microphone, only one person in the frame, no second face, no duplicated face, no cloned co-host, sculptural acoustic panels and amber practical lights" },
@@ -1241,6 +1254,7 @@ const studioPoseTemplates = {
   "old-moscow": oldMoscowPoseTemplates,
   "alpine-chalet": alpineChaletPoseTemplates,
   "tropical-conservatory": tropicalConservatoryPoseTemplates,
+  "joki-joya-moscow": jokiJoyaMoscowPoseTemplates,
   "podcast-studio": podcastStudioPoseTemplates,
 };
 

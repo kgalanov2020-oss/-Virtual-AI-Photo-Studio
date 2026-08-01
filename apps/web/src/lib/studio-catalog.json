@@ -723,6 +723,25 @@
       ]
     },
     {
+      "slug": "joki-joya-moscow",
+      "name": "Joki Joya Москва",
+      "description": "Яркое игровое пространство в Москве: современные play-зоны, мягкие модули, горки, сетки, шариковый бассейн и праздничный family lifestyle-свет.",
+      "preview_url": "/studios/joki-joya-moscow/preview.png",
+      "base_prompt": "inside a premium modern indoor family entertainment center in Moscow inspired by bright play spaces, colorful soft-play modules, safe climbing nets, slides, ball pit textures, trampoline zone details, arcade lights, party room accents, clean family lifestyle atmosphere, spacious and polished, no crowds, no readable signs, no brand logos, no mascot characters, no copyrighted elements",
+      "wardrobe_prompt": "family entertainment center wardrobe: clean comfortable smart-casual outfit, relaxed lifestyle clothing, neat sneakers, soft natural colors with one bright accent, fully clothed modest styling, child-safe friendly look, no logos, no costumes, no branded merchandise",
+      "gallery_urls": [
+        "/studios/joki-joya-moscow/master-wide.png",
+        "/studios/joki-joya-moscow/angle-02.png",
+        "/studios/joki-joya-moscow/angle-03.png",
+        "/studios/joki-joya-moscow/angle-04.png",
+        "/studios/joki-joya-moscow/angle-05.png",
+        "/studios/joki-joya-moscow/angle-06.png",
+        "/studios/joki-joya-moscow/angle-07.png",
+        "/studios/joki-joya-moscow/detail-shot.png",
+        "/studios/joki-joya-moscow/alternate-wide.png"
+      ]
+    },
+    {
       "slug": "podcast-studio",
       "name": "Подкаст-студия",
       "description": "Современная podcast-студия: профессиональные микрофоны, акустические панели, тёплый свет и чистый экспертный образ для личного бренда.",

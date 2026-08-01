@@ -191,6 +191,11 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
     description:
       "Тропическая оранжерея: стеклянная архитектура, экзотическая зелень, каменные дорожки и мягкие солнечные блики для botanical editorial-серии.",
   },
+  "joki-joya-moscow": {
+    name: "Joki Joya Москва",
+    description:
+      "Яркое игровое пространство в Москве: современные play-зоны, мягкие модули, горки, сетки, шариковый бассейн и праздничный family lifestyle-свет.",
+  },
   "podcast-studio": {
     name: "Подкаст-студия",
     description:
