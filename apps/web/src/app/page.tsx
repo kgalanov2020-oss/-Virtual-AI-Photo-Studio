@@ -44,6 +44,9 @@ const studioLabels: Record<string, string> = {
   "old-moscow": "Исторический портрет",
   "alpine-chalet": "Winter luxury",
   "tropical-conservatory": "Botanical editorial",
+  "moscow-city": "Business skyline",
+  "vorobyovy-msu": "Academic Moscow",
+  "modern-gorky-park": "Urban park",
   "gum-moscow": "Moscow luxury",
   "advanced-karting": "Racing tech",
   "joki-joya-moscow": "Family lifestyle",
@@ -279,25 +282,6 @@ export default async function Home() {
             <span>Говорящее видео</span>
           </span>
           <strong>Создать видео в Avatar App ↗</strong>
-        </a>
-      </section>
-
-      <section className="atelier-section atelier-translator-promo">
-        <div>
-          <p className="eyebrow">Полезный бонус</p>
-          <h2>Для пользователей нашего сервиса — бесплатный AI‑переводчик</h2>
-          <p>
-            Работает быстро в любой стране — через веб‑интерфейс и как бот в
-            Telegram. Переводит текст, голосовые сообщения и текст на
-            изображениях.
-          </p>
-        </div>
-        <a
-          href="https://t.me/voxa_translate_bot?start=virtualphotostudio"
-          rel="noreferrer"
-          target="_blank"
-        >
-          Открыть в Telegram ↗
         </a>
       </section>
 

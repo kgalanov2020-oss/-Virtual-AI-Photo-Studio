@@ -1189,6 +1189,45 @@ const tropicalConservatoryPoseTemplates = [
   { slug: "conservatory-hero", name: "Главный botanical кадр", camera: "лучший beauty editorial-ракурс, объектив 70 мм", pose: "финальная элегантная поза среди зелени", prompt: "signature tropical conservatory editorial portrait, diffused sunlight, lush refined greenery, polished final image" },
 ];
 
+const moscowCityPoseTemplates = [
+  { slug: "skyscraper-lobby", name: "Лобби небоскрёба", camera: "объектив 70 мм, уровень глаз", pose: "стоит в стеклянном бизнес-лобби, корпус слегка повернут", prompt: "standing in a premium glass skyscraper lobby, marble reflections, tall windows, polished Moscow City business mood, no readable signs or logos" },
+  { slug: "tower-street", name: "У башен Москва-Сити", camera: "объектив 70 мм, вертикальная перспектива", pose: "стоит на деловой улице между башнями", prompt: "standing in a modern tower street canyon, reflective facades rising above, clean premium urban editorial atmosphere" },
+  { slug: "river-embankment", name: "На набережной", camera: "объектив 85 мм, мягкая глубина", pose: "полуоборот у набережной, skyline за спиной", prompt: "half-turn on a clean river embankment with Moscow City inspired skyline behind, elegant city lifestyle portrait" },
+  { slug: "rooftop-terrace", name: "Rooftop-терраса", camera: "объектив 70 мм, вечерний свет", pose: "стоит на rooftop-террасе с видом на башни", prompt: "on a luxury rooftop terrace overlooking glass towers, dusk light, refined business-lifestyle atmosphere" },
+  { slug: "night-skyline", name: "Вечерний skyline", camera: "объектив 85 мм, городские огни", pose: "стоит на фоне вечерних башен", prompt: "portrait against night skyscraper lights and river reflections, cinematic modern Moscow business district mood" },
+  { slug: "skyline-lounge", name: "Lounge с видом", camera: "объектив 70 мм, интерьерный свет", pose: "сидит или стоит в lounge-зоне у панорамного окна", prompt: "in a premium skyline lounge with floor-to-ceiling windows, towers visible outside, warm interior light" },
+  { slug: "glass-promenade", name: "Стеклянный переход", camera: "широкий объектив 35 мм", pose: "идёт по стеклянной promenade-зоне, естественный шаг", prompt: "walking through a glass promenade among skyscrapers, architectural reflections, modern urban movement" },
+  { slug: "wide-city", name: "Панорама Москва-Сити", camera: "широкий объектив 35 мм", pose: "стоит небольшим силуэтом на фоне панорамы", prompt: "wide environmental Moscow City inspired skyline shot, person smaller in frame, towers and river dominate" },
+  { slug: "reflective-facade", name: "У отражающего фасада", camera: "объектив 85 мм, боковой свет", pose: "полуоборот у стеклянного фасада", prompt: "half-turn beside a reflective glass facade, tower reflections and clean business editorial geometry" },
+  { slug: "city-hero", name: "Главный business кадр", camera: "лучший urban editorial-ракурс, объектив 70 мм", pose: "финальная уверенная поза в Москва-Сити", prompt: "signature Moscow City premium business portrait, glass towers, polished skyline, confident modern editorial final image" },
+];
+
+const vorobyovyMsuPoseTemplates = [
+  { slug: "msu-facade", name: "Фасад МГУ", camera: "объектив 70 мм, лёгкий нижний ракурс", pose: "стоит перед монументальной академической архитектурой", prompt: "standing before a monumental Moscow university-style tower facade, classic academic architecture, no readable signs" },
+  { slug: "observation-deck", name: "Смотровая площадка", camera: "объектив 85 мм, skyline за спиной", pose: "полуоборот у парапета смотровой площадки", prompt: "half-turn at a Sparrow Hills inspired observation deck overlooking Moscow skyline, elegant city panorama" },
+  { slug: "academic-alley", name: "Академическая аллея", camera: "объектив 70 мм, уровень глаз", pose: "идёт по зелёной академической аллее", prompt: "walking along a green academic alley near university buildings, classic Moscow park light" },
+  { slug: "stone-stairs", name: "Каменная лестница", camera: "объектив 70 мм, перспективный ракурс", pose: "стоит на широкой каменной лестнице, руки видны", prompt: "standing on broad stone stairs with balustrades and park lamps, refined Moscow academic editorial mood" },
+  { slug: "river-view", name: "Вид на Москву-реку", camera: "объектив 85 мм, мягкий свет", pose: "стоит у вида на реку и город", prompt: "near a river panorama with Moscow skyline beyond, calm premium city landscape portrait" },
+  { slug: "golden-msu", name: "Золотой час у МГУ", camera: "объектив 70 мм, тёплый контровой свет", pose: "стоит на фоне силуэта МГУ в золотой час", prompt: "golden-hour portrait with monumental university tower silhouette, warm classic Moscow atmosphere" },
+  { slug: "park-bench", name: "Парковая скамья", camera: "объектив 85 мм, мягкая глубина", pose: "сидит на скамье в академическом парке", prompt: "seated on a classic park bench near lampposts and mature trees, quiet academic Moscow lifestyle" },
+  { slug: "wide-sparrow-hills", name: "Широкий вид Воробьёвых гор", camera: "широкий объектив 35 мм", pose: "стоит небольшим силуэтом на смотровой зоне", prompt: "wide environmental Sparrow Hills viewpoint, person smaller in frame, river bend, skyline and greenery dominate" },
+  { slug: "seasonal-campus", name: "Сезонный кампус", camera: "объектив 70 мм, чистый городской свет", pose: "стоит в чистой сезонной парковой зоне", prompt: "clean autumn or winter academic park scene near Moscow university architecture, elegant understated portrait" },
+  { slug: "msu-hero", name: "Главный академический кадр", camera: "лучший Moscow editorial-ракурс, объектив 70 мм", pose: "финальная уверенная поза у МГУ", prompt: "signature Sparrow Hills and MSU inspired Moscow editorial portrait, monumental academic architecture and skyline, polished final image" },
+];
+
+const modernGorkyParkPoseTemplates = [
+  { slug: "modern-entrance", name: "Современный вход", camera: "объектив 70 мм, уровень глаз", pose: "стоит у современного входа в парк без надписей", prompt: "standing near a modern central park entrance with clean stone and dark metal details, no readable signs or logos" },
+  { slug: "tree-avenue", name: "Аллея деревьев", camera: "объектив 70 мм, мягкий дневной свет", pose: "идёт по зелёной аллее, естественный шаг", prompt: "walking along a renovated tree-lined avenue, clean Moscow park lifestyle mood, soft daylight" },
+  { slug: "river-embankment", name: "Набережная парка", camera: "объектив 85 мм, river background", pose: "полуоборот у набережной с лавками", prompt: "half-turn beside a clean river embankment with modern benches and greenery, stylish urban leisure atmosphere" },
+  { slug: "cafe-terrace", name: "Кафе-терраса", camera: "объектив 70 мм, lifestyle-ракурс", pose: "сидит или стоит у современной кафе-террасы", prompt: "near a contemporary park cafe terrace with umbrellas and plants, warm polished lifestyle light, no readable branding" },
+  { slug: "fountain-plaza", name: "Площадь с фонтанами", camera: "объектив 70 мм, отражённый свет", pose: "стоит у низкого фонтана, не перекрывая воду", prompt: "standing near a modern fountain plaza, water jets and greenery behind, clean urban park editorial image" },
+  { slug: "glass-pavilion", name: "Стеклянный павильон", camera: "объектив 85 мм, архитектурный свет", pose: "полуоборот у стеклянного павильона", prompt: "half-turn near a contemporary glass park pavilion, ornamental grasses and wood decking, premium Moscow lifestyle mood" },
+  { slug: "open-lawn", name: "Открытый газон", camera: "широкий объектив 35 мм", pose: "стоит на краю большого газона, skyline далеко", prompt: "wide open lawn in a modern central park, distant Moscow skyline hints, relaxed clean lifestyle composition" },
+  { slug: "evening-alley", name: "Вечерняя аллея", camera: "объектив 85 мм, тёплые огни", pose: "стоит под вечерними гирляндами и фонарями", prompt: "evening park alley with warm string lights and benches, polished urban leisure portrait, no crowds" },
+  { slug: "seasonal-park", name: "Сезонный парк", camera: "объектив 70 мм, чистая сезонная атмосфера", pose: "стоит на дорожке в осеннем или зимнем парке", prompt: "clean autumn or winter modern park path with trees and city hints, elegant Moscow lifestyle scene" },
+  { slug: "gorky-hero", name: "Главный park lifestyle кадр", camera: "лучший lifestyle-ракурс, объектив 70 мм", pose: "финальная расслабленная поза в современном парке", prompt: "signature modern Gorky Park inspired lifestyle portrait, renovated promenade, greenery, warm city leisure mood, polished final image" },
+];
+
 const jokiJoyaMoscowPoseTemplates = [
   { slug: "play-zone-portrait", name: "В игровой зоне", camera: "объектив 70 мм, уровень глаз", pose: "стоит в просторной современной игровой зоне, лицо и руки открыты", prompt: "standing in a premium indoor play-zone with colorful soft modules, safe open floor, polished family lifestyle lighting, no logos or readable signs" },
   { slug: "ball-pit-edge", name: "У шарикового бассейна", camera: "объектив 85 мм, мягкая глубина", pose: "сидит или стоит у края шарикового бассейна, спокойная естественная поза", prompt: "near the edge of a bright ball pit, colorful spheres as soft background texture, clean cheerful family portrait, no mascot characters" },
@@ -1280,6 +1319,9 @@ const studioPoseTemplates = {
   "old-moscow": oldMoscowPoseTemplates,
   "alpine-chalet": alpineChaletPoseTemplates,
   "tropical-conservatory": tropicalConservatoryPoseTemplates,
+  "moscow-city": moscowCityPoseTemplates,
+  "vorobyovy-msu": vorobyovyMsuPoseTemplates,
+  "modern-gorky-park": modernGorkyParkPoseTemplates,
   "gum-moscow": gumMoscowPoseTemplates,
   "advanced-karting": advancedKartingPoseTemplates,
   "joki-joya-moscow": jokiJoyaMoscowPoseTemplates,

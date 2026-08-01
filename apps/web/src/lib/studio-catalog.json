@@ -723,6 +723,63 @@
       ]
     },
     {
+      "slug": "moscow-city",
+      "name": "Москва-Сити",
+      "description": "Современный деловой район: стеклянные башни, набережная, rooftop-террасы, бизнес-lounge и вечерний skyline для премиальной urban-серии.",
+      "preview_url": "/studios/moscow-city/preview.png",
+      "base_prompt": "inside and around a Moscow City inspired premium skyscraper business district with glass towers, reflective facades, river embankment, rooftop terrace, luxury lobby, skyline lounge, pedestrian promenade, polished modern urban editorial atmosphere, no crowds, no readable signs, no logos",
+      "wardrobe_prompt": "Moscow City wardrobe: premium business and urban luxury styling, tailored suit, blazer, elegant dress, trench coat or smart separates, black, graphite, cream and metallic accents, polished shoes, fully clothed, no logos, no sportswear",
+      "gallery_urls": [
+        "/studios/moscow-city/master-wide.png",
+        "/studios/moscow-city/angle-02.png",
+        "/studios/moscow-city/angle-03.png",
+        "/studios/moscow-city/angle-04.png",
+        "/studios/moscow-city/angle-05.png",
+        "/studios/moscow-city/angle-06.png",
+        "/studios/moscow-city/angle-07.png",
+        "/studios/moscow-city/detail-shot.png",
+        "/studios/moscow-city/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "vorobyovy-msu",
+      "name": "Воробьёвы горы и МГУ",
+      "description": "Воробьёвы горы и МГУ: смотровая площадка, академические аллеи, монументальная архитектура, Москва-река и классический московский skyline.",
+      "preview_url": "/studios/vorobyovy-msu/preview.png",
+      "base_prompt": "near Sparrow Hills and Moscow State University inspired monumental academic architecture, observation deck over Moscow, green park alleys, stone stairs and balustrades, river panorama, classic Moscow editorial atmosphere, no crowds, no readable signs, no logos",
+      "wardrobe_prompt": "Sparrow Hills and MSU wardrobe: refined city academic lifestyle styling, tailored coat, blazer, knit, elegant dress or smart casual separates, calm navy, beige, grey and burgundy tones, fully clothed, no logos, no tourist costume",
+      "gallery_urls": [
+        "/studios/vorobyovy-msu/master-wide.png",
+        "/studios/vorobyovy-msu/angle-02.png",
+        "/studios/vorobyovy-msu/angle-03.png",
+        "/studios/vorobyovy-msu/angle-04.png",
+        "/studios/vorobyovy-msu/angle-05.png",
+        "/studios/vorobyovy-msu/angle-06.png",
+        "/studios/vorobyovy-msu/angle-07.png",
+        "/studios/vorobyovy-msu/detail-shot.png",
+        "/studios/vorobyovy-msu/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "modern-gorky-park",
+      "name": "Современный Парк Горького",
+      "description": "Современный Парк Горького: обновлённые аллеи, набережная, кафе-террасы, павильоны, фонтаны и чистая lifestyle-атмосфера центра Москвы.",
+      "preview_url": "/studios/modern-gorky-park/preview.png",
+      "base_prompt": "inside a modern Gorky Park Moscow inspired central park setting with renovated promenades, tree alleys, river embankment, cafe terraces, contemporary glass pavilions, fountain plaza, lawns, warm evening park lights, stylish Moscow leisure editorial atmosphere, no crowds, no readable signs, no logos",
+      "wardrobe_prompt": "modern Gorky Park wardrobe: clean urban lifestyle styling, trench coat, relaxed blazer, knit, midi dress, denim or smart casual separates, comfortable polished shoes, natural colors with one accent, fully clothed, no logos, no sportswear costume",
+      "gallery_urls": [
+        "/studios/modern-gorky-park/master-wide.png",
+        "/studios/modern-gorky-park/angle-02.png",
+        "/studios/modern-gorky-park/angle-03.png",
+        "/studios/modern-gorky-park/angle-04.png",
+        "/studios/modern-gorky-park/angle-05.png",
+        "/studios/modern-gorky-park/angle-06.png",
+        "/studios/modern-gorky-park/angle-07.png",
+        "/studios/modern-gorky-park/detail-shot.png",
+        "/studios/modern-gorky-park/alternate-wide.png"
+      ]
+    },
+    {
       "slug": "gum-moscow",
       "name": "ГУМ Москва",
       "description": "Историческая галерея ГУМа: стеклянный свод, мрамор, кремово-золотые фасады, витрины, праздничный свет и отдельный кадр у стойки с мороженым.",
