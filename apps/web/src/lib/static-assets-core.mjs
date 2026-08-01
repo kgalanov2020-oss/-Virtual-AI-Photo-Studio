@@ -1,4 +1,4 @@
-export const STATIC_ASSET_VERSION = "2026-08-01-hq-preview-2";
+export const STATIC_ASSET_VERSION = "2026-08-01-hq-preview-3";
 export const STATIC_ASSET_CDN_REVISION = "";
 export const STATIC_ASSET_CDN_BASE = "";
 
