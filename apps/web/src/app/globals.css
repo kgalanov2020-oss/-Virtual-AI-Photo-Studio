@@ -131,7 +131,7 @@ a {
   background:
     linear-gradient(90deg, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.48) 42%, rgba(0, 0, 0, 0.12) 100%),
     linear-gradient(0deg, rgba(0, 0, 0, 0.52), transparent 54%),
-    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-4") center / cover;
+    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-5") center / cover;
   inset: 0;
   position: absolute;
 }
@@ -459,7 +459,7 @@ a {
   align-items: center;
   background:
     linear-gradient(90deg, rgba(28, 27, 24, 0.96) 0%, rgba(28, 27, 24, 0.78) 48%, rgba(28, 27, 24, 0.62) 100%),
-    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-4") center / cover;
+    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-5") center / cover;
   color: var(--background);
   display: grid;
   gap: clamp(24px, 4vw, 64px);
@@ -1703,7 +1703,7 @@ a {
 
 .landing-hero {
   align-items: end;
-  background: url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-4") center / cover;
+  background: url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-5") center / cover;
   display: grid;
   min-height: min(790px, calc(100vh - 72px));
   padding: 84px clamp(22px, 5vw, 72px) 72px;
@@ -2038,7 +2038,7 @@ h1 {
   aspect-ratio: 4 / 5;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.32)),
-    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-4") center / cover;
+    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-5") center / cover;
   border: 1px solid var(--line);
   border-radius: 8px;
   display: grid;
