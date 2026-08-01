@@ -131,7 +131,7 @@ a {
   background:
     linear-gradient(90deg, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.48) 42%, rgba(0, 0, 0, 0.12) 100%),
     linear-gradient(0deg, rgba(0, 0, 0, 0.52), transparent 54%),
-    url("/studios/modern-office/master-wide.webp?v=2026-08-01-studio-webp-quality-1") center / cover;
+    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-2") center / cover;
   inset: 0;
   position: absolute;
 }
@@ -413,7 +413,8 @@ a {
 }
 
 .before-after-selfies {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(84px, 148px));
+  justify-content: start;
 }
 
 .before-after-results {
@@ -431,6 +432,7 @@ a {
 
 .before-after-selfies img {
   aspect-ratio: 3 / 4;
+  max-width: 148px;
   object-fit: contain;
   object-position: center;
 }
@@ -454,7 +456,7 @@ a {
   align-items: center;
   background:
     linear-gradient(90deg, rgba(28, 27, 24, 0.96) 0%, rgba(28, 27, 24, 0.78) 48%, rgba(28, 27, 24, 0.62) 100%),
-    url("/studios/modern-office/master-wide.webp?v=2026-08-01-studio-webp-quality-1") center / cover;
+    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-2") center / cover;
   color: var(--background);
   display: grid;
   gap: clamp(24px, 4vw, 64px);
@@ -1697,7 +1699,7 @@ a {
 
 .landing-hero {
   align-items: end;
-  background: url("/studios/modern-office/master-wide.webp?v=2026-08-01-studio-webp-quality-1") center / cover;
+  background: url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-2") center / cover;
   display: grid;
   min-height: min(790px, calc(100vh - 72px));
   padding: 84px clamp(22px, 5vw, 72px) 72px;
@@ -2032,7 +2034,7 @@ h1 {
   aspect-ratio: 4 / 5;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.32)),
-    url("/studios/modern-office/master-wide.webp?v=2026-08-01-studio-webp-quality-1") center / cover;
+    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-2") center / cover;
   border: 1px solid var(--line);
   border-radius: 8px;
   display: grid;
@@ -4064,7 +4066,8 @@ h1 {
   }
 
   .before-after-selfies {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(72px, 112px));
+    justify-content: start;
   }
 
   .before-after-results {
@@ -4096,6 +4099,7 @@ h1 {
 
   .before-after-selfies img {
     max-height: 150px;
+    max-width: 112px;
   }
 
   .before-after-results img {

@@ -726,11 +726,11 @@
       "slug": "moscow-city",
       "name": "Москва-Сити",
       "description": "Реальный образ Москва-Сити: башни Федерация, Эволюция, ОКО и Нева, Пресненская набережная, стеклянные переходы, площади и кадры внутри комплекса между небоскрёбами.",
-      "preview_url": "/studios/moscow-city/preview.png",
+      "preview_url": "/studios/moscow-city/city-core-wide.png",
       "base_prompt": "inside and around the real Moscow International Business Center, Moscow City, with recognizable Federation Tower twin glass towers, Evolution Tower spiral silhouette, OKO and Neva Towers, Presnenskaya embankment, Afimall-style glass atrium, pedestrian plazas and glass passages between skyscrapers, photorealistic Moscow business district editorial atmosphere, no crowds, no readable signs, no logos, not a generic skyline",
       "wardrobe_prompt": "Moscow City wardrobe: premium business and urban luxury styling, tailored suit, blazer, elegant dress, trench coat or smart separates, black, graphite, cream and metallic accents, polished shoes, fully clothed, no logos, no sportswear",
       "gallery_urls": [
-        "/studios/moscow-city/master-wide.png",
+        "/studios/moscow-city/city-core-wide.png",
         "/studios/moscow-city/angle-02.png",
         "/studios/moscow-city/angle-03.png",
         "/studios/moscow-city/angle-04.png",
