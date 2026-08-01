@@ -1,12 +1,13 @@
 import { PRODUCT_IMAGES_PER_STUDIO, TARGET_SHOTS_PER_STUDIO } from "@/lib/generation";
 import { formatMoney, getPhotoPackage } from "@/lib/pricing";
-import { getActiveStudios } from "@/lib/studios";
+import { getCatalogStudios } from "@/lib/studios";
 import { publicCdnAssetUrl, versionPublicAsset } from "@/lib/static-assets-core.mjs";
 import Image from "next/image";
 import { AuthNavAction } from "./auth-nav-action";
 import { LazyAutoplayVideo } from "./lazy-autoplay-video";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const studioLabels: Record<string, string> = {
   "modern-office": "Деловая серия",
@@ -54,17 +55,7 @@ const studioLabels: Record<string, string> = {
 };
 
 export default async function Home() {
-  const studiosResult = await getActiveStudios();
-
-  if (studiosResult.status === "missing-env") {
-    return <SetupPanel />;
-  }
-
-  if (studiosResult.status === "error") {
-    return <ErrorPanel message={studiosResult.message} />;
-  }
-
-  const studios = studiosResult.studios;
+  const studios = getCatalogStudios();
   const featuredStudio = studios.find((studio) => studio.slug === "modern-office") ?? studios[0];
   const freePackage = getPhotoPackage("free_2");
   const fullPackage = getPhotoPackage("studio_40");

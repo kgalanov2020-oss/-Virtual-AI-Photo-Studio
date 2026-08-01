@@ -8,6 +8,9 @@ import { versionPublicAsset } from "./static-assets-core.mjs";
 
 type CatalogStudio = {
   slug: string;
+  name: string;
+  description: string;
+  preview_url: string | null;
   gallery_urls?: string[];
   wardrobe_prompt?: string;
 };
@@ -48,6 +51,24 @@ export async function getActiveStudios(): Promise<StudiosResult> {
       ((data ?? []) as Studio[]).map(withCatalogMetadata).map(translateStudio),
     ),
   };
+}
+
+export function getCatalogStudios(): Studio[] {
+  return sortStudiosByRating(
+    (catalog.studios as CatalogStudio[])
+      .map((studio, index) =>
+        withCatalogMetadata({
+          id: studio.slug,
+          slug: studio.slug,
+          name: studio.name,
+          description: studio.description,
+          preview_url: studio.preview_url,
+          is_active: true,
+          created_at: new Date(Date.UTC(2026, 0, 1, 0, 0, index)).toISOString(),
+        }),
+      )
+      .map(translateStudio),
+  );
 }
 
 export async function getStudioSession(

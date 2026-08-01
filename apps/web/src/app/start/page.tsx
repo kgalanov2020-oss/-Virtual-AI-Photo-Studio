@@ -3,13 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "5 AI-фото бесплатно по обычным селфи",
+  title: "2 AI-фото бесплатно по обычным селфи",
   description:
-    "Загрузите обычные селфи, выберите готовую локацию и получите первые 5 AI-фото бесплатно без фотографа и студийной съёмки.",
+    "Загрузите обычные селфи, выберите готовую локацию и получите первые 2 AI-фото бесплатно без фотографа и студийной съёмки.",
   alternates: {
     canonical: "https://virtualphotostudio.ru/start",
   },
 };
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const signupHref = "/login?next=%2F%23studios";
 
@@ -29,13 +32,13 @@ export default function AdStartPage() {
       <section className="ad-start-hero">
         <div className="ad-start-hero-copy">
           <p className="eyebrow">AI-фотосессия онлайн</p>
-          <h1>5 AI-фото бесплатно</h1>
+          <h1>2 AI-фото бесплатно</h1>
           <p className="ad-start-lead">
             Загрузите обычные селфи, выберите локацию и получите готовые портреты без
             фотографа и студийной съёмки.
           </p>
           <Link className="button primary ad-start-cta" href={signupHref}>
-            Получить 5 фото
+            Получить 2 фото
           </Link>
           <p className="ad-start-note">Регистрация по email. Банковская карта не нужна.</p>
         </div>
@@ -118,7 +121,7 @@ export default function AdStartPage() {
 
       <section className="ad-start-final">
         <h2>Попробуйте на своих селфи</h2>
-        <p>После регистрации на баланс сразу начисляются 5 бесплатных фото.</p>
+        <p>После регистрации на баланс сразу начисляются 2 бесплатных фото.</p>
         <Link className="button primary ad-start-cta" href={signupHref}>
           Начать бесплатно
         </Link>
