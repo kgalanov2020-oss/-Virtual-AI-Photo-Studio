@@ -1202,6 +1202,32 @@ const jokiJoyaMoscowPoseTemplates = [
   { slug: "game-space-hero", name: "Главный family fun кадр", camera: "лучший lifestyle-ракурс, объектив 70 мм", pose: "финальная уверенная и дружелюбная поза в ярком игровом пространстве", prompt: "signature premium family entertainment center portrait, colorful safe play architecture, polished cheerful final image, no logos" },
 ];
 
+const gumMoscowPoseTemplates = [
+  { slug: "main-arcade", name: "Главная галерея ГУМа", camera: "объектив 70 мм, уровень глаз", pose: "стоит в исторической галерее, корпус слегка повернут", prompt: "standing inside a GUM Moscow inspired historic arcade, cream ornate facades, marble floor, glass vaulted roof, warm luxury light, no readable signs or logos" },
+  { slug: "balcony-gallery", name: "У балюстрады", camera: "объектив 85 мм, мягкая глубина", pose: "полуоборот у чугунной балюстрады, руки видны", prompt: "half-turn near elegant black arcade railing and ornate cream balcony, glass roof perspective, polished Moscow luxury mood" },
+  { slug: "ice-cream-counter", name: "У стойки с мороженым", camera: "объектив 70 мм, editorial-ракурс", pose: "стоит рядом с элегантной стойкой мороженого, не перекрывая витрину", prompt: "beside an elegant ice cream counter inside a GUM Moscow style arcade, waffle cones and glass display visible, cream and gold kiosk, no readable menu, no logos" },
+  { slug: "fountain-area", name: "У фонтана", camera: "объектив 50 мм, широкий интерьерный ракурс", pose: "стоит у декоративного фонтана или центральной зоны", prompt: "near a classic indoor arcade fountain area, marble floor reflections, cream-gold historic architecture, warm festive lights" },
+  { slug: "festive-lights", name: "Праздничный свет", camera: "объектив 85 мм, мягкий боковой свет", pose: "стоит под мягкими праздничными огнями", prompt: "portrait under refined festive lights in an ornate luxury arcade, glass roof bokeh, cream facades, elegant city holiday mood" },
+  { slug: "cafe-corner", name: "У café corner", camera: "объектив 70 мм, lifestyle-ракурс", pose: "сидит или стоит у аккуратной café-зоны, руки видны", prompt: "near a refined cafe corner in a historic shopping arcade, small tables, warm lamps, marble floor, no readable branding" },
+  { slug: "marble-corridor", name: "Мраморный проход", camera: "объектив 70 мм, перспективный ракурс", pose: "идёт по мраморному проходу, естественный шаг", prompt: "walking through a marble corridor of a GUM-like arcade, repeated arches and shopfronts without text, polished editorial motion" },
+  { slug: "storefront-perspective", name: "Перспектива витрин", camera: "объектив 85 мм, витринный свет", pose: "стоит у ряда витрин без видимых логотипов", prompt: "near elegant non-branded storefront windows, cream ornate arcade rhythm, soft display lighting, luxury Moscow editorial portrait" },
+  { slug: "wide-gum", name: "Широкий кадр ГУМа", camera: "широкий объектив 35 мм", pose: "стоит небольшим силуэтом в большой галерее", prompt: "wide environmental GUM Moscow inspired arcade shot, person smaller in frame, glass vaulted roof, balconies, marble floor and festive lights dominate" },
+  { slug: "gum-hero", name: "Главный кадр ГУМа", camera: "лучший luxury editorial-ракурс, объектив 70 мм", pose: "финальная уверенная поза в исторической галерее", prompt: "signature Moscow luxury arcade editorial portrait, ornate cream and gold architecture, glass roof, marble reflections, polished final image" },
+];
+
+const advancedKartingPoseTemplates = [
+  { slug: "track-corner", name: "Поворот трассы", camera: "объектив 70 мм, низкий динамичный ракурс", pose: "стоит у безопасного борта трассы, корпус слегка повернут", prompt: "standing near a safe indoor karting track corner, dark asphalt, red-white barriers, LED lane lights, cinematic racing atmosphere" },
+  { slug: "pit-lane", name: "Пит-лейн", camera: "объектив 50 мм, перспективный ракурс", pose: "стоит в пит-лейне рядом с электрокартами", prompt: "in a premium electric karting pit lane beside parked karts, black and red details, polished high-tech sports venue, no logos" },
+  { slug: "starting-grid", name: "Стартовая решётка", camera: "объектив 70 мм, фронтальный гоночный ракурс", pose: "стоит на стартовой решётке, уверенная поза", prompt: "on an empty indoor karting starting grid, checkered markings, overhead race lights without readable text, premium racing editorial" },
+  { slug: "kart-garage", name: "Гараж картов", camera: "объектив 85 мм, мягкая глубина", pose: "стоит у ряда картов в технической зоне", prompt: "beside a row of electric karts in a modern garage area, concrete texture, tires and tools arranged cleanly, no brand marks" },
+  { slug: "podium-area", name: "Подиум", camera: "объектив 70 мм, симметричный ракурс", pose: "стоит у подиума победителя, руки видны", prompt: "near a sleek racing podium with red LED underlight, dark textured wall, no readable numbers or sponsor logos" },
+  { slug: "helmet-wall", name: "Стена шлемов", camera: "объектив 85 мм, боковой свет", pose: "полуоборот у стены со шлемами, лицо открыто", prompt: "half-turn beside a premium helmet display wall, black and red helmets as graphic background, face uncovered, no logos" },
+  { slug: "neon-tunnel", name: "Неоновый тоннель трассы", camera: "широкий объектив 35 мм, динамичная перспектива", pose: "стоит у светового тоннеля трассы на безопасной зоне", prompt: "near a neon-lit indoor track tunnel bend, red and white light strips, dark asphalt curve, cinematic high-tech karting mood" },
+  { slug: "lounge-overlook", name: "Lounge над трассой", camera: "объектив 70 мм, интерьерный свет", pose: "сидит или стоит в lounge-зоне с видом на трассу", prompt: "in a glass lounge overlooking an indoor karting track, leather seating, warm tables, track visible through windows, no readable signs" },
+  { slug: "wide-track", name: "Широкий кадр трассы", camera: "широкий объектив 35 мм", pose: "стоит небольшим силуэтом на безопасной зоне у трассы", prompt: "wide environmental indoor karting circuit shot, person smaller in frame, sweeping track, barriers, LED lights and pit structures dominate" },
+  { slug: "karting-hero", name: "Главный racing кадр", camera: "лучший cinematic racing-ракурс, объектив 70 мм", pose: "финальная уверенная поза на фоне продвинутой трассы", prompt: "signature premium indoor karting editorial portrait, dramatic track curves, red-white barriers, black asphalt, polished final motorsport image" },
+];
+
 const podcastStudioPoseTemplates = [
   { slug: "host-microphone", name: "У микрофона ведущего", camera: "объектив 70 мм, уровень глаз", pose: "сидит у broadcast-микрофона, лицо и руки открыты", prompt: "seated at a professional broadcast microphone, face and hands clear, warm expert-content studio lighting" },
   { slug: "cohost-angle", name: "Ракурс соведущего", camera: "объектив 85 мм, боковой ракурс", pose: "сидит один за подкаст-столом в полуобороте к соседнему пустому микрофону, спокойный уверенный взгляд; в кадре не должно быть второго человека", prompt: "solo three-quarter podcast co-host camera angle toward a second empty microphone, only one person in the frame, no second face, no duplicated face, no cloned co-host, sculptural acoustic panels and amber practical lights" },
@@ -1254,6 +1280,8 @@ const studioPoseTemplates = {
   "old-moscow": oldMoscowPoseTemplates,
   "alpine-chalet": alpineChaletPoseTemplates,
   "tropical-conservatory": tropicalConservatoryPoseTemplates,
+  "gum-moscow": gumMoscowPoseTemplates,
+  "advanced-karting": advancedKartingPoseTemplates,
   "joki-joya-moscow": jokiJoyaMoscowPoseTemplates,
   "podcast-studio": podcastStudioPoseTemplates,
 };

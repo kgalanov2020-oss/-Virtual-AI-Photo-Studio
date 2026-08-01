@@ -44,6 +44,8 @@ const studioLabels: Record<string, string> = {
   "old-moscow": "Исторический портрет",
   "alpine-chalet": "Winter luxury",
   "tropical-conservatory": "Botanical editorial",
+  "gum-moscow": "Moscow luxury",
+  "advanced-karting": "Racing tech",
   "joki-joya-moscow": "Family lifestyle",
   "podcast-studio": "Экспертный контент",
 };

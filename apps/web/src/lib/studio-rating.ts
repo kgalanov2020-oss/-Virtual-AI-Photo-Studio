@@ -14,6 +14,8 @@ export const STUDIO_RATING_ORDER = [
   "red-carpet-premiere",
   "alpine-chalet",
   "tropical-conservatory",
+  "gum-moscow",
+  "advanced-karting",
   "joki-joya-moscow",
   "podcast-studio",
   "white-cyclorama-studio",

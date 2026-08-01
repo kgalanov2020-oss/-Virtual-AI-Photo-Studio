@@ -191,6 +191,16 @@ const studioTranslations: Record<string, Pick<Studio, "name" | "description">> =
     description:
       "Тропическая оранжерея: стеклянная архитектура, экзотическая зелень, каменные дорожки и мягкие солнечные блики для botanical editorial-серии.",
   },
+  "gum-moscow": {
+    name: "ГУМ Москва",
+    description:
+      "Историческая галерея ГУМа: стеклянный свод, мрамор, кремово-золотые фасады, витрины, праздничный свет и отдельный кадр у стойки с мороженым.",
+  },
+  "advanced-karting": {
+    name: "Продвинутый картинг",
+    description:
+      "Премиальный indoor-картинг: трасса с LED-светом, пит-лейн, стартовая решётка, электрокарты, подиум и гоночный high-tech mood.",
+  },
   "joki-joya-moscow": {
     name: "Joki Joya Москва",
     description:

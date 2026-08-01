@@ -723,6 +723,44 @@
       ]
     },
     {
+      "slug": "gum-moscow",
+      "name": "ГУМ Москва",
+      "description": "Историческая галерея ГУМа: стеклянный свод, мрамор, кремово-золотые фасады, витрины, праздничный свет и отдельный кадр у стойки с мороженым.",
+      "preview_url": "/studios/gum-moscow/preview.png",
+      "base_prompt": "inside a GUM Moscow inspired historic luxury shopping arcade with cream and gold ornate facades, marble floor, glass vaulted roof, elegant railings, warm festive lighting, refined storefront rhythm, one scene may include an elegant ice cream counter with waffle cones, polished Moscow luxury editorial atmosphere, no crowds, no readable signs, no brand logos",
+      "wardrobe_prompt": "GUM Moscow wardrobe: elegant city luxury styling, tailored coat, suit, refined dress or smart separates, cream, black, burgundy and gold accents, polished shoes, fully clothed premium editorial look, no logos, no costumes",
+      "gallery_urls": [
+        "/studios/gum-moscow/master-wide.png",
+        "/studios/gum-moscow/angle-02.png",
+        "/studios/gum-moscow/angle-03.png",
+        "/studios/gum-moscow/angle-04.png",
+        "/studios/gum-moscow/angle-05.png",
+        "/studios/gum-moscow/angle-06.png",
+        "/studios/gum-moscow/angle-07.png",
+        "/studios/gum-moscow/detail-shot.png",
+        "/studios/gum-moscow/alternate-wide.png"
+      ]
+    },
+    {
+      "slug": "advanced-karting",
+      "name": "Продвинутый картинг",
+      "description": "Премиальный indoor-картинг: трасса с LED-светом, пит-лейн, стартовая решётка, электрокарты, подиум и гоночный high-tech mood.",
+      "preview_url": "/studios/advanced-karting/preview.png",
+      "base_prompt": "inside a premium advanced indoor electric karting center with dark asphalt track, red-white safety barriers, LED lane lights, pit lane, electric karts, starting grid, helmet wall, podium, glass lounge overlooking the circuit, cinematic high-tech racing atmosphere, no crowds, no readable text, no brand logos",
+      "wardrobe_prompt": "advanced karting wardrobe: premium motorsport-inspired smart casual styling, fitted jacket or sleek bomber, dark jeans or trousers, clean sneakers, optional plain racing gloves, fully clothed, no logos, no branded racing suits, no helmet covering the face",
+      "gallery_urls": [
+        "/studios/advanced-karting/master-wide.png",
+        "/studios/advanced-karting/angle-02.png",
+        "/studios/advanced-karting/angle-03.png",
+        "/studios/advanced-karting/angle-04.png",
+        "/studios/advanced-karting/angle-05.png",
+        "/studios/advanced-karting/angle-06.png",
+        "/studios/advanced-karting/angle-07.png",
+        "/studios/advanced-karting/detail-shot.png",
+        "/studios/advanced-karting/alternate-wide.png"
+      ]
+    },
+    {
       "slug": "joki-joya-moscow",
       "name": "Joki Joya Москва",
       "description": "Яркое игровое пространство в Москве: современные play-зоны, мягкие модули, горки, сетки, шариковый бассейн и праздничный family lifestyle-свет.",
