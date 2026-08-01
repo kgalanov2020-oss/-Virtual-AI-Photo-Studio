@@ -1,4 +1,4 @@
-export const STATIC_ASSET_VERSION = "2026-07-29-cloudflare-webp-1";
+export const STATIC_ASSET_VERSION = "2026-08-01-studio-webp-quality-1";
 export const STATIC_ASSET_CDN_REVISION = "";
 export const STATIC_ASSET_CDN_BASE = "";
 
