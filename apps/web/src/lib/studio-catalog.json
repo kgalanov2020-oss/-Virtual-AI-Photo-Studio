@@ -725,9 +725,9 @@
     {
       "slug": "moscow-city",
       "name": "Москва-Сити",
-      "description": "Современный деловой район: стеклянные башни, набережная, rooftop-террасы, бизнес-lounge и вечерний skyline для премиальной urban-серии.",
+      "description": "Реальный образ Москва-Сити: башни Федерация, Эволюция, ОКО и Нева, Пресненская набережная, стеклянные переходы, площади и кадры внутри комплекса между небоскрёбами.",
       "preview_url": "/studios/moscow-city/preview.png",
-      "base_prompt": "inside and around a Moscow City inspired premium skyscraper business district with glass towers, reflective facades, river embankment, rooftop terrace, luxury lobby, skyline lounge, pedestrian promenade, polished modern urban editorial atmosphere, no crowds, no readable signs, no logos",
+      "base_prompt": "inside and around the real Moscow International Business Center, Moscow City, with recognizable Federation Tower twin glass towers, Evolution Tower spiral silhouette, OKO and Neva Towers, Presnenskaya embankment, Afimall-style glass atrium, pedestrian plazas and glass passages between skyscrapers, photorealistic Moscow business district editorial atmosphere, no crowds, no readable signs, no logos, not a generic skyline",
       "wardrobe_prompt": "Moscow City wardrobe: premium business and urban luxury styling, tailored suit, blazer, elegant dress, trench coat or smart separates, black, graphite, cream and metallic accents, polished shoes, fully clothed, no logos, no sportswear",
       "gallery_urls": [
         "/studios/moscow-city/master-wide.png",
@@ -762,11 +762,11 @@
     },
     {
       "slug": "modern-gorky-park",
-      "name": "Современный Парк Горького",
-      "description": "Современный Парк Горького: обновлённые аллеи, набережная, кафе-террасы, павильоны, фонтаны и чистая lifestyle-атмосфера центра Москвы.",
+      "name": "Современный парк",
+      "description": "Современный городской парк: чистые аллеи, набережная, café-террасы, стеклянные павильоны, фонтаны, газоны и спокойная lifestyle-атмосфера.",
       "preview_url": "/studios/modern-gorky-park/preview.png",
-      "base_prompt": "inside a modern Gorky Park Moscow inspired central park setting with renovated promenades, tree alleys, river embankment, cafe terraces, contemporary glass pavilions, fountain plaza, lawns, warm evening park lights, stylish Moscow leisure editorial atmosphere, no crowds, no readable signs, no logos",
-      "wardrobe_prompt": "modern Gorky Park wardrobe: clean urban lifestyle styling, trench coat, relaxed blazer, knit, midi dress, denim or smart casual separates, comfortable polished shoes, natural colors with one accent, fully clothed, no logos, no sportswear costume",
+      "base_prompt": "inside a contemporary urban park with renovated promenades, tree alleys, river embankment, cafe terraces, contemporary glass pavilions, fountain plaza, lawns, warm evening park lights, stylish city leisure editorial atmosphere, no crowds, no readable signs, no logos",
+      "wardrobe_prompt": "modern urban park wardrobe: clean urban lifestyle styling, trench coat, relaxed blazer, knit, midi dress, denim or smart casual separates, comfortable polished shoes, natural colors with one accent, fully clothed, no logos, no sportswear costume",
       "gallery_urls": [
         "/studios/modern-gorky-park/master-wide.png",
         "/studios/modern-gorky-park/angle-02.png",
@@ -800,11 +800,11 @@
     },
     {
       "slug": "advanced-karting",
-      "name": "Продвинутый картинг",
+      "name": "Картинг",
       "description": "Премиальный indoor-картинг: трасса с LED-светом, пит-лейн, стартовая решётка, электрокарты, подиум и гоночный high-tech mood.",
       "preview_url": "/studios/advanced-karting/preview.png",
       "base_prompt": "inside a premium advanced indoor electric karting center with dark asphalt track, red-white safety barriers, LED lane lights, pit lane, electric karts, starting grid, helmet wall, podium, glass lounge overlooking the circuit, cinematic high-tech racing atmosphere, no crowds, no readable text, no brand logos",
-      "wardrobe_prompt": "advanced karting wardrobe: premium motorsport-inspired smart casual styling, fitted jacket or sleek bomber, dark jeans or trousers, clean sneakers, optional plain racing gloves, fully clothed, no logos, no branded racing suits, no helmet covering the face",
+      "wardrobe_prompt": "karting wardrobe: premium motorsport-inspired smart casual styling, fitted jacket or sleek bomber, dark jeans or trousers, clean sneakers, optional plain racing gloves, fully clothed, no logos, no branded racing suits, no helmet covering the face",
       "gallery_urls": [
         "/studios/advanced-karting/master-wide.png",
         "/studios/advanced-karting/angle-02.png",
@@ -819,8 +819,8 @@
     },
     {
       "slug": "joki-joya-moscow",
-      "name": "Joki Joya Москва",
-      "description": "Яркое игровое пространство в Москве: современные play-зоны, мягкие модули, горки, сетки, шариковый бассейн и праздничный family lifestyle-свет.",
+      "name": "Детская игровая комната",
+      "description": "Фотореалистичная детская игровая комната: современные play-зоны, мягкие модули, горки, сетки, шариковый бассейн и праздничный family lifestyle-свет.",
       "preview_url": "/studios/joki-joya-moscow/preview.png",
       "base_prompt": "inside a premium modern indoor family entertainment center in Moscow inspired by bright play spaces, colorful soft-play modules, safe climbing nets, slides, ball pit textures, trampoline zone details, arcade lights, party room accents, clean family lifestyle atmosphere, spacious and polished, no crowds, no readable signs, no brand logos, no mascot characters, no copyrighted elements",
       "wardrobe_prompt": "family entertainment center wardrobe: clean comfortable smart-casual outfit, relaxed lifestyle clothing, neat sneakers, soft natural colors with one bright accent, fully clothed modest styling, child-safe friendly look, no logos, no costumes, no branded merchandise",
