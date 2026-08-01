@@ -131,7 +131,7 @@ a {
   background:
     linear-gradient(90deg, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.48) 42%, rgba(0, 0, 0, 0.12) 100%),
     linear-gradient(0deg, rgba(0, 0, 0, 0.52), transparent 54%),
-    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-3") center / cover;
+    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-4") center / cover;
   inset: 0;
   position: absolute;
 }
@@ -413,7 +413,7 @@ a {
 }
 
 .before-after-selfies {
-  grid-template-columns: repeat(3, minmax(84px, 148px));
+  grid-template-columns: repeat(3, minmax(72px, 124px));
   justify-content: start;
 }
 
@@ -432,9 +432,12 @@ a {
 
 .before-after-selfies img {
   aspect-ratio: 3 / 4;
-  max-width: 148px;
+  background: #f4f2ec;
+  max-height: 166px;
+  max-width: 124px;
   object-fit: contain;
   object-position: center;
+  padding: 6px;
 }
 
 .before-after-results img {
@@ -456,7 +459,7 @@ a {
   align-items: center;
   background:
     linear-gradient(90deg, rgba(28, 27, 24, 0.96) 0%, rgba(28, 27, 24, 0.78) 48%, rgba(28, 27, 24, 0.62) 100%),
-    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-3") center / cover;
+    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-4") center / cover;
   color: var(--background);
   display: grid;
   gap: clamp(24px, 4vw, 64px);
@@ -1209,8 +1212,9 @@ a {
 .article-showcase-selfies img {
   aspect-ratio: 4 / 5;
   background: #eeeae3;
-  object-fit: cover;
-  object-position: top;
+  object-fit: contain;
+  object-position: center;
+  padding: 8px;
 }
 
 .article-showcase-results img {
@@ -1699,7 +1703,7 @@ a {
 
 .landing-hero {
   align-items: end;
-  background: url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-3") center / cover;
+  background: url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-4") center / cover;
   display: grid;
   min-height: min(790px, calc(100vh - 72px));
   padding: 84px clamp(22px, 5vw, 72px) 72px;
@@ -2034,7 +2038,7 @@ h1 {
   aspect-ratio: 4 / 5;
   background:
     linear-gradient(180deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.32)),
-    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-3") center / cover;
+    url("/studios/modern-office/master-wide.webp?v=2026-08-01-hq-preview-4") center / cover;
   border: 1px solid var(--line);
   border-radius: 8px;
   display: grid;
@@ -4066,7 +4070,7 @@ h1 {
   }
 
   .before-after-selfies {
-    grid-template-columns: repeat(3, minmax(72px, 112px));
+    grid-template-columns: repeat(3, minmax(64px, 96px));
     justify-content: start;
   }
 
@@ -4098,8 +4102,9 @@ h1 {
   }
 
   .before-after-selfies img {
-    max-height: 150px;
-    max-width: 112px;
+    max-height: 132px;
+    max-width: 96px;
+    padding: 5px;
   }
 
   .before-after-results img {
