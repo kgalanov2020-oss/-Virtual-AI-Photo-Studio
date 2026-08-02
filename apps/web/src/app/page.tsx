@@ -135,7 +135,7 @@ export default async function Home() {
                 height={960}
                 loading="lazy"
                 sizes="(max-width: 640px) 28vw, (max-width: 1100px) 30vw, 13vw"
-                src="/selfie-guide/01-front-neutral.webp"
+                src="/selfie-guide/01-front-neutral.jpg"
                 width={720}
               />
               <Image
@@ -143,7 +143,7 @@ export default async function Home() {
                 height={960}
                 loading="lazy"
                 sizes="(max-width: 640px) 28vw, (max-width: 1100px) 30vw, 13vw"
-                src="/selfie-guide/03-left-three-quarter.webp"
+                src="/selfie-guide/03-left-three-quarter.jpg"
                 width={720}
               />
               <Image
@@ -151,7 +151,7 @@ export default async function Home() {
                 height={960}
                 loading="lazy"
                 sizes="(max-width: 640px) 28vw, (max-width: 1100px) 30vw, 13vw"
-                src="/selfie-guide/05-left-profile.webp"
+                src="/selfie-guide/05-left-profile.jpg"
                 width={720}
               />
             </div>

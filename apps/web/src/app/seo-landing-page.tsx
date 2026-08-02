@@ -53,7 +53,7 @@ export function SeoLandingPage({ page }: { page: SeoPage }) {
             height={960}
             priority
             sizes="(max-width: 900px) 46vw, 24vw"
-            src="/selfie-guide/01-front-neutral.webp"
+            src="/selfie-guide/01-front-neutral.jpg"
             width={720}
           />
           <Image

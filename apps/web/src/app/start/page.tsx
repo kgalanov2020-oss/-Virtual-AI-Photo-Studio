@@ -47,7 +47,7 @@ export default function AdStartPage() {
           <figure>
             <Image
               alt="Обычное селфи до AI-фотосессии"
-              src="/selfie-guide/03-left-three-quarter.webp"
+              src="/selfie-guide/03-left-three-quarter.jpg"
               width={640}
               height={854}
               loading="lazy"

@@ -90,7 +90,7 @@ test("asset cache routes match media files but never the dynamic studio HTML rou
 
 test("CSS background assets use local versioned public paths", async () => {
   const css = await readFile(new URL("../app/globals.css", import.meta.url), "utf8");
-  const backgroundUrl = `/studios/modern-office/master-wide.webp?v=${STATIC_ASSET_VERSION}`;
+  const backgroundUrl = `/studios/modern-office/master-wide.png?v=${STATIC_ASSET_VERSION}`;
 
   assert.ok(css.includes(backgroundUrl));
   assert.equal(css.includes("cdn.jsdelivr.net"), false);

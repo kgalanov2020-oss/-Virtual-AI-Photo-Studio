@@ -2,7 +2,6 @@ import { createSupabaseBrowserClient, hasSupabaseEnv } from "./supabase";
 import catalog from "./studio-catalog.json";
 import type { Studio, StudioShot } from "./types";
 import { translateShot, translateStudio } from "./ru";
-import { preferWebpAsset } from "./assets";
 import { sortStudiosByRating } from "./studio-rating";
 import { versionPublicAsset } from "./static-assets-core.mjs";
 
@@ -121,14 +120,11 @@ export async function getStudioSession(
 
 function withCatalogMetadata(studio: Studio): Studio {
   const catalogStudio = catalogBySlug.get(studio.slug);
-  const previewUrl = preferWebpAsset(studio.preview_url);
 
   return {
     ...studio,
-    preview_url: previewUrl ? versionPublicAsset(previewUrl) : previewUrl,
-    gallery_urls: catalogStudio?.gallery_urls?.map((url) =>
-      versionPublicAsset(preferWebpAsset(url) ?? url),
-    ),
+    preview_url: studio.preview_url ? versionPublicAsset(studio.preview_url) : studio.preview_url,
+    gallery_urls: catalogStudio?.gallery_urls?.map((url) => versionPublicAsset(url)),
     wardrobe_prompt: catalogStudio?.wardrobe_prompt,
   };
 }

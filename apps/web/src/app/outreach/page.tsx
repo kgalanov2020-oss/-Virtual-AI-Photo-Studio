@@ -568,7 +568,7 @@ function buildHtmlEmail(textBody: string, promoCode: string) {
       <div class="outreach-email-comparison">
         <div>
           <span>До</span>
-          <img alt="Селфи до AI-фотосессии" src="${STATIC_ASSET_CDN_BASE}/selfie-guide/01-front-neutral.webp">
+          <img alt="Селфи до AI-фотосессии" src="${STATIC_ASSET_CDN_BASE}/selfie-guide/01-front-neutral.jpg">
         </div>
         <div>
           <span>После</span>

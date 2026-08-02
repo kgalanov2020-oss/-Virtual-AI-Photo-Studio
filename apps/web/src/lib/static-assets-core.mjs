@@ -1,4 +1,4 @@
-export const STATIC_ASSET_VERSION = "2026-08-02-fit-images-1";
+export const STATIC_ASSET_VERSION = "2026-08-02-png-previews-selfies-1";
 export const STATIC_ASSET_CDN_REVISION = "";
 export const STATIC_ASSET_CDN_BASE = "";
 

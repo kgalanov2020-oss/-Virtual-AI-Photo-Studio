@@ -27,16 +27,16 @@ type ArticleExampleImage = {
 };
 
 const selfieImages = [
-  "/selfie-guide/01-front-neutral.webp",
-  "/selfie-guide/02-front-smile.webp",
-  "/selfie-guide/03-left-three-quarter.webp",
-  "/selfie-guide/04-right-three-quarter.webp",
-  "/selfie-guide/05-left-profile.webp",
-  "/selfie-guide/06-right-profile.webp",
-  "/selfie-guide/07-from-above.webp",
-  "/selfie-guide/08-from-below.webp",
-  "/selfie-guide/09-daylight.webp",
-  "/selfie-guide/10-clean-face.webp",
+  "/selfie-guide/01-front-neutral.jpg",
+  "/selfie-guide/02-front-smile.jpg",
+  "/selfie-guide/03-left-three-quarter.jpg",
+  "/selfie-guide/04-right-three-quarter.jpg",
+  "/selfie-guide/05-left-profile.jpg",
+  "/selfie-guide/06-right-profile.jpg",
+  "/selfie-guide/07-from-above.jpg",
+  "/selfie-guide/08-from-below.jpg",
+  "/selfie-guide/09-daylight.jpg",
+  "/selfie-guide/10-clean-face.jpg",
 ];
 
 const beforeSets = [
