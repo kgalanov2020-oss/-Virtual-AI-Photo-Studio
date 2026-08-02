@@ -1,4 +1,4 @@
-export const STATIC_ASSET_VERSION = "2026-08-02-moscow-city-selfie-guide-1";
+export const STATIC_ASSET_VERSION = "2026-08-02-moscow-city-selfie-guide-2";
 export const STATIC_ASSET_CDN_REVISION = "";
 export const STATIC_ASSET_CDN_BASE = "";
 
