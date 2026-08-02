@@ -147,6 +147,7 @@ function StudioImage({
       className={className}
       height={900}
       priority={priority}
+      quality={86}
       sizes={sizes}
       src={src}
       width={1200}

@@ -300,7 +300,8 @@ function StudioPreview({ alt, src }: { alt: string; src: string }) {
       alt={alt}
       fill
       loading="lazy"
-      sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 420px"
+      quality={86}
+      sizes="(max-width: 640px) 50vw, (max-width: 1100px) 50vw, 420px"
       src={src}
     />
   );
