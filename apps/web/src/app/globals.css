@@ -375,6 +375,8 @@ a {
 .before-after-section {
   background: #ecefec;
   border-block: 1px solid #d7ddd8;
+  contain-intrinsic-size: 900px;
+  content-visibility: auto;
   overflow: hidden;
   padding-top: clamp(30px, 4vw, 52px);
 }
@@ -461,6 +463,8 @@ a {
     linear-gradient(90deg, rgba(28, 27, 24, 0.96) 0%, rgba(28, 27, 24, 0.78) 48%, rgba(28, 27, 24, 0.62) 100%),
     url("/studios/modern-office/master-wide.webp?v=2026-08-02-mobile-assets-5") center / cover;
   color: var(--background);
+  contain-intrinsic-size: 860px;
+  content-visibility: auto;
   display: grid;
   gap: clamp(24px, 4vw, 64px);
   grid-template-columns: minmax(0, 0.9fr) minmax(320px, 640px);

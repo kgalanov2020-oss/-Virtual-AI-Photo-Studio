@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import type { Studio } from "@/lib/types";
 
-const INITIAL_STUDIO_COUNT = 12;
+const INITIAL_STUDIO_COUNT = 6;
 const STUDIO_COUNT_STEP = 12;
 
 type StudioGridClientProps = {
@@ -66,8 +66,10 @@ function StudioPreview({ alt, src }: { alt: string; src: string }) {
       alt={alt}
       decoding="async"
       fetchPriority="low"
+      height={1000}
       loading="lazy"
       src={src}
+      width={800}
     />
   );
 }

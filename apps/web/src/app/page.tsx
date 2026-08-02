@@ -7,8 +7,8 @@ import { AuthNavAction } from "./auth-nav-action";
 import { LazyAutoplayVideo } from "./lazy-autoplay-video";
 import { StudioGridClient } from "./studio-grid-client";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const dynamic = "force-static";
+export const revalidate = 3600;
 
 const studioLabels: Record<string, string> = {
   "modern-office": "Деловая серия",
