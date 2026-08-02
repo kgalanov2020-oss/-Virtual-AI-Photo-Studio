@@ -3196,9 +3196,11 @@ h1 {
 
 .guide-photo {
   aspect-ratio: 4 / 5;
+  background: #f4f2ec;
   display: block;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
+  padding: 8px;
   width: 100%;
 }
 
