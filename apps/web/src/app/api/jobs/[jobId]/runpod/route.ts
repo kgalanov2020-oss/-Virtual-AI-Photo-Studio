@@ -244,7 +244,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
           ? await generateGeminiStudioPhoto(selfieBlob, generationPrompt)
           : await generateBusinessPortrait(selfieBlob, generationPrompt);
     } catch (generationError) {
-      if (provider === "gemini" && isGeminiRegionUnavailable(generationError)) {
+      if (provider === "gemini" && isGeminiProviderUnavailable(generationError)) {
         const fallbackResponse = await proxyGenerationToFallback({
           jobId,
           token,
@@ -361,10 +361,12 @@ function isGeminiPolicyBlock(error: unknown) {
   return /Input blocked|Prohibited Use policy|invalid_request/i.test(message);
 }
 
-function isGeminiRegionUnavailable(error: unknown) {
+function isGeminiProviderUnavailable(error: unknown) {
   const message = error instanceof Error ? error.message : String(error);
 
-  return /not available in your current location|available-regions|current location/i.test(message);
+  return /not available in your current location|available-regions|current location|dunning decision|PERMISSION_DENIED|billing account|past due|valid payment information|403/i.test(
+    message,
+  );
 }
 
 async function proxyGenerationToFallback({
@@ -444,7 +446,7 @@ function calculateProgress(completed: number, total: number) {
 }
 
 function isRetryableGenerationError(message: string) {
-  return /Gemini не вернул изображение|Gemini did not return an image|Deadline expired|UNAVAILABLE|503|429|quota|too_many_requests/i.test(
+  return /Gemini не вернул изображение|Gemini did not return an image|Deadline expired|UNAVAILABLE|503|429|quota|too_many_requests|платёжные данные Google Cloud|биллинг Google Cloud|AI-генератор временно недоступен/i.test(
     message,
   );
 }
@@ -458,6 +460,17 @@ function normalizeGenerationError(
     return [
       "Gemini временно не может создать фото: закончилась или превышена квота запросов.",
       "Попробуйте позже или подключите новый ключ/платный лимит Gemini.",
+    ].join(" ");
+  }
+
+  if (
+    /dunning decision|PERMISSION_DENIED|billing account|past due|valid payment information|403/i.test(
+      rawMessage,
+    )
+  ) {
+    return [
+      "AI-генератор временно недоступен: у проекта Google Cloud не подтверждены платёжные данные или есть просрочка по биллингу.",
+      "Обновите оплату в Google Cloud Billing, затем нажмите «Продолжить генерацию».",
     ].join(" ");
   }
 
