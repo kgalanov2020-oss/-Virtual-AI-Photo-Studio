@@ -219,7 +219,7 @@ export default async function Home() {
           {studios.map((studio, index) => (
             <article className="atelier-studio-tile" key={studio.id}>
               {studio.preview_url ? (
-                <StudioPreview alt={studio.name} src={studio.preview_url} />
+                <StudioPreview alt={studio.name} src={studio.card_preview_url ?? studio.preview_url} />
               ) : null}
               <a href={`/studios/${studio.slug}`}>
                 <span>{String(index + 1).padStart(2, "0")}</span>
@@ -300,7 +300,7 @@ function StudioPreview({ alt, src }: { alt: string; src: string }) {
       alt={alt}
       fill
       loading="lazy"
-      sizes="(max-width: 1100px) 50vw, 33vw"
+      sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 420px"
       src={src}
     />
   );

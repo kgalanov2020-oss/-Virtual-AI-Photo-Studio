@@ -66,3 +66,16 @@ test("every catalog PNG has the WebP file served by preferWebpAsset", async () =
     }
   }
 });
+
+test("every catalog studio has a lightweight card preview", async () => {
+  const catalog = await readCatalog();
+
+  for (const studio of catalog.studios) {
+    const cardPath = path.join(publicRoot, "studios", studio.slug, "preview-card.webp");
+
+    await assert.doesNotReject(
+      access(cardPath),
+      `${studio.slug} must have preview-card.webp for the homepage grid`,
+    );
+  }
+});

@@ -6,6 +6,7 @@ export type Studio = {
   name: string;
   description: string;
   preview_url: string | null;
+  card_preview_url?: string | null;
   gallery_urls?: string[];
   wardrobe_prompt?: string;
   is_active: boolean;

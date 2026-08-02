@@ -3,6 +3,7 @@ import catalog from "./studio-catalog.json";
 import type { Studio, StudioShot } from "./types";
 import { translateShot, translateStudio } from "./ru";
 import { sortStudiosByRating } from "./studio-rating";
+import { preferWebpAsset } from "./assets";
 import { versionPublicAsset } from "./static-assets-core.mjs";
 
 type CatalogStudio = {
@@ -120,11 +121,28 @@ export async function getStudioSession(
 
 function withCatalogMetadata(studio: Studio): Studio {
   const catalogStudio = catalogBySlug.get(studio.slug);
+  const previewUrl = studio.preview_url ?? catalogStudio?.preview_url ?? null;
 
   return {
     ...studio,
-    preview_url: studio.preview_url ? versionPublicAsset(studio.preview_url) : studio.preview_url,
-    gallery_urls: catalogStudio?.gallery_urls?.map((url) => versionPublicAsset(url)),
+    preview_url: versionCatalogAsset(previewUrl),
+    card_preview_url: versionCatalogAsset(cardPreviewUrl(studio.slug, previewUrl)),
+    gallery_urls: catalogStudio?.gallery_urls
+      ?.map((url) => versionCatalogAsset(url))
+      .filter((url): url is string => Boolean(url)),
     wardrobe_prompt: catalogStudio?.wardrobe_prompt,
   };
+}
+
+function versionCatalogAsset(url: string | null | undefined): string | null {
+  const webpUrl = preferWebpAsset(url);
+  return webpUrl ? versionPublicAsset(webpUrl) : null;
+}
+
+function cardPreviewUrl(slug: string, previewUrl: string | null): string | null {
+  if (!previewUrl?.startsWith(`/studios/${slug}/`)) {
+    return previewUrl;
+  }
+
+  return `/studios/${slug}/preview-card.webp`;
 }
