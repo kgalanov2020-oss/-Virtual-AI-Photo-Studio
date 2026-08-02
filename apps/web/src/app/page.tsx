@@ -5,6 +5,7 @@ import { publicCdnAssetUrl, versionPublicAsset } from "@/lib/static-assets-core.
 import Image from "next/image";
 import { AuthNavAction } from "./auth-nav-action";
 import { LazyAutoplayVideo } from "./lazy-autoplay-video";
+import { StudioGridClient } from "./studio-grid-client";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -215,22 +216,7 @@ export default async function Home() {
           </div>
         </div>
 
-        <div className="atelier-studio-grid">
-          {studios.map((studio, index) => (
-            <article className="atelier-studio-tile" key={studio.id}>
-              {studio.preview_url ? (
-                <StudioPreview alt={studio.name} src={studio.card_preview_url ?? studio.preview_url} />
-              ) : null}
-              <a href={`/studios/${studio.slug}`}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <em>{studioLabels[studio.slug] ?? "Портретная серия"}</em>
-                  <strong>{studio.name}</strong>
-                </div>
-              </a>
-            </article>
-          ))}
-        </div>
+        <StudioGridClient labels={studioLabels} studios={studios} />
       </section>
 
       <section className="atelier-section atelier-avatar-bridge">
@@ -287,23 +273,6 @@ export default async function Home() {
         </nav>
       </footer>
     </main>
-  );
-}
-
-function StudioPreview({ alt, src }: { alt: string; src: string }) {
-  if (!src.startsWith("/")) {
-    return <img alt={alt} decoding="async" loading="lazy" src={src} />;
-  }
-
-  return (
-    <Image
-      alt={alt}
-      fill
-      loading="lazy"
-      quality={86}
-      sizes="(max-width: 640px) 50vw, (max-width: 1100px) 50vw, 420px"
-      src={src}
-    />
   );
 }
 
